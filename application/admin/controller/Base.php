@@ -12,6 +12,7 @@ class Base extends Controller
 {
     // 初始化方法
     protected function initialize(){
+        // $
         $this->uid = session('uid');
         $this->name = session('u_name');
         // 继承

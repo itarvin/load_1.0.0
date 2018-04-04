@@ -62,6 +62,8 @@ class  Backdoor extends controller
             //注册session
             session('uid',$user->id);
             session('u_name',$user->users);
+            $salt = md5($user->users.$user->pwd);
+            setcookie("auth_".$user->id,$salt, time()+3600*12);
             //更新最后请求IP及时间
             $time = date('Y-m-d H:i:s',time());
             $user->where($where_query)->update(['lasttime' => $time]);

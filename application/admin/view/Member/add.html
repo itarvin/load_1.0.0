@@ -39,55 +39,58 @@
         //指定允许上传的文件类型
         upload.render({
             elem: '#test3'
-            ,url: '{:url("Member/importMember")}'
+            ,url: '{:url("Member/loadmember")}'
             ,accept: 'file' //普通文件
             ,done: function(res){
                 if(res.status == 1)
                 {
-                    var type = 'auto';
-                    var text = '文件上传成功！是否立即检测天提交数据！';
-                    layer.open({
-                        type: 1
-                        ,offset: type
-                        ,id: 'layerDemo'+type //防止重复弹出
-                        ,content: '<div style="padding: 20px 100px;">'+ text +'</div>'
-                        ,btn: ['立即更新', '取消操作']
-                        ,btnAlign: 'c' //按钮居中
-                        ,shade: 0 //不显示遮罩
-                        ,yes: function(){
-                            // 触发检测数据
-                            checkdata(res.symbol);
-                        }
-                        ,btn2: function(){
-                            layer.closeAll();
-                        }
-                    });
+                    if(res.deal <= res.total){
+                        batch(res.success,res.error,res.deal);
+                        var type = 'auto';
+                        var text = '数据上传中！操作成功'+res.success+'条！,操作失败'+res.error+'条！';
+                        layer.open({
+                            type: 1
+                            ,offset: type
+                            ,id: 'layerDemo'+type
+                            ,content: '<div style="padding: 20px 100px;">'+ text +'</div>'
+                            ,btn: ['确定','取消']
+                            ,btnAlign: 'c' //按钮居中
+                            ,shade: 0 //不显示遮罩
+                            ,yes: function(){
+                                layer.closeAll();
+                            }
+                        });
+                        var x = $('.layui-layer-btn a.layui-layer-btn0');
+                        var y = $('.layui-layer-btn a.layui-layer-btn1');
+                        x.hide();
+                        y.hide();
+                    }else {
+                        var type = 'auto';
+                        var text = '数据上传结束！操作成功'+res.success+'条！,操作失败'+res.error+'条！';
+                        layer.open({
+                            type: 1
+                            ,offset: type
+                            ,id: 'layerDemo'+type //防止重复弹出
+                            ,content: '<div style="padding: 20px 100px;">'+ text +'</div>'
+                            ,btn: ['确定']
+                            ,btnAlign: 'c'
+                            ,shade: 0
+                            ,yes: function(){
+                                layer.closeAll();
+                            }
+                        });
+                    }
                 }else if(res.status == '-1'){
                     var type = 'auto';
-                    var text = '文件不存在数据！请重新下载模板填写！';
+                    var text = '未在文件中获取到文件!';
                     layer.open({
                         type: 1
                         ,offset: type
                         ,id: 'layerDemo'+type //防止重复弹出
                         ,content: '<div style="padding: 20px 100px;">'+ text +'</div>'
-                        ,btn: '关闭全部'
-                        ,btnAlign: 'c' //按钮居中
-                        ,shade: 0 //不显示遮罩
-                        ,yes: function(){
-                            layer.closeAll();
-                        }
-                    });
-                }else {
-                    var type = 'auto';
-                    var text = '文件上传失败了！';
-                    layer.open({
-                        type: 1
-                        ,offset: type
-                        ,id: 'layerDemo'+type //防止重复弹出
-                        ,content: '<div style="padding: 20px 100px;">'+ text +'</div>'
-                        ,btn: '关闭全部'
-                        ,btnAlign: 'c' //按钮居中
-                        ,shade: 0 //不显示遮罩
+                        ,btn: ['确定']
+                        ,btnAlign: 'c'
+                        ,shade: 0
                         ,yes: function(){
                             layer.closeAll();
                         }
@@ -96,32 +99,37 @@
             }
         });
     });
-    function checkdata(symbol)
+    function batch(success,error,deal)
     {
+        var data = {
+            success : success,
+            error :error,
+            deal : deal,
+        };
         $.ajax({
-			url:"{:url('Member/leadMember')}",
+			url:"{:url('Member/batchMember')}",
 			type:'post',
 			dataType:'json',
-			data: {symbol: symbol},
-            // 请求发送之前
-            beforeSend:function(XMLHttpRequest){
-                var i = $('#layerDemoauto');
-                i.html("<div style='padding: 20px 100px;'>正在请求服务器更新数据!请稍后···</div>");
-                var x = $('.layui-layer-btn a.layui-layer-btn0');
-                x.hide();
-            },
+			data: data,
 			success:function(msg){
                 if(msg.status == 1){
-                    var i = $('#layerDemoauto');
-                    var x = $('.layui-layer-btn a.layui-layer-btn0');
-                    var y = $('.layui-layer-btn a.layui-layer-btn1');
-                    i.html('<div style="padding: 20px 100px;">数据上传结束！操作成功'+msg.success+'条！,操作失败'+msg.error+'条！</div>');
-                    x.hide();
-                    y.text('确定');
+                    if(msg.deal < msg.total){
+                        batch(msg.success,msg.error,msg.deal);
+                        var i = $('#layerDemoauto');
+                        var x = $('.layui-layer-btn a.layui-layer-btn0');
+                        var y = $('.layui-layer-btn a.layui-layer-btn1');
+                        i.html('<div style="padding: 20px 100px;">数据上传中~！操作成功'+msg.success+'条！,操作失败'+msg.error+'条！</div>');
+                        x.hide();
+                        y.hide();
+                    }else {
+                        var i = $('#layerDemoauto');
+                        var x = $('.layui-layer-btn a.layui-layer-btn0');
+                        i.html('<div style="padding: 20px 100px;">数据上传结束！操作成功'+msg.success+'条！,操作失败'+msg.error+'条！</div>');
+                        x.show();
+                    }
                 }else {
                     var i = $('#layerDemoauto');
                     var x = $('.layui-layer-btn a.layui-layer-btn0');
-                    var y = $('.layui-layer-btn a.layui-layer-btn1');
                     i.html('<div style="padding: 20px 100px;">操作失败了！请稍后再试！</div>');
                     x.hide();
                     y.text('结束操作');

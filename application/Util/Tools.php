@@ -69,12 +69,11 @@ class Tools {
             }
             break;
         }
-        $data = array();
+        $data = [];
         while (($j++ < $lines) && !feof($fp)) {
             $re = fgetcsv($fp);
-            // 转码
-            foreach($re as $k => $v){
-                $da[$k] = iconv('gbk','utf-8',$v);
+            for ($i = 0; $i < count($re); $i++) {
+                $da[$i] = iconv('gbk','utf-8',$re[$i]);
             }
             $data[] = $da;
         }

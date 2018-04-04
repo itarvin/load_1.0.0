@@ -169,24 +169,36 @@ class Member extends Base
      * @param array $array 键值对集合
      * @return josn
      */
-    public function importMember()
+    public function loadmember()
     {
         $way = config('upload_path').'/custom';
         $file = request()->file('file');
-        $info = $file->rule('uniqid')->move($way);
-        $filname = $info->getSaveName();
-        if($info)
+        $fields = Cache::get('scv_field');
+        // 如果文件太大。则会提示null
+        if($file != null)
         {
-            Cache::set('scv_'.$this->uid,$filname);
-            $line = count(file($way.'/'.$filname));
-            // 获取csv所有的数据存储缓存
-            $content = Tools::read_csv_lines($way.'/'.$filname,$line);
-            if($content){
-                Cache::set('scv_file'.$this->uid,$content);
-                $data['status'] = ReturnCode::SUCCESS;
-                $data['symbol'] = 'scv_'.$this->uid;
+            $info = $file->rule('uniqid')->move($way);
+            $filename = $info->getSaveName();
+            if($info)
+            {
+                Cache::set('scv_'.$this->uid,$filename);
+                $line = count(file($way.'/'.$filename));
+                $dealLine = $line > 1001 ? 1001 : $line;
+                // 若文件行数大于1000行。则先处理1000行，返回前端回调处理剩下的数据
+                $start = 1;
+                $content = Tools::read_csv_lines($way.'/'.$filename,$dealLine,$start);
+                if($content){
+                    $result = $this->checkdata($content,$fields,$filename);
+                    $data = array(
+                        'status'  => ReturnCode::SUCCESS,
+                        'success' => $result['success'],
+                        'error'   => $result['error'],
+                        'deal'    => ($dealLine - 1),
+                        'total'   => ($line - 1)
+                    );
+                }
             }else {
-                $data['status'] = ReturnCode::NODATA;
+                $data['status'] = ReturnCode::ERROR;
             }
         }else {
             $data['status'] = ReturnCode::ERROR;
@@ -194,33 +206,19 @@ class Member extends Base
         return json($data);
     }
 
-    /**
-     * 检测CSV文件与存在数据有哪些已存在
-     * @param string $way csv文件路径
-     * @return json
-     */
-    public function leadMember()
+
+
+    private function checkdata($file,$fields,$filename)
     {
-        $model = new Consumer;
-        $symbol = input('symbol');
-        $filename = Cache::pull('scv_'.$this->uid);
-        // 先删除文件
-        unlink(config('upload_path').'/custom/'.$filename);
-        $cachefile = 'scv_file'.$this->uid;
-        $fields = Cache::get('scv_field');
-        // 获取并删除内容缓存
-        $file = Cache::pull($cachefile);
         if($file){
         // 根据字段拼接其键
-            $pho = [];
-            $qq = [];
             foreach ($file as $k => $v) {
                 foreach ($fields as $k1 => $v1) {
                     $data[$k][$v1] = $v[$k1] ? Tools::convertStrType($v[$k1],'TOSBC') : '';
                     if($v1 == 'qq'){
-                        $qq[] = $v[$k1];
-                    }else if($v1 == 'phone'){
-                        $pho[] = $v[$k1];
+                        $qq[$k] = $v[$k1];
+                    }else if($v1 == 'phone') {
+                        $ph[$k] = $v[$k1];
                     }
                 }
                 $data[$k]['uid'] = $this->uid;
@@ -233,51 +231,123 @@ class Member extends Base
                     $have[] = $k;
                 }
             }
-            // 读取一次数据库所有数据
-            $existData = $model->field('qq,phone')->select();
-            // 分离两个字段
-            $existQq = [];
-            $existPh = [];
-            foreach($existData as $k => $v){
-                $existQq[] = $v['qq'];
-                $existPh[] = $v['phone'];
+            // 先去重
+            $newqq = array_unique($qq);
+            $newph = array_unique($ph);
+            foreach (array_flip($qq) as $key => $value) {
+                if(!in_array($value,array_flip($newqq))){
+                    $have[] = $value;
+                }
             }
+            foreach (array_flip($ph) as $key => $value) {
+                if(!in_array($value,array_flip($newph))){
+                    $have[] = $value;
+                }
+            }
+            // 读取一次数据库所有数据
+            $model = new Consumer;
+            $haveqq = $model->field('qq,phone')->where('qq','in',$qq)->select();
+            $haveph = $model->field('qq,phone')->where('phone','in',$ph)->select();
             // 如果已经存在，返回键
-            $have = $this->arraySearch($existQq,$qq,$have);
-            $have = $this->arraySearch($existPh,$pho,$have);
+            $have = $this->arraySearch($haveqq,$qq,$have,'qq');
+            $have = $this->arraySearch($haveph,$ph,$have,'phone');
+            array_unique($have);
             // -------------------对数据清洗
             $errors = count($have);
             if($errors > 0){
-                $con = Cache::get('scv_'.$this->uid.'_'.$filename);
-                $error =  $con ? $con : [];
-                foreach($have as $v){
-                    array_push($error,$data[$v]);
-                    // 用键注销值
+                // $error = Cache::get('scv_'.$this->uid.'_'.$filename) ? Cache::get('scv_'.$this->uid.'_'.$filename) : array();
+                foreach($have as $k => $v)
+                {
+                    // var_dump($data[$v]);
                     unset($data[$v]);
                 }
-                $error = Cache::set('scv_'.$this->uid.'_'.$filename,$error);
+                // Cache::set('scv_'.$this->uid.'_'.$filename,$error);
             }
             // -------------------批量新增数据
             $success = $model->limit(100)->insertAll($data);
-            // 返回参数
-            $return['status'] = ReturnCode::SUCCESS;
-            $return['success'] = $success;
-            $return['error'] = $errors;
-        }else {
-            $return['status'] = ReturnCode::ERROR;
+            return array(
+                'success' => $success,
+                'error'   => $errors,
+            );
         }
-        return json($return);
+    }
+
+    /**
+     * 检测CSV文件与存在数据有哪些已存在
+     * @param string $way csv文件路径
+     * @return json
+     */
+    public function batchMember()
+    {
+        $model = new Consumer;
+        // 接收客户端返回的信息
+        $input = input('post.');
+        // 拼接文件路径
+        $way = config('upload_path').'/custom';
+        $filename = Cache::get('scv_'.$this->uid);
+        $fields = Cache::get('scv_field');
+        // 分析文件存在多少数据
+        $line = count(file($way.'/'.$filename));
+        // 起始行根据客户端处理了多少数据
+        $start = $input['deal'] ? $input['deal'] + 1 : 1001;
+        // 读取行数，判断总行数减去已经处理的，如还大于1000，则只处理1000，反之处理剩余的条数
+        $dealLine = ($line - $start) > 1001 ? 1001 : $line - $start;
+        $deal = ($dealLine == 1001) ? ($dealLine - 1) : ($line - $start);
+        $content = Tools::read_csv_lines($way.'/'.$filename,$dealLine,$start);
+        if($content){
+            $result = $this->checkdata($content,$fields,$filename);
+            $data = array(
+                'status'  => ReturnCode::SUCCESS,
+                'success' => ($result['success'] + $input['success']),
+                'error'   => ($result['error'] + $input['error']),
+                'deal'    => $deal + $input['deal'],
+                'total'   => ($line - 1),
+                // 'start'   => $start,
+            );
+        }else {
+            $data['status'] = ReturnCode::ERROR;
+        }
+        return json($data);
     }
 
 
-    private function arraySearch($exist,$array,$have)
+    private function arraySearch($exist,$array,$have,$ke)
     {
         foreach ($exist as $key => $value) {
-            $k = array_search($value,$array);
-            if($k){
+            $k = array_search($value[$ke],$array);
+            // 避免键为0被误伤到
+            if($k == '0' || $k != false){
                 $have[] = $k;
             }
         }
         return $have;
+    }
+
+
+
+    public function insert()
+    {
+        $qq = 1293532145;
+        $phone = 19937987854;
+        $name = 'damnfnahf';
+        $qqs = [];
+        $phones = [];
+        $success = 0;
+        for($j = 1; $j < 2; $j++)
+        {
+            for($i = 1; $i < 100000 * $j; $i++)
+            {
+                $da['username'] = $name.$i;
+                $da['qq'] =  $qq + $i;
+                $da['phone'] =  $phone + $i;
+                $da['address'] = '福干哈该嘎达事故哈斯归案活动覆盖噶大幅和规划的覅股变得更吧';
+                $da['newtime'] = date('Y-m-d H:i:s',time());
+                $da['note'] = "给和偶觉得神佛跟你说大概覅偶倒计时公司豆腐干拿到手功能的三个呢然后你替我耳机呢如同那位";
+                $data[] = $da;
+            }
+            $model = new Consumer;
+            $success += $model->limit(100)->insertAll($data);
+        }
+        return json($success);
     }
 }

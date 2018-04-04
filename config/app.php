@@ -137,6 +137,6 @@ return [
     // 异常处理handle类 留空使用 \think\exception\Handle
     'exception_handle'       => '',
     // 定义上传文件目录
-    'upload_path'            => '../public/uploads',
+    'upload_path'            => '../runtime/tmp/uploads',
 
 ];
