@@ -31,6 +31,14 @@
         <form class="layui-form layui-col-md12 x-so"  action="{:url('Member/index')}" method="post">
           <input class="layui-input" placeholder="开始日" name="start" id="start" value="{:input('post.start')}">
           <input class="layui-input" placeholder="截止日" name="end" id="end" value="{:input('post.end')}">
+          <div class="layui-input-inline">
+              <select name="type">
+                  <option value="">所有</option>
+                  <option value="qq">QQ</option>
+                  <option value="phone">电话</option>
+                  <option value="weixin">微信</option>
+              </select>
+          </div>
           <input type="text" name="keyword"  placeholder="请输入qq/phone/weixin/备注" autocomplete="off" class="layui-input" value="{:input('post.keyword')}">
           <button class="layui-btn"  lay-submit="" lay-filter="sreach"><i class="layui-icon">&#xe615;</i></button>
         </form>
@@ -40,7 +48,7 @@
         <button class="layui-btn layui-btn-danger" onclick="delAll()"><i class="layui-icon"></i>批量删除</button>
         {/if}
         <button class="layui-btn" onclick="x_admin_show('添加用户','{:url('Member/add')}',600,400)"><i class="layui-icon"></i>添加</button>
-        <span class="x-right" style="line-height:40px">共有数据：{$count} 条</span>
+        <span class="x-right" style="line-height:40px">共有数据： 条</span>
       </xblock>
       <table class="layui-table">
         <thead>

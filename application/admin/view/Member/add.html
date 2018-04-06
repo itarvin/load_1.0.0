@@ -36,21 +36,31 @@
     layui.use('upload', function(){
         var $ = layui.jquery
         ,upload = layui.upload;
+
         //指定允许上传的文件类型
         upload.render({
             elem: '#test3'
             ,url: '{:url("Member/loadmember")}'
+            ,before: function(input){
+                //加载层
+                $('#test3').hide();
+                var index = layer.load(2, {shade: false});
+                //0代表加载的风格，支持0-2
+            }
             ,accept: 'file' //普通文件
             ,done: function(res){
+                $('#test3').hide();
                 if(res.status == 1)
                 {
-                    if(res.deal <= res.total){
+                    if(res.deal < res.total){
                         batch(res.success,res.error,res.deal);
                         var type = 'auto';
-                        var text = '数据上传中！操作成功'+res.success+'条！,操作失败'+res.error+'条！';
+                        var text = '数据上传中~！操作成功<span style="color:green;">'+res.success+'</span>条！,操作失败<span style="color:red;">'+res.error+'</span>条！';
                         layer.open({
                             type: 1
                             ,offset: type
+                            ,width:600
+                            ,height:357
                             ,id: 'layerDemo'+type
                             ,content: '<div style="padding: 20px 100px;">'+ text +'</div>'
                             ,btn: ['确定','取消']
@@ -60,18 +70,22 @@
                                 layer.closeAll();
                             }
                         });
-                        var x = $('.layui-layer-btn a.layui-layer-btn0');
-                        var y = $('.layui-layer-btn a.layui-layer-btn1');
-                        x.hide();
-                        y.hide();
-                    }else {
+                        var title = $('.layui-layer-title');
+                        $('.layui-layer-btn a.layui-layer-btn0').hide();
+                        $('.layui-layer-btn a.layui-layer-btn1').hide();
+                        title.html('<span style="color:red;">数据操作中！请勿关闭！</span>');
+                        $('.layui-layer-setwin').hide();
+                    }else if(res.deal == res.total) {
                         var type = 'auto';
-                        var text = '数据上传结束！操作成功'+res.success+'条！,操作失败'+res.error+'条！';
+                        var title = $('.layui-layer-title');
+                        title.html('<span style="color:green;">数据操作结束！</span>');
+                        var text = '数据上传结束！操作成功<span style="color:green;">'+res.success+'</span>条！,操作失败<span style="color:red;">'+res.error+'</span>条！';
                         layer.open({
                             type: 1
                             ,offset: type
                             ,id: 'layerDemo'+type //防止重复弹出
                             ,content: '<div style="padding: 20px 100px;">'+ text +'</div>'
+                            ,area: ['600px', '357px'] //宽高
                             ,btn: ['确定']
                             ,btnAlign: 'c'
                             ,shade: 0
@@ -80,9 +94,11 @@
                             }
                         });
                     }
-                }else if(res.status == '-1'){
+                }else if(res.status == 0){
                     var type = 'auto';
-                    var text = '未在文件中获取到文件!';
+                    var text = '未在文件中获取到数据！';
+                    var title = $('.layui-layer-title');
+                    title.html('<span style="color:red;">数据操作异常！</span>');
                     layer.open({
                         type: 1
                         ,offset: type
@@ -99,7 +115,7 @@
             }
         });
     });
-    function batch(success,error,deal)
+    function batch(success,error,deal,page,startpage)
     {
         var data = {
             success : success,
@@ -112,27 +128,32 @@
 			dataType:'json',
 			data: data,
 			success:function(msg){
-                if(msg.status == 1){
-                    if(msg.deal < msg.total){
+                if(msg.status == 1 ){
+                    if(msg.deal == msg.total) {
+                        var i = $('#layerDemoauto');
+                        $('.layui-layer-btn a.layui-layer-btn0').show();
+                        i.html('<div class="load" style="padding: 20px 100px;">数据上传结束！操作成功<span style="color:green;">'+msg.success+'</span>条！,操作失败<span style="color:red;">'+msg.error+'</span>条！</div>');
+                        $('.layui-layer-setwin').show();
+                        var title = $('.layui-layer-title');
+                        title.html('<span style="color:green;">数据操作结束！</span>');
+                    }else if(msg.deal < msg.total){
                         batch(msg.success,msg.error,msg.deal);
                         var i = $('#layerDemoauto');
-                        var x = $('.layui-layer-btn a.layui-layer-btn0');
-                        var y = $('.layui-layer-btn a.layui-layer-btn1');
-                        i.html('<div style="padding: 20px 100px;">数据上传中~！操作成功'+msg.success+'条！,操作失败'+msg.error+'条！</div>');
-                        x.hide();
-                        y.hide();
-                    }else {
-                        var i = $('#layerDemoauto');
-                        var x = $('.layui-layer-btn a.layui-layer-btn0');
-                        i.html('<div style="padding: 20px 100px;">数据上传结束！操作成功'+msg.success+'条！,操作失败'+msg.error+'条！</div>');
-                        x.show();
+                        $('.layui-layer-btn a.layui-layer-btn0').hide();
+                        $('.layui-layer-btn a.layui-layer-btn1').hide();
+                        i.html('<div style="padding: 20px 100px;">数据上传中~！操作成功<span style="color:green;">'+msg.success+'</span>条！,操作失败<span style="color:red;">'+msg.error+'</span>条！</div>');
+                        $('#test3').show();
+                        $('.layui-layer-setwin').hide();
                     }
                 }else {
                     var i = $('#layerDemoauto');
                     var x = $('.layui-layer-btn a.layui-layer-btn0');
-                    i.html('<div style="padding: 20px 100px;">操作失败了！请稍后再试！</div>');
+                    var y = $('.layui-layer-btn a.layui-layer-btn1');
+                    i.html('<div style="padding: 20px 100px;color:red;">操作失败了！请稍后再试！</div>');
                     x.hide();
                     y.text('结束操作');
+                    $('#test3').show();
+                    v('.layui-layer-content').hide();
                 }
 			},
 		});

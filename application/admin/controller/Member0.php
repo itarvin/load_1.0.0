@@ -5,7 +5,6 @@ use think\File;
 use think\facade\Cache;
 use app\util\ReturnCode;
 use app\util\Tools;
-use think\facade\Request;
 
 class Member extends Base
 {
@@ -16,38 +15,47 @@ class Member extends Base
     {
         $member = new Consumer;
         // 获取当前管理员的客户会员
-        // 预定义type 数组
-        $checktype = array('qq,phone,weixin');
-        $where = array();
         if(request()->isPost())
         {
-            $start = Request::param('start','','trim');
-            $end = Request::param('end','','trim');
-            $type = Request::param('type','','trim');
-            $keyword = Request::param('keyword','','trim');
-            //check time
+            $data = input('post.');
+            $start = $data['start'] ? trim($data['start']) : '';
+            $end = $data['end'] ? trim($data['end']) : '';
+            $keyword = $data['keyword'] ? trim($data['keyword']) : '';
+            $keywordComplex = [];
+            if (!empty($keyword)) {
+                $keywordComplex[] = ['qq|phone|weixin|note','like',"%".$keyword."%"];
+            }
+            $where = array();
             if ($start && $end) {
                 $where[] = ['newtime','between',[$start,$end]];
             }elseif($start){
                 $where[] = ['newtime','GT',$start];
             }elseif ($end) {
-                $where[] = ['newtime','LT',$end];
+                c
             }
-            // check type
-            if (!empty($keyword)) {
-                if($type && in_array($type,$checktype)){
-                    $where[] = [$type, 'EQ', $keyword];
-                }else{
-                    $where[] = ['qq|phone|weixin', 'EQ', $keyword];
-                }
+
+            if($this->uid != 1)
+            {
+                $list = $member->order('id desc')->where(array('uid' => $this->uid))
+                ->where($keywordComplex)->where($where)->paginate();
+                $count = $member->where(array('uid' => $this->uid))
+                ->where($keywordComplex)->where($where)->count();
+            }else {
+                $list = $member->order('id desc')->where($keywordComplex)->where($where)->paginate();
+                $count = $member->where($keywordComplex)->where($where)->count();
             }
-            // check Admin
-            if($this->uid != 1){
-                $where[] = ['uid','=',$this->uid];
+        }else {
+            if($this->uid != 1)
+            {
+                $list = $member->order('id desc')->where(array('uid' => $this->uid))->paginate(10);
+                $count = $member->where(array('uid' => $this->uid))->count();
+            }else {
+                $list = $member->order('id desc')->paginate(10);
+                $count = $member->count();
             }
         }
-        $list = $member->where($where)->order('id desc')->paginate();
         $this->assign('list',$list);
+        $this->assign('count',$count);
         $this->assign('uid',$this->uid);
         return $this->fetch('Member/index');
     }
@@ -167,7 +175,6 @@ class Member extends Base
         $way = config('upload_path').'/custom';
         $file = request()->file('file');
         $fields = Cache::get('scv_field') ? Cache::get('scv_field') : config('upload_field');
-        $maxItem = config('maxitem');
         // 如果文件太大。则会提示null
         if($file != null)
         {
@@ -181,7 +188,7 @@ class Member extends Base
                 $line = count(file($way.'/'.$filename));
                 if($line > 1)
                 {
-                    $dealLine = $line > $maxItem ? $maxItem : $line;
+                    $dealLine = $line > 1001 ? 1001 : $line;
                     // 若文件行数大于1000行。则先处理1000行，返回前端回调处理剩下的数据
                     $start = 0;
                     $content = Tools::read_csv_lines($way.'/'.$filename,$dealLine,$start);
@@ -286,20 +293,18 @@ class Member extends Base
     public function batchMember()
     {
         $model = new Consumer;
-        $maxItem = config('maxitem');
-        $success = Request::param('success','','trim');
-        $error = Request::param('error','','trim');
-        $deals = Request::param('deal','','trim');
+        $input = input('post.');
         // 拼接文件路径
         $way = config('upload_path').'/custom';
         $filename = Cache::get('scv_'.$this->uid);
         $fields = Cache::get('scv_field');
         $line = count(file($way.'/'.$filename));
+        $maxItem=500;
         // 起始行根据客户端处理了多少数据
-        $start = $deals ? $deals : $maxItem;
+        $start = $input['deal'] ? $input['deal'] : $maxItem;
         // 读取行数，判断总行数减去已经处理的，如还大于1000，则只处理1000，反之处理剩余的条数
-        $dealLine = ($line - $start) > $maxItem ? $maxItem : $line - $start;
-        $deal = ($dealLine == $maxItem) ? ($maxItem - 1) : ($line - $start - 1);
+        $dealLine = ($line - $start) > 1001 ? 1001 : $line - $start;
+        $deal = ($dealLine == 1001) ? ($dealLine - 1) : ($line - $start - 1);
         $content = Tools::read_csv_lines($way.'/'.$filename,$dealLine,$start);
         if($content){
             $result = $this->checkdata($content,$fields,$filename);
@@ -309,9 +314,9 @@ class Member extends Base
             }
             $data = array(
                 'status'  => ReturnCode::SUCCESS,
-                'success' => ($result['success'] + $success),
-                'error'   => ($result['error'] + $error),
-                'deal'    => $deal + $deals,
+                'success' => ($result['success'] + $input['success']),
+                'error'   => ($result['error'] + $input['error']),
+                'deal'    => $deal + $input['deal'],
                 'total'   => ($line - 1),
             );
         }else {

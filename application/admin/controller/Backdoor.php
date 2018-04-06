@@ -3,6 +3,7 @@ namespace app\admin\controller;
 use think\Controller;
 use think\captcha\Captcha;
 use app\admin\model\Administrators;
+use think\facade\Cookie;
 use think\Validate;
 class  Backdoor extends controller
 {
@@ -63,7 +64,8 @@ class  Backdoor extends controller
             session('uid',$user->id);
             session('u_name',$user->users);
             $salt = md5($user->users.$user->pwd);
-            setcookie("auth_".$user->id,$salt, time()+3600*12);
+            // 设置cookie 前缀为think_
+            Cookie::set('auth_'.$user->id,$salt,['prefix'=>'load_','expire'=>3600 * 12]);
             //更新最后请求IP及时间
             $time = date('Y-m-d H:i:s',time());
             $user->where($where_query)->update(['lasttime' => $time]);
