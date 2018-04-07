@@ -48,7 +48,7 @@
         <button class="layui-btn layui-btn-danger" onclick="delAll()"><i class="layui-icon"></i>批量删除</button>
         {/if}
         <button class="layui-btn" onclick="x_admin_show('添加用户','{:url('Member/add')}',600,400)"><i class="layui-icon"></i>添加</button>
-        <span class="x-right" style="line-height:40px">共有数据： 条</span>
+        <span class="x-right" style="line-height:40px">共有数据：{$count} 条</span>
       </xblock>
       <table class="layui-table">
         <thead>
@@ -60,10 +60,9 @@
             {/if}
             <th>ID</th>
             <th>用户名</th>
-            <th>性别</th>
+            <th>微信</th>
             <th>手机</th>
             <th>QQ</th>
-            <th>地址</th>
             <th>加入时间</th>
             {if $uid != '1'}
             <th>操作</th></tr>
@@ -79,10 +78,9 @@
             {/if}
             <td>{$vo.id}</td>
             <td>{$vo.username}</td>
-            <td>{$vo.sex}</td>
+            <td>{$vo.weixin}</td>
             <td>{$vo.phone}</td>
             <td>{$vo.qq}</td>
-            <td>{$vo.address}</td>
             <td>{$vo.newtime}</td>
             {if $uid != '1'}
             <td class="td-manage">

@@ -140,5 +140,4 @@ return [
     'upload_path'            => '../public/uploads',
     'upload_field'           => array('username','phone','address','note','qq'),
     'maxitem'                => 1001,
-
 ];

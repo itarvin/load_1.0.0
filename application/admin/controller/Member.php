@@ -7,20 +7,17 @@ use app\util\ReturnCode;
 use app\util\Tools;
 use think\facade\Request;
 
-class Member extends Base
-{
+class Member extends Base{
     /**
      * 主页显示
      */
-    public function index()
-    {
+    public function index(){
         $member = new Consumer;
         // 获取当前管理员的客户会员
         // 预定义type 数组
         $checktype = array('qq,phone,weixin');
         $where = array();
-        if(request()->isPost())
-        {
+        if(request()->isPost()){
             $start = Request::param('start','','trim');
             $end = Request::param('end','','trim');
             $type = Request::param('type','','trim');
@@ -47,15 +44,16 @@ class Member extends Base
             }
         }
         $list = $member->where($where)->order('id desc')->paginate();
+        $count = $list->total();
         $this->assign('list',$list);
+        $this->assign('count',$count);
         $this->assign('uid',$this->uid);
         return $this->fetch('Member/index');
     }
 
 
     // 批量删除
-    public function batchdelete()
-    {
+    public function batchdelete(){
         $data = input('post.');
         $member = new Consumer;
         // 先判断当前是删除数据是否为本人的客户。
@@ -90,15 +88,13 @@ class Member extends Base
     }
 
 
-
-    public function delete()
-    {
+    // 单条删除
+    public function delete(){
         $id = input('post.deleid');
         $member = new Consumer;
         // 先判断当前是删除数据是否为本人的客户。
         $have = $member->where('id',$id)->find();
-        if($have['uid']  != $this->uid)
-        {
+        if($have['uid']  != $this->uid){
             $data['status'] = ReturnCode::ERROR;
             $data['msg'] = '当前客户非您的客户！';
         }else {
@@ -113,16 +109,14 @@ class Member extends Base
     /**
      * 添加操作
      */
-    public function add()
-    {
+    public function add(){
         return $this->fetch('Member/add');
     }
 
     /**
      * 下载CSV文件模板
      */
-    public function downMould()
-    {
+    public function downMould(){
         $field = config('upload_field');
         Cache::set('scv_field',$field);
         $data = Tools::fieldMapped($field);
@@ -162,31 +156,29 @@ class Member extends Base
      * @param array $array 键值对集合
      * @return josn
      */
-    public function loadmember()
-    {
+    public function loadmember(){
         $way = config('upload_path').'/custom';
         $file = request()->file('file');
         $fields = Cache::get('scv_field') ? Cache::get('scv_field') : config('upload_field');
         $maxItem = config('maxitem');
-        // 如果文件太大。则会提示null
-        if($file != null)
-        {
+        // 如果文件太大无法上传。则会提示null
+        if($file != null){
             $info = $file->rule('uniqid')->move($way);
             $filename = $info->getSaveName();
             // 限制文件类型
             $type = explode(".",$filename);
-            if($info && $type[1] == 'csv')
-            {
+            if($info && $type[1] == 'csv'){
                 Cache::set('scv_'.$this->uid,$filename);
                 $line = count(file($way.'/'.$filename));
-                if($line > 1)
-                {
+                if($line > 1){
                     $dealLine = $line > $maxItem ? $maxItem : $line;
                     // 若文件行数大于1000行。则先处理1000行，返回前端回调处理剩下的数据
                     $start = 0;
                     $content = Tools::read_csv_lines($way.'/'.$filename,$dealLine,$start);
                     if($content){
+                        // 执行检测和插入数据
                         $result = $this->checkdata($content,$fields,$filename);
+
                         $data = array(
                             'status'  => ReturnCode::SUCCESS,
                             'success' => $result['success'],
@@ -208,9 +200,11 @@ class Member extends Base
     }
 
 
-
-    private function checkdata($file,$fields,$filename)
-    {
+    /**
+     * 检测数据。并批量插入数据库
+     * @return success(成功条数) error(失败条数)
+     */
+    private function checkdata($file,$fields,$filename){
         if($file){
             // 根据字段拼接其键
             foreach($file as $k => $v) {
@@ -262,8 +256,7 @@ class Member extends Base
             $errors = count($have);
             if($errors > 0){
                 $error = Cache::get('scv_'.$this->uid.'_'.$filename) ? Cache::get('scv_'.$this->uid.'_'.$filename) : array();
-                foreach($have as $k => $v)
-                {
+                foreach($have as $k => $v){
                     array_push($error,$data[$v]);
                     unset($data[$v]);
                 }
@@ -283,8 +276,7 @@ class Member extends Base
      * @param string $way csv文件路径
      * @return json
      */
-    public function batchMember()
-    {
+    public function batchMember(){
         $model = new Consumer;
         $maxItem = config('maxitem');
         $success = Request::param('success','','trim');
@@ -293,7 +285,7 @@ class Member extends Base
         // 拼接文件路径
         $way = config('upload_path').'/custom';
         $filename = Cache::get('scv_'.$this->uid);
-        $fields = Cache::get('scv_field');
+        $fields = Cache::get('scv_field') ? Cache::get('scv_field') : config('upload_field');;
         $line = count(file($way.'/'.$filename));
         // 起始行根据客户端处理了多少数据
         $start = $deals ? $deals : $maxItem;
@@ -320,9 +312,8 @@ class Member extends Base
         return json($data);
     }
 
-
-    private function arraySearch($exist,$array,$have,$ke)
-    {
+    // 根据值查询数组返回键
+    private function arraySearch($exist,$array,$have,$ke){
         foreach ($exist as $key => $value) {
             $k = array_search($value[$ke],$array);
             // 避免键为0被误伤到
