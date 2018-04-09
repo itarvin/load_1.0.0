@@ -18,19 +18,28 @@
   <body>
     <div class="x-nav">
       <span class="layui-breadcrumb">
-        <a href="">首页</a>
-        <a href="">演示</a>
-        <a>
-          <cite>导航元素</cite></a>
+        <a href="{:url('Index/index')}">首页</a>
+        <a href="{:url('Admin/index')}">销售管理</a>
+        <a><cite>销售客户列表</cite></a>
       </span>
       <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新">
         <i class="layui-icon" style="line-height:30px">ဂ</i></a>
     </div>
     <div class="x-body">
       <div class="layui-row">
-        <form class="layui-form layui-col-md12 x-so"  action="{:url('Member/index')}" method="post">
+        <form class="layui-form layui-col-md12 x-so"  action="{:url('Admin/custom')}" method="post">
           <input class="layui-input" placeholder="开始日期" name="start" id="start" value="{:input('post.start')}">
           <input class="layui-input" placeholder="截止日期" name="end" id="end" value="{:input('post.end')}">
+          {if $uid == '1'}
+          <div class="layui-input-inline">
+              <select name="uid">
+                  <option value="">所有员工</option>
+                  {volist name="users" id="vo"}
+                      <option value="{$vo.id}" {if input('uid') == $vo.id}selected{/if}>{$vo.users}</option>
+                  {/volist}
+              </select>
+          </div>
+          {/if}
           <div class="layui-input-inline">
               <select name="type">
                   <option value="">所有</option>
@@ -44,51 +53,43 @@
         </form>
       </div>
       <xblock>
-        {if $uid != '1'}
-        <button class="layui-btn layui-btn-danger" onclick="delAll()"><i class="layui-icon"></i>批量删除</button>
-        {/if}
-        <button class="layui-btn" onclick="x_admin_show('添加用户','{:url('Member/add')}',600,400)"><i class="layui-icon"></i>添加</button>
         <span class="x-right" style="line-height:40px">共有数据：{$count} 条</span>
       </xblock>
       <table class="layui-table">
         <thead>
           <tr>
-            {if $uid != '1'}
-            <th>
-              <div class="layui-unselect header layui-form-checkbox" lay-skin="primary"><i class="layui-icon">&#xe605;</i></div>
-            </th>
-            {/if}
             <th>ID</th>
             <th>用户名</th>
             <th>微信</th>
             <th>手机</th>
             <th>QQ</th>
             <th>加入时间</th>
-            {if $uid != '1'}
             <th>操作</th></tr>
-            {/if}
         </thead>
         <tbody>
         {volist name="list" id="vo"}
           <tr>
-            {if $uid != '1'}
-            <td>
-              <div class="layui-unselect layui-form-checkbox" lay-skin="primary" data-id='{$vo.id}'><i class="layui-icon">&#xe605;</i></div>
-            </td>
-            {/if}
             <td>{$vo.id}</td>
             <td>{$vo.username}</td>
             <td>{$vo.weixin}</td>
             <td>{$vo.phone}</td>
             <td>{$vo.qq}</td>
             <td>{$vo.newtime}</td>
-            {if $uid != '1'}
             <td class="td-manage">
-              <a title="删除" onclick="member_del(this,'{$vo.id}')" href="javascript:;">
-                <i class="layui-icon">&#xe640;</i>
-              </a>
+                <a title="订单" onclick="x_admin_show('添加订单','{:url('Admin/record',array('reid' => $vo.id))}',600,400)" href="javascript:;">
+                    <button class="layui-btn layui-btn-sm layui-btn-primary">
+                        <i class="layui-icon">&#xe63c;</i>
+                    </button>
+                </a>
+                {if $uid != '1'}
+                <a title="删除" onclick="member_del(this,'{$vo.id}')" href="javascript:;">
+                    <button class="layui-btn layui-btn-sm layui-btn-primary">
+                        <i class="layui-icon">&#xe640;</i>
+                    </button>
+                </a>
+                {/if}
             </td>
-            {/if}
+
           </tr>
         {/volist}
         </tbody>
@@ -102,12 +103,10 @@
     <script>
       layui.use('laydate', function(){
         var laydate = layui.laydate;
-
         //执行一个laydate实例
         laydate.render({
           elem: '#start' //指定元素
         });
-
         //执行一个laydate实例
         laydate.render({
           elem: '#end' //指定元素
@@ -133,30 +132,6 @@
                   },
               });
 
-          });
-      }
-
-
-
-      function delAll (argument) {
-          var data = tableCheck.getData();
-          layer.confirm('确认要删除吗？'+data,function(index){
-              //捉到所有被选中的，发异步进行删除
-              $.ajax({
-                  url:"{:url('Member/batchdelete')}",
-                  type:'post',
-                  dataType:'json',
-                  data: {deleid: data},
-                  success:function(msg){
-                      if(msg.status == 1)
-                      {
-                          layer.msg('删除'+msg.success+'条成功！', {icon: 1});
-                          $(".layui-form-checked").not('.header').parents('tr').remove();
-                      }else {
-                          layer.msg('客户列表存在'+msg.error+'个非您的客户！禁止操作！', {icon: 1});
-                      }
-                  },
-              });
           });
       }
   </script>

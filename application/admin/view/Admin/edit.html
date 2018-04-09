@@ -30,6 +30,15 @@
           </div>
           <div class="layui-form-item">
               <label for="phone" class="layui-form-label">
+                  <span class="x-red">*</span>性别
+              </label>
+              <div class="layui-input-inline">
+                  <input type="radio" name="gender" value="0" title="男" {if $data['gender'] == '0'}checked=''{/if}>
+                  <input type="radio" name="gender" value="1" title="女" {if $data['gender'] == '1'}checked=''{/if}>
+              </div>
+          </div>
+          <div class="layui-form-item">
+              <label for="phone" class="layui-form-label">
                   <span class="x-red">*</span>手机
               </label>
               <div class="layui-input-inline">
@@ -164,10 +173,8 @@
           });
           //监听提交
           form.on('submit(add)', function(data){
-            console.log(data);
             //发异步，把数据提交给php
             $.post("{:url('Admin/update')}",data.field,function(res){
-                console.log(res);
     			if(res.status == 1){
                     layer.alert("更新成功", {icon: 6},function () {
                         // 获得frame索引

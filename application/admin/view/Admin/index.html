@@ -18,10 +18,9 @@
   <body>
     <div class="x-nav">
       <span class="layui-breadcrumb">
-        <a href="">首页</a>
-        <a href="">演示</a>
-        <a>
-          <cite>导航元素</cite></a>
+        <a href="{:url('Index/index')}">首页</a>
+        <a href="{:url('Admin/index')}">销售管理</a>
+        <a><cite>销售列表</cite></a>
       </span>
       <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新">
         <i class="layui-icon" style="line-height:30px">ဂ</i></a>
@@ -29,15 +28,14 @@
     <div class="x-body">
       <div class="layui-row">
         <form class="layui-form layui-col-md12 x-so" action="{:url('Admin/index')}" method="post">
-          <input class="layui-input" placeholder="开始日" name="start" id="start" value="{:input('post.start')}">
-          <input class="layui-input" placeholder="截止日" name="end" id="end" value="{:input('post.end')}">
+          <input class="layui-input" placeholder="开始日期" name="start" id="start" value="{:input('post.start')}">
+          <input class="layui-input" placeholder="截止日期" name="end" id="end" value="{:input('post.end')}">
           <input type="text" name="users"  placeholder="请输入用户名" autocomplete="off" class="layui-input" value="{:input('post.users')}">
           <button class="layui-btn"  lay-submit="" lay-filter="sreach"><i class="layui-icon">&#xe615;</i></button>
         </form>
       </div>
       <xblock>
           {if $uid == '1'}
-          <button class="layui-btn layui-btn-danger" onclick="delAll()"><i class="layui-icon"></i>批量删除</button>
           <button class="layui-btn" onclick="x_admin_show('添加用户','./admin-add.html')"><i class="layui-icon"></i>添加</button>
           {/if}
           <span class="x-right" style="line-height:40px">共有数据：{$count} 条</span>
@@ -45,63 +43,59 @@
       <table class="layui-table">
         <thead>
           <tr>
-              {if $uid == '1'}
-              <th>
-                  <div class="layui-unselect header layui-form-checkbox" lay-skin="primary"><i class="layui-icon">&#xe605;</i></div>
-              </th>
-              {/if}
             <th>ID</th>
             <th>登录名</th>
             <th>手机</th>
             <th>微信</th>
-            <th>QQ1</th>
-            <th>QQ2</th>
-            <th>QQ3</th>
-            <th>QQ4</th>
-            <th>加入时间</th>
+            <th><div class="layui-input-inline">
+                <select name="hitcount" onchange="changehit()" id="change">
+                    <option value="" >点击数</option>
+                    <option value="today" >今天</option>
+                    <option value="week" >一周内</option>
+                    <option value="halfmonth" >半个月</option>
+                    <option value="month" >一个月</option>
+                    <option value="threemonth" >三个月</option>
+                </select>
+            </div>
+                <!-- <a onclick="loadhit()">点击数</a> -->
+            </th>
             <th>状态</th>
             <th>操作</th>
         </thead>
         <tbody>
-        {volist name="list" id="vo"}
-          <tr>
-              {if $uid == '1'}
-              <td>
-                  <div class="layui-unselect layui-form-checkbox" lay-skin="primary" data-id='2'><i class="layui-icon">&#xe605;</i></div>
-              </td>
-              {/if}
-            <td>{$vo.id}</td>
-            <td>{$vo.users}</td>
-            <td>{$vo.phone}</td>
-            <td>{$vo.weixin}</td>
-            <td>{$vo.qq1}</td>
-            <td>{$vo.qq2}</td>
-            <td>{$vo.qq3}</td>
-            <td>{$vo.qq4}</td>
-            <td>{$vo.newtime}</td>
-            <td class="td-status">
-              <span class="layui-btn layui-btn-normal layui-btn-mini">已启用</span></td>
-            <td class="td-manage">
-              <a onclick="member_stop(this,'10001')" href="javascript:;"  title="启用">
-                <i class="layui-icon">&#xe601;</i>
-              </a>
-              <a title="编辑"  onclick="x_admin_show('编辑','{:url('Admin/edit',array('id' => $vo.id))}')" href="javascript:;">
-                <i class="layui-icon">&#xe642;</i>
-              </a>
-              <a title="删除" onclick="member_del(this,'要删除的id')" href="javascript:;">
-                <i class="layui-icon">&#xe640;</i>
-              </a>
-            </td>
-          </tr>
-          {/volist}
-        </tbody>
-      </table>
-      <div class="page">
-        <div>
-            {$list|raw}
-        </div>
-      </div>
+            {volist name="list" id="vo"}
+              <tr>
+                <td>{$vo.id}</td>
+                <td>{$vo.users}</td>
+                <td>{$vo.phone}</td>
+                <td>{$vo.weixin}</td>
+                <th><span id="hit_{$vo.id}" style="font-size:20px;color:green;"></span></th>
+                <td class="td-status">
+                    <span class="layui-btn layui-btn-radius {if  $vo.chuqin == '0'}layui-btn-primary{else /}layui-btn-normal{/if}" onclick="changestatus({$vo.id})" id="stat_{$vo.id}">{if  $vo.chuqin == '0'}请假{else /}上班{/if}中</span>
+                </td>
+                <td class="td-manage">
 
+                  <a  href="{:url('Admin/custom')}"  title="员工客户">
+                      <button class="layui-btn layui-btn-sm layui-btn-primary">
+                          <i class="layui-icon">&#xe613;</i>
+                      </button>
+                  </a>
+
+                  <a title="编辑"  onclick="x_admin_show('编辑','{:url('Admin/edit',array('id' => $vo.id))}')" href="javascript:;">
+                      <button class="layui-btn layui-btn-sm layui-btn-primary">
+                          <i class="layui-icon">&#xe642;</i>
+                      </button>
+                  </a>
+                  <a title="删除" onclick="member_del(this,'要删除的id')" href="javascript:;">
+                      <button class="layui-btn layui-btn-sm layui-btn-primary">
+                          <i class="layui-icon">&#xe640;</i>
+                      </button>
+                  </a>
+                </td>
+              </tr>
+              {/volist}
+            </tbody>
+      </table>
     </div>
     <script>
       layui.use('laydate', function(){
@@ -117,31 +111,6 @@
           elem: '#end' //指定元素
         });
       });
-
-       /*用户-停用*/
-      function member_stop(obj,id){
-          layer.confirm('确认要停用吗？',function(index){
-
-              if($(obj).attr('title')=='启用'){
-
-                //发异步把用户状态进行更改
-                $(obj).attr('title','停用')
-                $(obj).find('i').html('&#xe62f;');
-
-                $(obj).parents("tr").find(".td-status").find('span').addClass('layui-btn-disabled').html('已停用');
-                layer.msg('已停用!',{icon: 5,time:1000});
-
-              }else{
-                $(obj).attr('title','启用')
-                $(obj).find('i').html('&#xe601;');
-
-                $(obj).parents("tr").find(".td-status").find('span').removeClass('layui-btn-disabled').html('已启用');
-                layer.msg('已启用!',{icon: 5,time:1000});
-              }
-
-          });
-      }
-
       /*用户-删除*/
       function member_del(obj,id){
           layer.confirm('确认要删除吗？',function(index){
@@ -150,18 +119,87 @@
               layer.msg('已删除!',{icon:1,time:1000});
           });
       }
+      layui.use('form', function(){
+          var form = layui.form; //只有执行了这一步，部分表单元素才会自动修饰成功
+
+          //……
+
+          //但是，如果你的HTML是动态生成的，自动渲染就会失效
+          // 因此你需要在相应的地方，执行下述方法来手动渲染，跟这类似的还有 element.init();
+          form.render();
+      });
+      layui.use(['layer', 'form', 'element'], function(){
+          var layer = layui.layer
+          ,form = layui.form
+          ,element = layui.element
+
+          //……
+          //你的代码都应该写在这里面
+      });
 
 
 
-      function delAll (argument) {
-
-        var data = tableCheck.getData();
-
-        layer.confirm('确认要删除吗？'+data,function(index){
-            //捉到所有被选中的，发异步进行删除
-            layer.msg('删除成功', {icon: 1});
-            $(".layui-form-checked").not('.header').parents('tr').remove();
-        });
+      function loadhit()
+      {
+          var str=$('.x-right').text();
+          var num=str.replace(/[^0-9]/ig,"");
+          console.log(num);
+      }
+      function changestatus(userid)
+      {
+          var data = {
+              uid : userid
+          };
+          $.ajax({
+              url:"{:url('Admin/status')}",
+              type:'post',
+              dataType:'json',
+              data: data,
+              success:function(msg){
+                  var cow = '#stat_' + userid;
+                  console.log(cow);
+                  if(msg.status == '1')
+                  {
+                      switch (msg.chuqin) {
+                          case '0':
+                              $(cow).removeClass('layui-btn-normal');
+                              $(cow).addClass('layui-btn-primary');
+                              $(cow).text('请假中');
+                              break;
+                          case '1':
+                              $(cow).removeClass('layui-btn-primary');
+                              $(cow).addClass('layui-btn-normal');
+                              $(cow).text('上班中');
+                              break;
+                      }
+                      layer.msg('成功操作！', function(){
+                      });
+                  }else {
+                      layer.msg('失败了！稍后再试！', function(){
+                      });
+                  }
+              },
+          });
+      }
+      function changehit(){
+          var opt=$('#change').find("option:selected").val();
+          var data = {
+              date : opt
+          };
+          $.ajax({
+              url:"{:url('Admin/getHit')}",
+              type:'post',
+              dataType:'json',
+              data: data,
+              success:function(msg){
+                  if(msg.status == 1){
+                      $.each(msg.data,function(key,value) {
+                          var anchor='#hit_'+key;
+                          $(anchor).text(value);
+                      });
+                  }
+              }
+          });
       }
     </script>
   </body>
