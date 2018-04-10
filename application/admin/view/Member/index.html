@@ -19,9 +19,9 @@
     <div class="x-nav">
       <span class="layui-breadcrumb">
         <a href="">首页</a>
-        <a href="">演示</a>
+        <a href="{:url('member/index')}">会员管理</a>
         <a>
-          <cite>导航元素</cite></a>
+          <cite>会员列表</cite></a>
       </span>
       <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新">
         <i class="layui-icon" style="line-height:30px">ဂ</i></a>
@@ -33,13 +33,13 @@
           <input class="layui-input" placeholder="截止日期" name="end" id="end" value="{:input('post.end')}">
           <div class="layui-input-inline">
               <select name="type">
-                  <option value="">所有</option>
+                  <option value="">模糊查询</option>
                   <option value="qq" {if input('type') == 'qq'}selected{/if}>QQ</option>
                   <option value="phone" {if input('type') == 'phone'}selected{/if}>电话</option>
                   <option value="weixin" {if input('type') == 'weixin'}selected{/if}>微信</option>
               </select>
           </div>
-          <input type="text" name="keyword"  placeholder="请输入qq/phone/weixin/备注" autocomplete="off" class="layui-input" value="{:input('post.keyword')}">
+          <input type="text" name="keyword"  placeholder="QQ/手机号/微信号/备注" autocomplete="off" class="layui-input" value="{:input('post.keyword')}">
           <button class="layui-btn"  lay-submit="" lay-filter="sreach"><i class="layui-icon">&#xe615;</i></button>
         </form>
       </div>

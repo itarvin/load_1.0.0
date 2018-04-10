@@ -14,7 +14,11 @@
     {load href="__ADMIN__/lib/layui/layui.js" charset="utf-8"  /}
     {load href="__ADMIN__/js/xadmin.js"  /}
   </head>
-
+  <style>
+      .dimission {
+          background-color: #aaa9a9;
+      }
+  </style>
   <body>
     <div class="x-nav">
       <span class="layui-breadcrumb">
@@ -45,8 +49,8 @@
           <tr>
             <th>ID</th>
             <th>登录名</th>
-            <th>手机</th>
-            <th>微信</th>
+            <th>手　机</th>
+            <th>微　信</th>
             <th><div class="layui-input-inline">
                 <select name="hitcount" onchange="changehit()" id="change">
                     <option value="" >点击数</option>
@@ -57,14 +61,13 @@
                     <option value="threemonth" >三个月</option>
                 </select>
             </div>
-                <!-- <a onclick="loadhit()">点击数</a> -->
             </th>
-            <th>状态</th>
-            <th>操作</th>
+            <th>状　态</th>
+            <th>操　作</th>
         </thead>
         <tbody>
             {volist name="list" id="vo"}
-              <tr>
+              <tr {if $vo['isow'] == '1'} class="dimission" {/if}>
                 <td>{$vo.id}</td>
                 <td>{$vo.users}</td>
                 <td>{$vo.phone}</td>
@@ -83,12 +86,12 @@
 
                   <a title="编辑"  onclick="x_admin_show('编辑','{:url('Admin/edit',array('id' => $vo.id))}')" href="javascript:;">
                       <button class="layui-btn layui-btn-sm layui-btn-primary">
-                          <i class="layui-icon">&#xe642;</i>
+                          <i class="layui-icon">编辑</i>
                       </button>
                   </a>
-                  <a title="删除" onclick="member_del(this,'要删除的id')" href="javascript:;">
+                  <a title="离职" onclick="member_del(this,'{$vo.id}')" href="javascript:;">
                       <button class="layui-btn layui-btn-sm layui-btn-primary">
-                          <i class="layui-icon">&#xe640;</i>
+                          <i class="layui-icon">离职</i>
                       </button>
                   </a>
                 </td>
@@ -115,8 +118,23 @@
       function member_del(obj,id){
           layer.confirm('确认要删除吗？',function(index){
               //发异步删除数据
-              $(obj).parents("tr").remove();
-              layer.msg('已删除!',{icon:1,time:1000});
+              $.ajax({
+                  url:"{:url('Admin/dimission')}",
+                  type:'post',
+                  dataType:'json',
+                  data: {uid:id},
+                  success:function(msg){
+                      if(msg.status == 1){
+                          $(obj).parents("tr").remove();
+                          layer.msg('操作成功!',{icon:1,time:1000});
+                      }else if(msg.status == -14) {
+                          layer.msg('当前用户无法操作！',{icon:1,time:1000});
+                      }else {
+                          layer.msg('操作失败了!稍后再试~！',{icon:1,time:1000});
+                      }
+                  }
+              });
+
           });
       }
       layui.use('form', function(){

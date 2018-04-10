@@ -11,12 +11,18 @@ class Member extends Base{
     /**
      * 主页显示
      */
-    public function index(){
+    public function index()
+    {
         $member = new Consumer;
         // 获取当前管理员的客户会员
         // 预定义type 数组
         $checktype = array('qq,phone,weixin');
         $where = array();
+        $where[] = ['is_delete','EQ','0'];
+        // check Admin
+        if($this->uid != 1){
+            $where[] = ['uid','EQ',$this->uid];
+        }
         if(request()->isPost()){
             $start = Request::param('start','','trim');
             $end = Request::param('end','','trim');
@@ -37,10 +43,6 @@ class Member extends Base{
                 }else{
                     $where[] = ['qq|phone|weixin', 'EQ', $keyword];
                 }
-            }
-            // check Admin
-            if($this->uid != 1){
-                $where[] = ['uid','=',$this->uid];
             }
         }
         $list = $member->where($where)->order('id desc')->paginate();
@@ -324,5 +326,49 @@ class Member extends Base{
             }
         }
         return $have;
+    }
+
+
+    /**
+     * 回收站
+     */
+    public function recycle()
+    {
+        $member = new Consumer;
+        // 预定义type 数组
+        $checktype = array('qq,phone,weixin');
+        $where = array();
+        $where[] = ['is_delete','EQ','1'];
+        if($this->uid != '1'){
+            $where[] = ['uid','EQ',$this->uid];
+        }
+        if(request()->isPost()){
+            $start = Request::param('start','','trim');
+            $end = Request::param('end','','trim');
+            $type = Request::param('type','','trim');
+            $keyword = Request::param('keyword','','trim');
+            //check time
+            if ($start && $end) {
+                $where[] = ['newtime','between',[$start,$end]];
+            }elseif($start){
+                $where[] = ['newtime','GT',$start];
+            }elseif ($end) {
+                $where[] = ['newtime','LT',$end];
+            }
+            // check type
+            if (!empty($keyword)) {
+                if($type && in_array($type,$checktype)){
+                    $where[] = [$type, 'EQ', $keyword];
+                }else{
+                    $where[] = ['qq|phone|weixin', 'EQ', $keyword];
+                }
+            }
+        }
+        $list = $member->where($where)->paginate();
+        $count = $list->total();
+        $this->assign('list',$list);
+        $this->assign('count',$count);
+        $this->assign('uid',$this->uid);
+        return $this->fetch('Member/recycle');
     }
 }

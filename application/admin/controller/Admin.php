@@ -32,7 +32,7 @@ class Admin extends Base
                 $where[] = ['users', 'LIKE', $users];
             }
         }
-        $list = $user->where($where)->order('id asc')->select();
+        $list = $user->where($where)->order('isow asc')->select();
         $count = $user->count();
         $this->assign('list',$list);
         $this->assign('count',$count);
@@ -136,20 +136,24 @@ class Admin extends Base
     }
 
 
-    // 添加消费
-    public function record()
+    // 离职
+    public function dimission()
     {
-        $khid = input('reid');
-        // 先检测当前客户是否为当前销售
-        $check = Consumer::find($khid);
-        if($check['uid'] != $this->uid){
-            $this->error('当前客户您无法操作！');
-            exit;
+        $uid = input('uid');
+        if($uid == 1){
+            $data['status'] = ReturnCode::AUTH_ERROR;
+        }else {
+            $re = Administrators::where('id','EQ',$uid)->update(array('isow' => '1'));
+            if($re){
+                $data['status'] = ReturnCode::SUCCESS;
+            }else {
+                $data['status'] = ReturnCode::ERROR;
+            }
         }
-        $check['users'] = $this->name;
-        $this->assign('data',$check);
-        return $this->fetch('admin/record');
+        return json($data);
     }
+
+
 
     //修改状态
     public function status()

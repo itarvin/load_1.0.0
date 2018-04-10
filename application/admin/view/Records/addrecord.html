@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>欢迎页面-X-admin2.0</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    {load href="__ADMIN__/css/font.css" /}
+    {load href="__ADMIN__/css/xadmin.css" /}
+    {load href="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"/}
+    {load href="__ADMIN__/lib/layui/layui.js" charset="utf-8" /}
+    {load href="__ADMIN__/js/xadmin.js" /}
+  </head>
+
+  <body>
+    <div class="x-nav">
+      <span class="layui-breadcrumb">
+        <a href="{:url('Index/index')}">首页</a>
+        <a href="{:url('Admin/index')}">销售管理</a>
+        <a><cite>添加订单</cite></a>
+      </span>
+      <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新">
+        <i class="layui-icon" style="line-height:30px">ဂ</i></a>
+    </div>
+    <div class="x-body">
+        <form action="{:url('Records/record')}" method="post">
+            <table class="layui-table">
+                <thead>
+                    <tr>
+                        <th>客户名称</th>
+                        <th>销售</th>
+                        <th>产品名称</th>
+                        <th>价格</th>
+                        <th>备注</th>
+                        <th>操作</th>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="text" value="{$data['username']}" class="layui-input"　disabled="disabled" style="background:#CCCCCC"></td>
+                        <td><input type="text" value="{$data['users']}" class="layui-input" 　disabled="disabled" style="background:#CCCCCC"></td>
+                        <input type="hidden" value="{$khid}" name="khid" >
+                        <td><input type="text" name="product[]" required="" autocomplete="off" class="layui-input"></td>
+                        <td><input type="text" name="price[]" required=""  autocomplete="off" class="layui-input"></td>
+                        <td><input type="text" name="note[]" required=""  autocomplete="on" class="layui-input"></td>
+                        <td><input onclick="addNewTr(this);" class="layui-btn layui-btn-normal" type="button" value="+" /></td>
+                    </tr>
+                    <tr id="submit" class="text-c">
+                        <td align="center"  colspan="6"><button class="layui-btn layui-btn-fluid">提交</button></td>
+                    </tr>
+              </tbody>
+          </table>
+      </from>
+  </div>
+  <script>
+      function addNewTr(btn)
+      {
+      	var tr = $(btn).parent().parent();
+        var val = $(btn).val();
+      	if($(btn).val() == "+")
+      	{
+      		var newTr = tr.clone();
+      		newTr.find(":button").val("-");
+      		$("#submit").before(newTr);
+      	}
+      	else
+      		tr.remove();
+      }
+  </script>
+</body>
+
+</html>

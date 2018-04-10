@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-
   <head>
     <meta charset="UTF-8">
     <title>欢迎页面-X-admin2.0</title>
@@ -14,41 +13,31 @@
     {load href="__ADMIN__/lib/layui/layui.js" charset="utf-8" /}
     {load href="__ADMIN__/js/xadmin.js" /}
   </head>
-
   <body>
     <div class="x-nav">
       <span class="layui-breadcrumb">
-        <a href="{:url('Index/index')}">首页</a>
-        <a href="{:url('Admin/index')}">销售管理</a>
-        <a><cite>销售客户列表</cite></a>
+        <a href="">首页</a>
+        <a href="{:url('Records/index')}">订单管理</a>
+        <a>
+          <cite>订单列表</cite></a>
       </span>
       <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新">
         <i class="layui-icon" style="line-height:30px">ဂ</i></a>
     </div>
     <div class="x-body">
       <div class="layui-row">
-        <form class="layui-form layui-col-md12 x-so"  action="{:url('Admin/custom')}" method="post">
+        <form class="layui-form layui-col-md12 x-so"  action="{:url('Member/index')}" method="post">
           <input class="layui-input" placeholder="开始日期" name="start" id="start" value="{:input('post.start')}">
           <input class="layui-input" placeholder="截止日期" name="end" id="end" value="{:input('post.end')}">
-          {if $uid == '1'}
           <div class="layui-input-inline">
-              <select name="uid">
-                  <option value="">所有销售</option>
-                  {volist name="users" id="vo"}
-                      <option value="{$vo.id}" {if input('uid') == $vo.id}selected{/if}>{$vo.users}</option>
+              <select name="aid" onchange="arise()" id="change">
+                  <option value="">所有行为</option>
+                  {volist name="acts" id="vo"}
+                  <option value="{$vo.id}">{$vo.act_name}</option>
                   {/volist}
               </select>
           </div>
-          {/if}
-          <div class="layui-input-inline">
-              <select name="type">
-                  <option value="">模糊查询</option>
-                  <option value="qq" {if input('type') == 'qq'}selected{/if}>QQ</option>
-                  <option value="phone" {if input('type') == 'phone'}selected{/if}>电话</option>
-                  <option value="weixin" {if input('type') == 'weixin'}selected{/if}>微信</option>
-              </select>
-          </div>
-          <input type="text" name="keyword"  placeholder="QQ/手机号/微信号/备注" autocomplete="off" class="layui-input" value="{:input('post.keyword')}">
+          <input type="text" name="keyword"  placeholder="导入关键字" autocomplete="off" class="layui-input" value="{:input('post.keyword')}">
           <button class="layui-btn"  lay-submit="" lay-filter="sreach"><i class="layui-icon">&#xe615;</i></button>
         </form>
       </div>
@@ -59,37 +48,24 @@
         <thead>
           <tr>
             <th>ID</th>
-            <th>客户名称</th>
-            <th>微　　信</th>
-            <th>手　　机</th>
+            <th>销　　售</th>
+            <th>操作行为</th>
             <th>Q　　Q</th>
-            <th>加入时间</th>
-            <th>操　　作</th></tr>
+            <th>备　　注</th>
+            <th>操作时间</th>
+            <th>ip地址</th>
+        </tr>
         </thead>
         <tbody>
         {volist name="list" id="vo"}
           <tr>
             <td>{$vo.id}</td>
-            <td>{$vo.username}</td>
-            <td>{$vo.weixin}</td>
-            <td>{$vo.phone}</td>
+            <td>{$vo.users}</td>
+            <th>{$vo.act}</th>
             <td>{$vo.qq}</td>
+            <td>{$vo.note}</td>
             <td>{$vo.newtime}</td>
-            <td class="td-manage">
-                <a title="订单" onclick="x_admin_show('添加订单','{:url('Records/addrecord',array('reid' => $vo.id))}',1000,600)" href="javascript:;">
-                    <button class="layui-btn layui-btn-sm layui-btn-primary">
-                        <i class="layui-icon">&#xe63c;</i>
-                    </button>
-                </a>
-                {if $uid != '1'}
-                <a title="删除" onclick="member_del(this,'{$vo.id}')" href="javascript:;">
-                    <button class="layui-btn layui-btn-sm layui-btn-primary">
-                        <i class="layui-icon">&#xe640;</i>
-                    </button>
-                </a>
-                {/if}
-            </td>
-
+            <td>{$vo.ip}</td>
           </tr>
         {/volist}
         </tbody>
@@ -103,10 +79,12 @@
     <script>
       layui.use('laydate', function(){
         var laydate = layui.laydate;
+
         //执行一个laydate实例
         laydate.render({
           elem: '#start' //指定元素
         });
+
         //执行一个laydate实例
         laydate.render({
           elem: '#end' //指定元素
@@ -117,7 +95,7 @@
           layer.confirm('确认要删除吗？',function(index){
               //发异步删除数据
               $.ajax({
-                  url:"{:url('Member/delete')}",
+                  url:"{:url('Records/delete')}",
                   type:'post',
                   dataType:'json',
                   data: {deleid: id},
