@@ -6,6 +6,7 @@
  */
 
 namespace app\util;
+use app\admin\model\Logact;
 class Tools {
      /**
      * 错误码对比
@@ -79,6 +80,40 @@ class Tools {
         }
         fclose($fp);
         return $data;
+    }
+
+
+    // 行为事件转键值
+    static public function logactKey($string)
+    {
+        $list = cache('Logact:list');
+        if(!$list){
+            $list = Logact::field('id,act')->select();
+            cache('Logact:list',$list);
+        }
+        $data = [];
+        foreach ($list as $k => $v) {
+            $data[$v['id']] = $v['act'];
+        }
+        $key = array_search($string,$data);
+        return $key;
+    }
+
+
+    // 关键字替换原有标识
+    static public function keywordReplace($string)
+    {
+        $array = array(
+            'username' => '名字',
+            'consume'  => '消费',
+            'product'  => '产品',
+            'note'     => '备注',
+            'phone'    => '手机号',
+            'qq'       => 'QQ',
+            'wechat'   => '微信号',
+        );
+        $keyword = array_search($string,array_flip($array));
+        return $keyword;
     }
 
 

@@ -34,9 +34,11 @@ class Admin extends Base
         }
         $list = $user->where($where)->order('isow asc')->select();
         $count = $user->count();
-        $this->assign('list',$list);
-        $this->assign('count',$count);
-        $this->assign('uid',$uid);
+        $this->assign(array(
+            'list' => $list,
+            'count'=>$count,
+            'uid'  => $this->uid,
+        ));
         return $this->fetch('admin/index');
     }
 
@@ -128,10 +130,12 @@ class Admin extends Base
         }
         $list = $member->where($where)->order('id desc')->paginate();
         $count = $list->total();
-        $this->assign('list',$list);
-        $this->assign('uid',$this->uid);
-        $this->assign('count',$count);
-        $this->assign('users',$users);
+        $this->assign(array(
+            'list' => $list,
+            'count'=>$count,
+            'uid'  => $this->uid,
+            'users'=> $users
+        ));
         return $this->fetch('admin/custom');
     }
 

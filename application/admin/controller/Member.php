@@ -1,6 +1,7 @@
 <?php
 namespace app\admin\controller;
 use app\admin\model\Consumer;
+use app\admin\model\Log;
 use think\File;
 use think\facade\Cache;
 use app\util\ReturnCode;
@@ -47,15 +48,18 @@ class Member extends Base{
         }
         $list = $member->where($where)->order('id desc')->paginate();
         $count = $list->total();
-        $this->assign('list',$list);
-        $this->assign('count',$count);
-        $this->assign('uid',$this->uid);
+        $this->assign(array(
+            'list' => $list,
+            'count'=>$count,
+            'uid'  => $this->uid,
+        ));
         return $this->fetch('Member/index');
     }
 
 
     // 批量删除
-    public function batchdelete(){
+    public function batchdelete()
+    {
         $data = input('post.');
         $member = new Consumer;
         // 先判断当前是删除数据是否为本人的客户。
@@ -73,6 +77,9 @@ class Member extends Base{
             $count = count($data['deleid']);
             $num = 0;
             foreach($data['deleid'] as $k => $v){
+                // ------日志处理 ---start
+                writelog($v,Tools::logactKey('cus_delete'),$this->uid);
+                // -------------------end
                 $re = $member->where('id',$v)->delete();
                 if($re){
                     $num += 1;
@@ -91,7 +98,8 @@ class Member extends Base{
 
 
     // 单条删除
-    public function delete(){
+    public function delete()
+    {
         $id = input('post.deleid');
         $member = new Consumer;
         // 先判断当前是删除数据是否为本人的客户。
@@ -158,7 +166,8 @@ class Member extends Base{
      * @param array $array 键值对集合
      * @return josn
      */
-    public function loadmember(){
+    public function loadmember()
+    {
         $way = config('upload_path').'/custom';
         $file = request()->file('file');
         $fields = Cache::get('scv_field') ? Cache::get('scv_field') : config('upload_field');
@@ -180,7 +189,6 @@ class Member extends Base{
                     if($content){
                         // 执行检测和插入数据
                         $result = $this->checkdata($content,$fields,$filename);
-
                         $data = array(
                             'status'  => ReturnCode::SUCCESS,
                             'success' => $result['success'],
@@ -206,7 +214,8 @@ class Member extends Base{
      * 检测数据。并批量插入数据库
      * @return success(成功条数) error(失败条数)
      */
-    private function checkdata($file,$fields,$filename){
+    private function checkdata($file,$fields,$filename)
+    {
         if($file){
             // 根据字段拼接其键
             foreach($file as $k => $v) {
@@ -264,6 +273,9 @@ class Member extends Base{
                 }
                 Cache::set('scv_'.$this->uid.'_'.$filename,$error);
             }
+            // ------日志处理 ---start
+            $re = writelog($data,Tools::logactKey('delete_import'),$this->uid);
+            // -------------------end
             // -------------------批量新增数据
             $success = $model->limit(100)->insertAll($data);
             return array(
@@ -272,6 +284,7 @@ class Member extends Base{
             );
         }
     }
+
 
     /**
      * 检测CSV文件与存在数据有哪些已存在
@@ -315,7 +328,8 @@ class Member extends Base{
     }
 
     // 根据值查询数组返回键
-    private function arraySearch($exist,$array,$have,$ke){
+    private function arraySearch($exist,$array,$have,$ke)
+    {
         foreach ($exist as $key => $value) {
             $k = array_search($value[$ke],$array);
             // 避免键为0被误伤到
@@ -366,9 +380,11 @@ class Member extends Base{
         }
         $list = $member->where($where)->paginate();
         $count = $list->total();
-        $this->assign('list',$list);
-        $this->assign('count',$count);
-        $this->assign('uid',$this->uid);
+        $this->assign(array(
+            'list' => $list,
+            'count'=>$count,
+            'uid'  => $this->uid,
+        ));
         return $this->fetch('Member/recycle');
     }
 }

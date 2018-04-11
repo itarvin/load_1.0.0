@@ -61,9 +61,10 @@
           <tr>
             <td>{$vo.id}</td>
             <td>{$vo.users}</td>
-            <th>{$vo.act}</th>
+            <th>{$vo.act_name}</th>
             <td>{$vo.qq}</td>
-            <td>{$vo.note}</td>
+            <!-- <td>{$vo.note|msubstr=20,80,'utf-8',false}</td> -->
+            <td>{$vo.note|msubstr=20,80,'utf-8',false}</td>
             <td>{$vo.newtime}</td>
             <td>{$vo.ip}</td>
           </tr>

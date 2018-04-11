@@ -4,6 +4,7 @@ use app\admin\model\Log;
 use app\admin\model\Logact;
 use app\util\ReturnCode;
 use think\facade\Request;
+use app\util\Tools;
 class Logs extends Base{
     /**
      * 主页显示
@@ -23,27 +24,42 @@ class Logs extends Base{
             $keyword = Request::param('keyword','','trim');
             //check time
             if ($start && $end) {
-                $where[] = ['newtime','between',[$start,$end]];
+                $where[] = ['a.newtime','between',[$start,$end]];
             }elseif($start){
-                $where[] = ['newtime','GT',$start];
+                $where[] = ['a.newtime','GT',$start];
             }elseif ($end) {
-                $where[] = ['newtime','LT',$end];
+                $where[] = ['a.newtime','LT',$end];
             }
             // check type
-            if (!empty($keyword)) {
-                if($type && in_array($type,$checktype)){
-                    $where[] = [$type, 'EQ', $keyword];
-                }else{
-                    $where[] = ['qq|phone|weixin', 'EQ', $keyword];
-                }
+            if (!empty($aid)) {
+                $where[] = ['a.act', 'EQ', $aid];
             }
         }
-        $list = $log->where($where)->order('id desc')->paginate();
+        $list = $log->alias('a')
+        ->field('a.*,b.users,c.act_name')
+        ->join('admin b','a.uid = b.id')
+        ->join(['logs_act'=>'c'],'a.act = c.id')
+        ->where($where)->order('id desc')->paginate();
+        // 处理json数组数组，替换关键字
+        foreach ($list as $key => $value) {
+            $note = json_decode($value['note']);
+            $object = object_to_array($note);
+            foreach ($object as $k => $v) {
+                foreach($v as $k1 => $v1)
+                {
+                    $da[Tools::keywordReplace($k1)] = $v1;
+                }
+                $das[] = $da;
+            }
+            $list[$key]['note'] = json_encode(array_to_object($das));
+        }
         $count = $list->total();
-        $this->assign('list',$list);
-        $this->assign('count',$count);
-        $this->assign('uid',$this->uid);
-        $this->assign('acts',$acts);
+        $this->assign(array(
+            'list' => $list,
+            'count'=>$count,
+            'uid'  => $this->uid,
+            'acts' => $acts,
+        ));
         return $this->fetch('Logs/index');
     }
 }

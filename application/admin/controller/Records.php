@@ -4,6 +4,7 @@ use app\admin\model\Consumer;
 use app\admin\model\Record;
 use think\Validate;
 use app\util\ReturnCode;
+use app\util\Tools;
 class Records extends Base
 {
     // 主页
@@ -78,6 +79,11 @@ class Records extends Base
             $da['newtime'] = date('Y-m-d H:i:s',time());
             $data[] = $da;
         }
+        // ------日志处理 ---start
+        foreach ($data as $key => $value) {
+            writelog($value,Tools::logactKey('buy_insert'),$this->uid);
+        }
+        // -------------------end
         $record = new Record;
         $re = $record->insertAll($data);
         if($re){

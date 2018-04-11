@@ -14,7 +14,6 @@ use app\util\ReturnCode;
 use think\facade\Request;
 
 class AdminLog {
-
     /**
      * 后台操作日志记录
      * @author itarivn <itarivn@163.com>
