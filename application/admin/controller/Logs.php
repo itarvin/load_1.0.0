@@ -31,27 +31,34 @@ class Logs extends Base{
                 $where[] = ['a.newtime','LT',$end];
             }
             // check type
-            if (!empty($aid)) {
+            if (!empty($aid) && !empty($keyword)) {
                 $where[] = ['a.act', 'EQ', $aid];
+                $where[] = ['a.note', 'LIKE', "%$keyword%"];
             }
-        }
-        $list = $log->alias('a')
-        ->field('a.*,b.users,c.act_name')
-        ->join('admin b','a.uid = b.id')
-        ->join(['logs_act'=>'c'],'a.act = c.id')
-        ->where($where)->order('id desc')->paginate();
-        // 处理json数组数组，替换关键字
-        foreach ($list as $key => $value) {
-            $note = json_decode($value['note']);
-            $object = object_to_array($note);
-            foreach ($object as $k => $v) {
-                foreach($v as $k1 => $v1)
-                {
-                    $da[Tools::keywordReplace($k1)] = $v1;
+            $list = $log->alias('a')
+            ->field('a.*,b.users,c.act_name')
+            ->join('admin b','a.uid = b.id')
+            ->join(['logs_act'=>'c'],'a.act = c.id')
+            ->where($where)->order('id desc')->paginate();
+            $lenght = mb_strlen($keyword,'utf8');
+            foreach ($list as $key => $value) {
+                $have = strpos($value['note'],$keyword);
+                if($have){
+                    $list[$key]['position'] = $have;
+                    $list[$key]['lenght'] = $lenght;
+                    $list[$key]['k'] = '1';
                 }
-                $das[] = $da;
             }
-            $list[$key]['note'] = json_encode(array_to_object($das));
+        }else {
+            $list = $log->alias('a')
+            ->field('a.*,b.users,c.act_name')
+            ->join('admin b','a.uid = b.id')
+            ->join(['logs_act'=>'c'],'a.act = c.id')
+            ->where($where)->order('id desc')->paginate();
+            foreach($list as $k => $v)
+            {
+                $list[$k]['k'] = '0';
+            }
         }
         $count = $list->total();
         $this->assign(array(

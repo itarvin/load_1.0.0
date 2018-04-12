@@ -39,6 +39,15 @@
           </div>
           <div class="layui-form-item">
               <label for="phone" class="layui-form-label">
+                  <span class="x-red">*</span>状  态
+              </label>
+              <div class="layui-input-inline">
+                  <input type="radio" name="gender" value="0" title="男" {if $data['gender'] == '0'}checked=''{/if}>
+                  <input type="radio" name="gender" value="1" title="女" {if $data['gender'] == '1'}checked=''{/if}>
+              </div>
+          </div>
+          <div class="layui-form-item">
+              <label for="phone" class="layui-form-label">
                   <span class="x-red">*</span>手　机
               </label>
               <div class="layui-input-inline">

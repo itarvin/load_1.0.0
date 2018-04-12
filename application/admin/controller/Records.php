@@ -105,6 +105,7 @@ class Records extends Base
             $data['status'] = ReturnCode::ERROR;
             $data['msg'] = '当前订单您不能操作！';
         }else {
+            writelog($id,Tools::logactKey('buy_delete'),$this->uid);
             $re = $record->where('id',$id)->delete();
             if($re){
                 $data['status'] = ReturnCode::SUCCESS;;

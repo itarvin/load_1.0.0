@@ -78,8 +78,8 @@
                 </td>
                 <td class="td-manage">
 
-                  <a  href="{:url('Admin/custom')}"  title="员工客户">
-                      <button class="layui-btn layui-btn-sm layui-btn-primary">
+                  <a   {if $uid == $vo.id}href="{:url('Admin/custom')}"{/if}  title="员工客户">
+                      <button class="layui-btn layui-btn-sm {if $uid == $vo.id}layui-btn-primary{else /}layui-btn-disabled{/if} ">
                           <i class="layui-icon">&#xe613;</i>
                       </button>
                   </a>
@@ -116,7 +116,7 @@
       });
       /*用户-删除*/
       function member_del(obj,id){
-          layer.confirm('确认要删除吗？',function(index){
+          layer.confirm('确认要离职吗？',function(index){
               //发异步删除数据
               $.ajax({
                   url:"{:url('Admin/dimission')}",

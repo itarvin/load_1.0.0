@@ -5,6 +5,7 @@ use app\admin\model\Log;
 use think\File;
 use think\facade\Cache;
 use app\util\ReturnCode;
+use app\admin\model\Record;
 use app\util\Tools;
 use think\facade\Request;
 
@@ -80,6 +81,7 @@ class Member extends Base{
                 // ------日志处理 ---start
                 writelog($v,Tools::logactKey('cus_delete'),$this->uid);
                 // -------------------end
+                $this->shiftCustom($v);
                 $re = $member->where('id',$v)->delete();
                 if($re){
                     $num += 1;
@@ -97,6 +99,16 @@ class Member extends Base{
     }
 
 
+    // 删除客户清除消费记录
+    private function shiftCustom($memberid)
+    {
+        $list = Record::field('id')->where('khid','EQ',$memberid)->select();
+        foreach ($list as $key => $value) {
+            Record::destroy($value['id']);
+        }
+    }
+
+
     // 单条删除
     public function delete()
     {
@@ -108,6 +120,7 @@ class Member extends Base{
             $data['status'] = ReturnCode::ERROR;
             $data['msg'] = '当前客户非您的客户！';
         }else {
+            $this->shiftCustom($id);
             $re = $member->where('id',$id)->delete();
             if($re){
                 $data['status'] = ReturnCode::SUCCESS;;

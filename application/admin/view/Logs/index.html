@@ -26,14 +26,14 @@
     </div>
     <div class="x-body">
       <div class="layui-row">
-        <form class="layui-form layui-col-md12 x-so"  action="{:url('Member/index')}" method="post">
+        <form class="layui-form layui-col-md12 x-so"  action="{:url('Logs/index')}" method="post">
           <input class="layui-input" placeholder="开始日期" name="start" id="start" value="{:input('post.start')}">
           <input class="layui-input" placeholder="截止日期" name="end" id="end" value="{:input('post.end')}">
           <div class="layui-input-inline">
               <select name="aid" onchange="arise()" id="change">
                   <option value="">所有行为</option>
                   {volist name="acts" id="vo"}
-                  <option value="{$vo.id}">{$vo.act_name}</option>
+                  <option value="{$vo.id}" {if input('post.aid') == $vo.id}selected{/if} >{$vo.act_name}</option>
                   {/volist}
               </select>
           </div>
@@ -63,8 +63,11 @@
             <td>{$vo.users}</td>
             <th>{$vo.act_name}</th>
             <td>{$vo.qq}</td>
-            <!-- <td>{$vo.note|msubstr=20,80,'utf-8',false}</td> -->
+            {if $vo.k == '1'}
+            <td><span style="color:red;font-size:25px;">{$vo.note|msubstr=($vo.position),($vo.position+$vo.lenght),'utf-8',false}</span></td>
+            {else/}
             <td>{$vo.note|msubstr=20,80,'utf-8',false}</td>
+            {/if}
             <td>{$vo.newtime}</td>
             <td>{$vo.ip}</td>
           </tr>
