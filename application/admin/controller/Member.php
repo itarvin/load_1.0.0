@@ -1,6 +1,7 @@
 <?php
 namespace app\admin\controller;
 use app\admin\model\Consumer;
+use app\admin\model\Administrators;
 use app\admin\model\Log;
 use think\File;
 use think\facade\Cache;
@@ -287,7 +288,7 @@ class Member extends Base{
                 Cache::set('scv_'.$this->uid.'_'.$filename,$error);
             }
             // ------日志处理 ---start
-            $re = writelog($data,Tools::logactKey('delete_import'),$this->uid);
+            writelog($data,Tools::logactKey('delete_import'),$this->uid);
             // -------------------end
             // -------------------批量新增数据
             $success = $model->limit(100)->insertAll($data);
@@ -399,5 +400,47 @@ class Member extends Base{
             'uid'  => $this->uid,
         ));
         return $this->fetch('Member/recycle');
+    }
+
+
+
+    public function edit()
+    {
+        $id = Request::param('id','','trim');
+        $consumer = new Consumer;
+        $data = $consumer->find($id);
+        if($this->uid != 1 && $data['uid'] != $this->uid){
+            $this->error('对不起，非法访问！');
+        }
+        $this->assign('data',$data);
+        return $this->fetch('member/edit');
+    }
+
+
+    public function update()
+    {
+        $input = input('post.');
+        $member = new Consumer;
+        if($this->uid != 1 && $input['uid'] != $this->uid){
+            $this->error('对不起，非法访问！');
+        }
+        $preview = $member->where(array('username'=>$input['username']))->find();
+        // 数据验证
+        $result = $this->validate($input,'app\admin\validate\Member');
+        if(!$result){
+            $data['status'] = ReturnCode::ERROR;
+            $data['info'] = $validate->getError();
+        }else {
+            // ------日志处理 ---start
+            writelog($input['id'],Tools::logactKey('cus_change'),$this->uid);
+            // -------------------end
+            if ($member->update($input)) {
+                $data['status'] = ReturnCode::SUCCESS;
+            } else {
+                $data['status'] = ReturnCode::ERROR;
+                $data['info'] = '更新失败了！';
+            }
+        }
+        return json($data);
     }
 }

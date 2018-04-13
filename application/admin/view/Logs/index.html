@@ -1,19 +1,4 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8">
-    <title>欢迎页面-X-admin2.0</title>
-    <meta name="renderer" content="webkit">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
-    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
-    {load href="__ADMIN__/css/font.css" /}
-    {load href="__ADMIN__/css/xadmin.css" /}
-    {load href="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"/}
-    {load href="__ADMIN__/lib/layui/layui.js" charset="utf-8" /}
-    {load href="__ADMIN__/js/xadmin.js" /}
-  </head>
-  <body>
+{layout name="layout/layout" /}
     <div class="x-nav">
       <span class="layui-breadcrumb">
         <a href="">首页</a>
@@ -29,15 +14,15 @@
         <form class="layui-form layui-col-md12 x-so"  action="{:url('Logs/index')}" method="post">
           <input class="layui-input" placeholder="开始日期" name="start" id="start" value="{:input('post.start')}">
           <input class="layui-input" placeholder="截止日期" name="end" id="end" value="{:input('post.end')}">
-          <div class="layui-input-inline">
-              <select name="aid" onchange="arise()" id="change">
+          <div class="layui-input-inline" >
+              <select name="aid" lay-filter="change">
                   <option value="">所有行为</option>
                   {volist name="acts" id="vo"}
                   <option value="{$vo.id}" {if input('post.aid') == $vo.id}selected{/if} >{$vo.act_name}</option>
                   {/volist}
               </select>
           </div>
-          <input type="text" name="keyword"  placeholder="导入关键字" autocomplete="off" class="layui-input" value="{:input('post.keyword')}">
+          <input style="display:none;" id="keyword" type="text" name="keyword"  placeholder="导入关键字" autocomplete="off" class="layui-input" value="{:input('post.keyword')}">
           <button class="layui-btn"  lay-submit="" lay-filter="sreach"><i class="layui-icon">&#xe615;</i></button>
         </form>
       </div>
@@ -64,10 +49,11 @@
             <th>{$vo.act_name}</th>
             <td>{$vo.qq}</td>
             {if $vo.k == '1'}
-            <td><span style="color:red;font-size:25px;">{$vo.note|msubstr=($vo.position),($vo.position+$vo.lenght),'utf-8',false}</span></td>
+            <td   onclick="getinfo({$vo.id})">......{$vo.note|msubstr=($vo.position-12),($vo.lenght+1),'utf-8',false}<span style="color:green;font-size:25px;">{$vo.note|msubstr=($vo.position),($vo.lenght),'utf-8',false}</span>{$vo.note|msubstr=($vo.position+$vo.lenght),($vo.lenght+10),'utf-8',false}......</td>
             {else/}
-            <td>{$vo.note|msubstr=20,80,'utf-8',false}</td>
+            <td onclick="getinfo({$vo.id})">{$vo.note|msubstr=0,80,'utf-8',false}</td>
             {/if}
+            <td style="display:none;" id="note_{$vo.id}">{$vo.note}</td>
             <td>{$vo.newtime}</td>
             <td>{$vo.ip}</td>
           </tr>
@@ -81,8 +67,11 @@
       </div>
     </div>
     <script>
-      layui.use('laydate', function(){
-        var laydate = layui.laydate;
+      layui.use(['laydate','form','layer'], function(){
+        var form = layui.form
+        ,laydate = layui.laydate
+        ,layer = layui.layer;
+
 
         //执行一个laydate实例
         laydate.render({
@@ -92,6 +81,14 @@
         //执行一个laydate实例
         laydate.render({
           elem: '#end' //指定元素
+        });
+
+        form.on('select(change)', function(data){
+            if(data.value == 10){
+                $('#keyword').show();
+            }else {
+                $('#keyword').hide();
+            }
         });
       });
       /*用户-删除*/
@@ -116,7 +113,24 @@
 
           });
       }
+      function getinfo(id)
+      {
+          var x = '#note_'+id;
+          var text = $(x).text();
+          layer.open({
+              type: 1
+              ,title: false //不显示标题栏
+              ,closeBtn: false
+              ,area: ['300px', '360px']
+              ,shade: 0.8
+              ,id: 'itarvin' //设定一个id，防止重复弹出
+              ,btn: ['关闭']
+              ,btnAlign: 'c'
+              ,moveType: 1 //拖拽模式，0或者1
+              ,content: '<div style="padding: 40px; line-height: 22px; background-color: #393D49; color: #fff; font-weight: 300;word-wrap:break-word; text-align:center;">详细内容:'+text+'</div>'
+              ,success: function(layero){
+                  layui
+              }
+          });
+      }
   </script>
-</body>
-
-</html>

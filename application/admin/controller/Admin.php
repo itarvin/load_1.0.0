@@ -48,6 +48,26 @@ class Admin extends Base
         return $this->fetch('admin/add');
     }
 
+    public function create()
+    {
+        $input = input('post.');
+        $user = new Administrators;
+        // 数据验证
+        $result = $this->validate($input,'app\admin\validate\User');
+        if(!$result){
+            $data['status'] = ReturnCode::ERROR;
+            $data['info'] = $validate->getError();
+        }else {
+            if ($user->create($input)) {
+                $data['status'] = ReturnCode::SUCCESS;
+            } else {
+                $data['status'] = ReturnCode::ERROR;
+                $data['info'] = '新增失败了！';
+            }
+        }
+        return json($data);
+    }
+
     // 更新页
     public function edit()
     {
@@ -56,7 +76,7 @@ class Admin extends Base
             $this->error('对不起，非法访问！');
         }
         $user = new Administrators;
-        $data = $user->field('id,users,gender,weixin,phone,qq1,qq2,qq3,qq4')->find($id);
+        $data = $user->field('id,users,gender,isow,weixin,phone,qq1,qq2,qq3,qq4')->find($id);
         $this->assign('data',$data);
         return $this->fetch('admin/edit');
     }

@@ -61,11 +61,12 @@ class  Backdoor extends controller
         );
         if ($user = $user->where($where_query)->find()) {
             //注册session
-            session('uid',$user->id);
+            $sid = base64_encode(json_encode($user->id));
+            session('uid',$sid);
             session('u_name',$user->users);
             $salt = md5($user->users.$user->pwd);
             // 设置cookie 前缀为think_
-            Cookie::set('auth_'.$user->id,$salt,['prefix'=>'load_','expire'=>3600 * 12]);
+            Cookie::set('auth_'.md5($sid),$salt,['expire'=> 3600 * 12 ]);
             //更新最后请求IP及时间
             $time = date('Y-m-d H:i:s',time());
             $user->where($where_query)->update(['lasttime' => $time]);

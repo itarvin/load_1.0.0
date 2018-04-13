@@ -100,23 +100,6 @@ class Tools {
     }
 
 
-    // 关键字替换原有标识
-    static public function keywordReplace($string)
-    {
-        $array = array(
-            'username' => '名字',
-            'consume'  => '消费',
-            'product'  => '产品',
-            'note'     => '备注',
-            'phone'    => '手机号',
-            'qq'       => 'QQ',
-            'wechat'   => '微信号',
-        );
-        $keyword = array_search($string,array_flip($array));
-        return $keyword;
-    }
-
-
     /**
     * 字符串半角和全角间相互转换
     * @param string $str 待转换的字符串
@@ -174,4 +157,22 @@ class Tools {
           return $str;
       }
   }
+
+
+  // 关键字替换原有标识
+    static public function keywordReplace($string)
+    {
+        $array = array(
+            'username' => '名字',
+            'consume'  => '消费',
+            'product'  => '产品',
+            'note'     => '备注',
+            'phone'    => '手机号',
+            'qq'       => 'QQ',
+            'wechat'   => '微信号',
+            'reguid'   => '原ID'
+        );
+        $keyword = array_search($string,array_flip($array));
+        return $keyword;
+    }
 }
