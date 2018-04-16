@@ -23,8 +23,11 @@
               </select>
           </div>
           <input type="text" name="keyword"  placeholder="QQ/手机号/微信号/备注" autocomplete="off" class="layui-input" value="{:input('post.keyword')}">
-          <button class="layui-btn"  lay-submit="" lay-filter="sreach"><i class="layui-icon">&#xe615;</i></button>
-          <button class="layui-btn layui-btn-primary layui-btn-radius" onclick="x_admin_show('回收站','{:url('Member/recycle')}',1200,600)">回收站</button>
+
+          <button class="layui-btn"  lay-submit="" lay-filter="sreach" onclick="changelogo()" id="button">
+              <i class="layui-icon" id='logo'>&#xe615;</i>
+          </button>
+          <button class="layui-btn layui-btn-primary layui-btn-radius"><a href="{:url('Member/recycle')}">回收站</a></button>
         </form>
       </div>
       <xblock>
@@ -75,7 +78,7 @@
                 </a>
                 <a title="订单"  onclick="x_admin_show('添加订单','{:url('Records/addrecord',array('reid' => $vo.id))}',1000,600)" href="javascript:;">
                     <button class="layui-btn layui-btn-sm layui-btn-primary">
-                        <i class="layui-icon">&#xe63c;</i>
+                        <i class="layui-icon">订单</i>
                     </button>
                 </a>
               <a title="删除" onclick="member_del(this,'{$vo.id}')" href="javascript:;">
@@ -155,4 +158,11 @@
               });
           });
       }
+      function changelogo()
+      {
+          $('#button').addClass('layui-btn-danger');
+          $('#logo').html('&#xe63d;');
+      }
+
+
   </script>

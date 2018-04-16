@@ -28,5 +28,22 @@ class Base extends Controller
             $this->redirect(url('Backdoor/login'));
         }
         $this->name = session('u_name');
+        if($this->checksuperman()){
+            $this->superman = 'yes';
+        }else {
+            $this->superman = 'no';
+        }
     }
+
+
+    protected function checksuperman()
+    {
+        $superlist = config('IS_SUPERMAN');
+        if(in_array($this->uid,$superlist)){
+            return true;
+        }else {
+            return false;
+        }
+    }
+
 }

@@ -13,7 +13,9 @@ class Logs extends Base{
         $log = new Log;
         $acts = Logact::field('id,act_name')->select();
         // 获取当前管理员的客户会员
-        $where = array();
+        $where = [];
+        $map = [];
+        $where[] = ['a.newtime','between',[date('Y-m-d',time()),date('Y-m-d H:i:s',time())]];
         if(request()->isPost()){
             $start = Request::param('start','','trim');
             $end = Request::param('end','','trim');
@@ -29,18 +31,35 @@ class Logs extends Base{
             }
             // check keyword
             if (!empty($aid) && !empty($keyword)) {
-                $where[] = ['a.note', 'LIKE', "%$keyword%"];
+                switch ($aid) {
+                    case '11':
+                        $where[] = ['a.qq', 'LIKE', "%$keyword%"];
+                        $li = Tools::logactKey('cus_insert').','.Tools::logactKey('buy_insert').','.Tools::logactKey('cus_delete').','.Tools::logactKey('buy_delete').','.Tools::logactKey('cus_change').','.Tools::logactKey('cus_isdelete');
+                        $where[] = ['a.act','in',$li];
+                        break;
+                    case 'all':
+                        $where[] = ['a.qq','LIKE', "%$keyword%"];
+                        $map[] = ['a.note','LIKE', "%,$keyword,%"];
+                        break;
+                    case '10':
+                        $map[] = ['a.note', 'LIKE', "%,$keyword,%"];
+                        $map[] = ['a.qq', 'LIKE', "%$keyword%"];
+                        break;
+                    default:
+                        $where[] = ['a.qq', 'LIKE', "%$keyword%"];
+                        $where[] = ['a.act','EQ',$aid];
+                        break;
+                }
             }
-            $where[] = ['a.act', 'EQ', $aid];
         }
         // 提取对应数据
         $list = $log->alias('a')
         ->field('a.*,b.users,c.act_name')
         ->join('admin b','a.uid = b.id')
         ->join(['logs_act'=>'c'],'a.act = c.id')
-        ->where($where)->order('id desc')->paginate();
+        ->where($where)->whereOr($map)->order('id desc')->paginate();
         // 是否提交了关键字
-        if(!empty($keyword)){
+        if(!empty($keyword) && $aid == Tools::logactKey('delete_import')){
             $lenght = mb_strlen($keyword,'utf8');
             foreach ($list as $key => $value) {
                 $have = strpos($value['note'],$keyword);

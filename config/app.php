@@ -139,5 +139,6 @@ return [
     // 定义上传文件目录
     'upload_path'            => '../public/uploads',
     'upload_field'           => array('username','phone','address','note','qq'),
+    'IS_SUPERMAN'           => array('1'),
     'maxitem'                => 1001,
 ];

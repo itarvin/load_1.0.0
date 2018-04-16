@@ -82,7 +82,7 @@ class Member extends Base{
                 // ------日志处理 ---start
                 writelog($v,Tools::logactKey('cus_delete'),$this->uid);
                 // -------------------end
-                $this->shiftCustom($v);
+                $del = $this->shiftCustom($v);
                 $re = $member->where('id',$v)->delete();
                 if($re){
                     $num += 1;
@@ -105,7 +105,7 @@ class Member extends Base{
     {
         $list = Record::field('id')->where('khid','EQ',$memberid)->select();
         foreach ($list as $key => $value) {
-            Record::destroy($value['id']);
+            Record::where('id',$value['id'])->delete();
         }
     }
 

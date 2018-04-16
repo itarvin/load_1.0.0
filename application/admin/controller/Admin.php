@@ -42,11 +42,13 @@ class Admin extends Base
         return $this->fetch('admin/index');
     }
 
+
     // 添加页
     public function add()
     {
         return $this->fetch('admin/add');
     }
+
 
     public function create()
     {
@@ -68,11 +70,12 @@ class Admin extends Base
         return json($data);
     }
 
+
     // 更新页
     public function edit()
     {
         $id = Request::param('id','','trim');
-        if($this->uid != 1 && $this->uid != $id){
+        if($this->superman != 'yes' && $this->uid != $id){
             $this->error('对不起，非法访问！');
         }
         $user = new Administrators;
@@ -81,12 +84,13 @@ class Admin extends Base
         return $this->fetch('admin/edit');
     }
 
+
     // 更新方法
     public function update()
     {
         $input = input('post.');
         $user = new Administrators;
-        if($this->uid != 1 && $this->uid != $input['id']){
+        if($this->superman != 'yes' && $this->uid != $input['id']){
             $this->error('对不起，非法访问！');
         }
         $preview = $user->where(array('users'=>$input['users']))->find();
@@ -121,7 +125,7 @@ class Admin extends Base
         // 预定义type 数组
         $checktype = array('qq,phone,weixin');
         $where = array();
-        if($this->uid != '1'){
+        if($this->superman != 'yes'){
             $where[] = ['uid','=',$this->uid];
         }
         if(request()->isPost()){
@@ -203,6 +207,7 @@ class Admin extends Base
         }
         return json($data);
     }
+
 
     // 获取点击数
     public function getHit()

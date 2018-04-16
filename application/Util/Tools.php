@@ -170,7 +170,8 @@ class Tools {
             'phone'    => '手机号',
             'qq'       => 'QQ',
             'wechat'   => '微信号',
-            'reguid'   => '原ID'
+            'reguid'   => '原ID',
+            'birthday' => '生日'
         );
         $keyword = array_search($string,array_flip($array));
         return $keyword;

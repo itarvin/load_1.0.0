@@ -69,7 +69,7 @@ function isMobile()
 function writelog($data,$act,$uid)
 {
     if($act == 10){
-        $note = '';
+        $note = ',';
         foreach($data as $k => $v){
             $phk = array_key_exists('phone',$v);
             $qqk = array_key_exists('qq',$v);
@@ -87,7 +87,7 @@ function writelog($data,$act,$uid)
         }
     }else if($act == 2) {
         $note = [];
-        $kh = Db::name('member')->field('username,qq')->find($data['khid']);
+        $kh = Db::name('member')->field('username,qq')->where('id',$data['khid'])->find();
         $note = json_encode(array(
             'username'=> $kh['username'],
             'product'=> $data['product'],
@@ -96,7 +96,7 @@ function writelog($data,$act,$uid)
         ));
         $da['qq'] = $kh['qq'];
     }else if($act == 3 || $act == 5){
-        $kh = Db::name('member')->field('username,qq,newtime')->find($data);
+        $kh = Db::name('member')->field('username,qq,newtime,birthday')->where('id',$data)->find();
         if($act == 3){
             $price = Db::name('record')->field('price')->where('khid','EQ',$data)->select();
             $sum = 0;
@@ -106,6 +106,7 @@ function writelog($data,$act,$uid)
             $note = json_encode(array(
                 'username'=> $kh['username'],
                 'consume'=> $sum,
+                'birthday'=> $kh['birthday'],
             ));
         }else if($act == 5){
             $note = json_encode(array(

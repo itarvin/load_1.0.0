@@ -75,6 +75,8 @@ class  Backdoor extends controller
             $this->error('登录失败:账号或密码错误','Backdoor/login');
         }
     }
+
+    
     // 退出
     public function logout()
     {

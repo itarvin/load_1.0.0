@@ -4,8 +4,11 @@ class Index extends Base
 {
     public function index()
     {
-        $this->assign('name',$this->name);
-        $this->assign('uid',$this->uid);
+        $this->assign(array(
+            'name' => $this->name,
+            'uid'  => $this->uid,
+            'issuper' => $this->superman
+        ));
         return $this->fetch();
     }
 

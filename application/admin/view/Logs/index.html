@@ -14,15 +14,22 @@
         <form class="layui-form layui-col-md12 x-so"  action="{:url('Logs/index')}" method="post">
           <input class="layui-input" placeholder="开始日期" name="start" id="start" value="{:input('post.start')}">
           <input class="layui-input" placeholder="截止日期" name="end" id="end" value="{:input('post.end')}">
-          <div class="layui-input-inline" >
-              <select name="aid" lay-filter="change">
-                  <option value="">所有行为</option>
-                  {volist name="acts" id="vo"}
-                  <option value="{$vo.id}" {if input('post.aid') == $vo.id}selected{/if} >{$vo.act_name}</option>
-                  {/volist}
-              </select>
-          </div>
-          <input style="display:none;" id="keyword" type="text" name="keyword"  placeholder="导入关键字" autocomplete="off" class="layui-input" value="{:input('post.keyword')}">
+              <div class="layui-input-inline">
+                  <select name="aid">
+                      <option value="">所有行为</option>
+                      <optgroup label="快捷操作">
+                          <option value="11" {if input('post.aid') == '11'}selected{/if}>普通日志</option>
+                          <option value="10" {if input('post.aid') == '10'}selected{/if}>导入日志</option>
+                          <option value="all" {if input('post.aid') == 'all'}selected{/if}>所有日志（慎用！）</option>
+                      </optgroup>
+                      <optgroup label="------------------">
+                          {volist name="acts" id="vo"}
+                          <option value="{$vo.id}" {if input('post.aid') == $vo.id}selected{/if} >{$vo.act_name}</option>
+                          {/volist}
+                      </optgroup>
+                  </select>
+              </div>
+          <input  id="keyword" type="text" name="keyword"  placeholder="导入关键字" autocomplete="off" class="layui-input" value="{:input('post.keyword')}">
           <button class="layui-btn"  lay-submit="" lay-filter="sreach"><i class="layui-icon">&#xe615;</i></button>
         </form>
       </div>
@@ -39,6 +46,7 @@
             <th>备　　注</th>
             <th>操作时间</th>
             <th>ip地址</th>
+            <th>查看详情</th>
         </tr>
         </thead>
         <tbody>
@@ -49,13 +57,14 @@
             <th>{$vo.act_name}</th>
             <td>{$vo.qq}</td>
             {if $vo.k == '1'}
-            <td   onclick="getinfo({$vo.id})">......{$vo.note|msubstr=($vo.position-12),($vo.lenght+1),'utf-8',false}<span style="color:green;font-size:25px;">{$vo.note|msubstr=($vo.position),($vo.lenght),'utf-8',false}</span>{$vo.note|msubstr=($vo.position+$vo.lenght),($vo.lenght+10),'utf-8',false}......</td>
+            <td>......{$vo.note|msubstr=($vo.position-12),($vo.lenght+1),'utf-8',false}<span style="color:green;font-size:25px;">{$vo.note|msubstr=($vo.position),($vo.lenght),'utf-8',false}</span>{$vo.note|msubstr=($vo.position+$vo.lenght),($vo.lenght+10),'utf-8',false}......</td>
             {else/}
-            <td onclick="getinfo({$vo.id})">{$vo.note|msubstr=0,80,'utf-8',false}</td>
+            <td>{$vo.note|msubstr=0,80,'utf-8',false}</td>
             {/if}
             <td style="display:none;" id="note_{$vo.id}">{$vo.note}</td>
             <td>{$vo.newtime}</td>
             <td>{$vo.ip}</td>
+            <td onclick="getinfo({$vo.id})">详情</td>
           </tr>
         {/volist}
         </tbody>
@@ -83,13 +92,13 @@
           elem: '#end' //指定元素
         });
 
-        form.on('select(change)', function(data){
-            if(data.value == 10){
-                $('#keyword').show();
-            }else {
-                $('#keyword').hide();
-            }
-        });
+        // form.on('select(change)', function(data){
+        //     if(data.value == 10){
+        //         $('#keyword').show();
+        //     }else {
+        //         $('#keyword').hide();
+        //     }
+        // });
       });
       /*用户-删除*/
       function member_del(obj,id){
@@ -129,8 +138,21 @@
               ,moveType: 1 //拖拽模式，0或者1
               ,content: '<div style="padding: 40px; line-height: 22px; background-color: #393D49; color: #fff; font-weight: 300;word-wrap:break-word; text-align:center;">详细内容:'+text+'</div>'
               ,success: function(layero){
-                  layui
               }
           });
       }
+
+          window.onload=function()
+          {
+              gettime();
+          }
+          function gettime()
+          {
+              var myDate = new Date();//获取系统当前时间
+              var year = myDate.getFullYear(); //获取完整的年份(4位,1970-????)
+              var month = myDate.getMonth() + 1; //获取当前月份(0-11,0代表1月)
+              var day = myDate.getDate(); //获取当前日(1-31)
+              var now = year+'-'+month+'-'+day;
+              $('#start').val(now);
+          }
   </script>

@@ -13,7 +13,7 @@ class Records extends Base
         $record = new Record;
         $uid = $this->uid;
         $where = array();
-        if($this->uid != 1)
+        if($this->superman != 'yes')
         {
             $where[] = ['a.uid','eq',$this->uid];
         }

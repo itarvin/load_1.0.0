@@ -30,7 +30,7 @@
             <th>谁的客户</th>
             {/if}
             <th>产品名称</th>
-            <th>价　　格</th>
+            <th>价　　格(RMB)</th>
             <th>加入时间</th>
             {if $uid != '1'}
             <th>操作</th></tr>
@@ -45,7 +45,7 @@
             <th>{$vo.users}</th>
             {/if}
             <td>{$vo.product}</td>
-            <td>{$vo.price}</td>
+            <td><i class="layui-icon">&#xe65e;</i>：{$vo.price}</td>
             <td>{$vo.newtime}</td>
             {if $uid != '1'}
             <td class="td-manage">
