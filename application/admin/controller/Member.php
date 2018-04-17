@@ -13,24 +13,30 @@ use think\facade\Request;
 class Member extends Base{
     /**
      * 主页显示
+     *获取当前管理员的客户会员
      */
     public function index()
     {
         $member = new Consumer;
-        // 获取当前管理员的客户会员
         // 预定义type 数组
-        $checktype = array('qq,phone,weixin');
-        $where = array();
+        $checktype = array('qq','phone','weixin');
+        $where = [];
         $where[] = ['is_delete','EQ','0'];
         // check Admin
-        if($this->uid != 1){
+        if($this->superman != 'yes'){
             $where[] = ['uid','EQ',$this->uid];
         }
-        if(request()->isPost()){
+        // 默认取出当天范围内的客户
+        $where[] = ['newtime','between',[date('Y-m-d',time()),date('Y-m-d H:i:s',time())]];
+        if(request()->isPost())
+        {
+            $where = [];
+            // 接收参数
             $start = Request::param('start','','trim');
             $end = Request::param('end','','trim');
             $type = Request::param('type','','trim');
             $keyword = Request::param('keyword','','trim');
+
             //check time
             if ($start && $end) {
                 $where[] = ['newtime','between',[$start,$end]];
@@ -39,6 +45,7 @@ class Member extends Base{
             }elseif ($end) {
                 $where[] = ['newtime','LT',$end];
             }
+
             // check type
             if (!empty($keyword)) {
                 if($type && in_array($type,$checktype)){
@@ -54,6 +61,7 @@ class Member extends Base{
             'list' => $list,
             'count'=>$count,
             'uid'  => $this->uid,
+            'superman'  => $this->superman,
         ));
         return $this->fetch('Member/index');
     }
@@ -64,7 +72,6 @@ class Member extends Base{
     {
         $data = input('post.');
         $member = new Consumer;
-        // 先判断当前是删除数据是否为本人的客户。
         $nums = 0;
         foreach($data['deleid'] as $k => $v){
             $have = $member->where('id',$v)->find();
@@ -79,11 +86,12 @@ class Member extends Base{
             $count = count($data['deleid']);
             $num = 0;
             foreach($data['deleid'] as $k => $v){
+                // 放进回收站暂不做日志处理，和删除相关订单信息
                 // ------日志处理 ---start
-                writelog($v,Tools::logactKey('cus_delete'),$this->uid);
+                // writelog($v,Tools::logactKey('cus_delete'),$this->uid);
                 // -------------------end
-                $del = $this->shiftCustom($v);
-                $re = $member->where('id',$v)->delete();
+                // $del = $this->shiftCustom($v);
+                $re = $member->where('id',$v)->update(array('is_delete' => 1));
                 if($re){
                     $num += 1;
                 }
@@ -122,7 +130,31 @@ class Member extends Base{
             $data['msg'] = '当前客户非您的客户！';
         }else {
             $this->shiftCustom($id);
+            // ------日志处理 ---start
+            writelog($id,Tools::logactKey('cus_delete'),$this->uid);
+            // -------------------end
             $re = $member->where('id',$id)->delete();
+            if($re){
+                $data['status'] = ReturnCode::SUCCESS;;
+            }
+        }
+        return json($data);
+    }
+
+
+
+    // 回收站恢复
+    public function renew()
+    {
+        $id = input('post.newid');
+        $member = new Consumer;
+        // 先判断当前是删除数据是否为本人的客户。
+        $have = $member->where('id',$id)->find();
+        if($have['uid']  != $this->uid){
+            $data['status'] = ReturnCode::ERROR;
+            $data['msg'] = '当前客户非您的客户！';
+        }else {
+            $re = $member->where('id',$id)->update(array('is_delete' => '0'));
             if($re){
                 $data['status'] = ReturnCode::SUCCESS;;
             }

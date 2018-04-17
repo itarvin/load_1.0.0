@@ -20,7 +20,7 @@
           <input class="layui-input" placeholder="截止日期" name="end" id="end" value="{:input('post.end')}">
           <input type="text" name="users"  placeholder="请输入用户名" autocomplete="off" class="layui-input" value="{:input('post.users')}">
 
-          <button class="layui-btn"  lay-submit="" lay-filter="sreach"><i class="layui-icon">&#xe615;</i></button>
+          <button class="layui-btn"  lay-submit="" lay-filter="sreach" onclick="changelogo()" id="button"><i class="layui-icon" id="logo">&#xe615;</i></button>
 
         </form>
       </div>
@@ -64,8 +64,8 @@
                 </td>
                 <td class="td-manage">
 
-                  <a   {if $uid == $vo.id}href="{:url('Admin/custom')}"{/if}  title="员工客户">
-                      <button class="layui-btn layui-btn-sm {if $uid == $vo.id}layui-btn-primary{else /}layui-btn-disabled{/if} ">
+                  <a  href="{:url('Admin/custom')}"  title="员工客户">
+                      <button class="layui-btn layui-btn-sm layui-btn-primary">
                           <i class="layui-icon">&#xe613;</i>
                       </button>
                   </a>
@@ -204,5 +204,10 @@
                   }
               }
           });
+      }
+      function changelogo()
+      {
+          $('#button').addClass('layui-btn-danger');
+          $('#logo').html('&#xe63d;');
       }
     </script>

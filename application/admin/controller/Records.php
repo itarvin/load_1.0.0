@@ -2,9 +2,9 @@
 namespace app\admin\controller;
 use app\admin\model\Consumer;
 use app\admin\model\Record;
-use think\Validate;
 use app\util\ReturnCode;
 use app\util\Tools;
+use think\facade\Request;
 class Records extends Base
 {
     // 主页
@@ -12,26 +12,35 @@ class Records extends Base
     {
         $record = new Record;
         $uid = $this->uid;
-        $where = array();
-        if($this->superman != 'yes')
-        {
+        $where = [];
+        // 检测是否是超管
+        if($this->superman != 'yes'){
             $where[] = ['a.uid','eq',$this->uid];
         }
+        // 默认取出当天范围内的客户
+        $where[] = ['a.newtime','between',[date('Y-m-d',time()),date('Y-m-d H:i:s',time())]];
+        // 处理查询
         if(request()->isPost()){
+            // 重新处理条件
+            $where = [];
+            // 检测是否是超管
+            if($this->superman != 'yes'){
+                $where[] = ['a.uid','eq',$this->uid];
+            }
             $start = Request::param('start','','trim');
             $end = Request::param('end','','trim');
             $keyword = Request::param('keyword','','trim');
             //check time
             if ($start && $end) {
-                $where[] = ['newtime','between',[$start,$end]];
+                $where[] = ['a.newtime','between',[$start,$end]];
             }elseif($start){
-                $where[] = ['newtime','GT',$start];
+                $where[] = ['a.newtime','GT',$start];
             }elseif ($end) {
-                $where[] = ['newtime','LT',$end];
+                $where[] = ['a.newtime','LT',$end];
             }
-
+            //  check keyword
             if (!empty($keyword)) {
-                $where[] = ['product|price', 'LIKE', $keyword];
+                $where[] = ['a.product|a.price', 'LIKE', "%$keyword%"];
             }
         }
         $list = $record->alias('a')
@@ -41,14 +50,16 @@ class Records extends Base
         ->where($where)
         ->order('id desc')->paginate();
         $count = $list->total();
-        $this->assign('list',$list);
-        $this->assign('count',$count);
-        $this->assign('uid',$uid);
+        $this->assign(array(
+            'list'  => $list,
+            'count' => $count,
+            'uid'   => $uid
+        ));
         return $this->fetch('records/index');
     }
 
 
-    // 添加消费
+    // 添加消费页
     public function addrecord()
     {
         $khid = input('reid');
@@ -64,7 +75,7 @@ class Records extends Base
         return $this->fetch('Records/addrecord');
     }
 
-
+    // 处理添加订单数据
     public function record()
     {
         $input = input('post.');
@@ -87,14 +98,11 @@ class Records extends Base
         $record = new Record;
         $re = $record->insertAll($data);
         if($re){
-            $this->success('添加'.$re.'条订单成功！','Admin/index');
+            $this->success('添加'.$re.'条订单成功！');
         }
     }
 
-
-
     //删除订单
-
     public function delete()
     {
         $id = input('post.deleid');

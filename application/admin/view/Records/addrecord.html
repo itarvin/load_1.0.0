@@ -30,7 +30,7 @@
 
                         <td><input type="text" name="price[]" required=""  autocomplete="off" class="layui-input" onkeyup="value=value.replace(/[^\d\.\/]/ig,'')"/></td>
 
-                        <td><input type="text" name="note[]" required=""  autocomplete="on" class="layui-input" list="in"></td>
+                        <td><input type="text" name="note[]" required=""  autocomplete="off" class="layui-input" list="in"></td>
                         <datalist id="in">
                             <option>本人</option>
                             <option>父亲</option>
@@ -44,24 +44,25 @@
                         <td><input onclick="addNewTr(this);" class="layui-btn layui-btn-normal" type="button" value="+" /></td>
                     </tr>
                     <tr id="submit" class="text-c">
-                        <td align="center"  colspan="6"><button class="layui-btn layui-btn-fluid">提交</button></td>
+                        <td align="center"  colspan="6"><button class="layui-btn layui-btn-fluid" lay-filter="add">提交</button></td>
                     </tr>
               </tbody>
           </table>
       </from>
   </div>
-  <script>
-      function addNewTr(btn)
-      {
-      	var tr = $(btn).parent().parent();
+    <script>
+    function addNewTr(btn)
+    {
+        var tr = $(btn).parent().parent();
         var val = $(btn).val();
-      	if($(btn).val() == "+")
+        if($(btn).val() == "+")
       	{
       		var newTr = tr.clone();
       		newTr.find(":button").val("-");
       		$("#submit").before(newTr);
-      	}
-      	else
-      		tr.remove();
-      }
-  </script>
+      	}else{
+            tr.remove();
+        }
+    }
+
+    </script>

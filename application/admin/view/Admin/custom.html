@@ -32,7 +32,7 @@
               </select>
           </div>
           <input type="text" name="keyword"  placeholder="QQ/手机号/微信号/备注" autocomplete="off" class="layui-input" value="{:input('post.keyword')}">
-          <button class="layui-btn"  lay-submit="" lay-filter="sreach"><i class="layui-icon">&#xe615;</i></button>
+          <button class="layui-btn"  lay-submit="" lay-filter="sreach"  id="button" onclick="changelogo()"><i class="layui-icon" id="logo">&#xe615;</i></button>
         </form>
       </div>
       <xblock>
@@ -117,5 +117,10 @@
               });
 
           });
+      }
+      function changelogo()
+      {
+          $('#button').addClass('layui-btn-danger');
+          $('#logo').html('&#xe63d;');
       }
   </script>

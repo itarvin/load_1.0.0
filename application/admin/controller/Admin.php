@@ -3,9 +3,7 @@ namespace app\admin\controller;
 use app\admin\model\Administrators;
 use app\admin\model\Consumer;
 use app\admin\model\Hitcount;
-use app\admin\model\Record;
 use think\facade\Request;
-use think\Validate;
 use app\util\ReturnCode;
 class Admin extends Base
 {

@@ -27,49 +27,51 @@
           <button class="layui-btn"  lay-submit="" lay-filter="sreach" onclick="changelogo()" id="button">
               <i class="layui-icon" id='logo'>&#xe615;</i>
           </button>
-          <button class="layui-btn layui-btn-primary layui-btn-radius"><a href="{:url('Member/recycle')}">回收站</a></button>
         </form>
       </div>
       <xblock>
-        {if $uid != '1'}
-        <button class="layui-btn layui-btn-danger" onclick="delAll()"><i class="layui-icon"></i>批量删除</button>
-        {/if}
+          <!-- 暂不开放当前功能 -->
+        <!-- {if $superman != 'yes'}
+        <button class="layui-btn layui-btn-danger" onclick="delAll()"><i class="layui-icon"></i>批量回收站</button>
         <button class="layui-btn" onclick="x_admin_show('添加用户','{:url('Member/add')}',600,400)"><i class="layui-icon"></i>添加</button>
+        {/if} -->
         <span class="x-right" style="line-height:40px">共有数据：{$count} 条</span>
       </xblock>
       <table class="layui-table">
         <thead>
           <tr>
-            {if $uid != '1'}
+             <!-- 暂不开放当前功能 -->
+            <!-- {if $superman != 'yes'}
             <th>
               <div class="layui-unselect header layui-form-checkbox" lay-skin="primary"><i class="layui-icon">&#xe605;</i></div>
             </th>
-            {/if}
+            {/if} -->
             <th>ID</th>
             <th>用户名</th>
             <th>微信</th>
             <th>手机</th>
             <th>QQ</th>
             <th>加入时间</th>
-            {if $uid != '1'}
+            {if $superman != 'yes'}
             <th>操作</th></tr>
             {/if}
         </thead>
         <tbody>
         {volist name="list" id="vo"}
           <tr>
-            {if $uid != '1'}
+              <!-- 暂不开放当前功能 -->
+            <!-- {if $superman != 'yes'}
             <td>
               <div class="layui-unselect layui-form-checkbox" lay-skin="primary" data-id='{$vo.id}'><i class="layui-icon">&#xe605;</i></div>
             </td>
-            {/if}
+            {/if} -->
             <td>{$vo.id}</td>
             <td>{$vo.username}</td>
             <td>{$vo.weixin}</td>
             <td>{$vo.phone}</td>
             <td>{$vo.qq}</td>
             <td>{$vo.newtime}</td>
-            {if $uid != '1'}
+            {if $superman != 'yes'}
             <td class="td-manage">
                 <a title="编辑"  onclick="x_admin_show('编辑','{:url('member/edit',array('id' => $vo.id))}')" href="javascript:;">
                     <button class="layui-btn layui-btn-sm layui-btn-primary">
@@ -81,11 +83,12 @@
                         <i class="layui-icon">订单</i>
                     </button>
                 </a>
-              <a title="删除" onclick="member_del(this,'{$vo.id}')" href="javascript:;">
+              <!-- 暂不开放当前功能 -->
+              <!-- <a title="删除" onclick="member_del(this,'{$vo.id}')" href="javascript:;">
                   <button class="layui-btn layui-btn-sm layui-btn-primary">
                       <i class="layui-icon">&#xe640;</i>
                   </button>
-              </a>
+              </a> -->
             </td>
             {/if}
           </tr>
@@ -131,15 +134,12 @@
                       }
                   },
               });
-
           });
       }
 
-
-
       function delAll (argument) {
           var data = tableCheck.getData();
-          layer.confirm('确认要删除吗？'+data,function(index){
+          layer.confirm('确认要回收吗？'+data,function(index){
               //捉到所有被选中的，发异步进行删除
               $.ajax({
                   url:"{:url('Member/batchdelete')}",
@@ -149,7 +149,7 @@
                   success:function(msg){
                       if(msg.status == 1)
                       {
-                          layer.msg('删除'+msg.success+'条成功！', {icon: 1});
+                          layer.msg('回收'+msg.success+'条成功！请在您的回收站查看！', {icon: 1});
                           $(".layui-form-checked").not('.header').parents('tr').remove();
                       }else {
                           layer.msg('客户列表存在'+msg.error+'个非您的客户！禁止操作！', {icon: 1});
@@ -163,6 +163,21 @@
           $('#button').addClass('layui-btn-danger');
           $('#logo').html('&#xe63d;');
       }
-
-
+      // 默认填充当天的时间
+      window.onload=function()
+      {
+          gettime();
+      }
+      function gettime()
+      {
+          var myDate = new Date();//获取系统当前时间
+          var year = myDate.getFullYear(); //获取完整的年份(4位,1970-????)
+          var month = myDate.getMonth() + 1; //获取当前月份(0-11,0代表1月)
+          var day = myDate.getDate(); //获取当前日(1-31)
+          var now = year+'-'+month+'-'+day;
+          var hasvalue = $('#start').val();
+          if(!hasvalue){
+              $('#start').val(now);
+          }
+      }
   </script>

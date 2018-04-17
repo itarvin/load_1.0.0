@@ -11,7 +11,7 @@
     </div>
     <div class="x-body">
       <div class="layui-row">
-        <form class="layui-form layui-col-md12 x-so"  action="{:url('Member/index')}" method="post">
+        <form class="layui-form layui-col-md12 x-so"  action="{:url('Records/index')}" method="post">
           <input class="layui-input" placeholder="开始日期" name="start" id="start" value="{:input('post.start')}">
           <input class="layui-input" placeholder="截止日期" name="end" id="end" value="{:input('post.end')}">
           <input type="text" name="keyword"  placeholder="产品名称|价格" autocomplete="off" class="layui-input" value="{:input('post.keyword')}">
@@ -101,5 +101,22 @@
               });
 
           });
+      }
+      // 默认填充当天的时间
+      window.onload=function()
+      {
+          gettime();
+      }
+      function gettime()
+      {
+          var myDate = new Date();//获取系统当前时间
+          var year = myDate.getFullYear(); //获取完整的年份(4位,1970-????)
+          var month = myDate.getMonth() + 1; //获取当前月份(0-11,0代表1月)
+          var day = myDate.getDate(); //获取当前日(1-31)
+          var now = year+'-'+month+'-'+day;
+          var hasvalue = $('#start').val();
+          if(!hasvalue){
+              $('#start').val(now);
+          }
       }
   </script>
