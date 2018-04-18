@@ -95,8 +95,8 @@ function writelog($data,$act,$uid)
             'note'=> $data['note'],
         ));
         $da['qq'] = $kh['qq'];
-    }else if($act == 3 || $act == 5){
-        $kh = Db::name('member')->field('username,qq,newtime,birthday')->where('id',$data)->find();
+    }else if($act == 3 || $act == 5 || $act == 1){
+        $kh = Db::name('member')->field('username,qq,newtime,birthday,weixin,phone')->where('id',$data)->find();
         if($act == 3){
             $price = Db::name('record')->field('price')->where('khid','EQ',$data)->select();
             $sum = 0;
@@ -112,6 +112,13 @@ function writelog($data,$act,$uid)
             $note = json_encode(array(
                 'reguid'  => $data,
                 'username'=> $kh['username'],
+                'newtime'=> $kh['newtime'],
+            ));
+        }else if($act == 1){
+            $note = json_encode(array(
+                'username'=> $kh['username'],
+                'weixin'=> $kh['weixin'],
+                'phone'=> $kh['phone'],
                 'newtime'=> $kh['newtime'],
             ));
         }

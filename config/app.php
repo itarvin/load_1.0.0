@@ -21,7 +21,7 @@ return [
     // 应用调试模式
     'app_debug'              => true,
     // 应用Trace
-    'app_trace'              => true,
+    'app_trace'              => false,
     // 应用模式状态
     'app_status'             => '',
     // 是否支持多模块
@@ -138,7 +138,19 @@ return [
     'exception_handle'       => '',
     // 定义上传文件目录
     'upload_path'            => '../public/uploads',
+    // 定义导入客户字段
     'upload_field'           => array('username','phone','address','note','qq'),
+    // 定义超级管理员id,
     'IS_SUPERMAN'           => array('1'),
+    // 定义导入最大处理数
     'maxitem'                => 1001,
+    // 动态获取允许跨域地址
+    'TRENDS_ALLOW_ORIGIN'   =>  '*',
+    //向外跨域配置
+    'CROSS_DOMAIN' => [
+        'Access-Control-Allow-Origin'      => '*',
+        'Access-Control-Allow-Methods'     => 'POST,GET',
+        'Access-Control-Allow-Headers'     => 'Token, User-Agent, Keep-Alive, Origin, No-Cache, X-Requested-With, If-Modified-Since, Pragma, Last-Modified, Cache-Control, Expires, Content-Type, X-E4M-With',
+        'Access-Control-Allow-Credentials' => 'true'
+    ],
 ];

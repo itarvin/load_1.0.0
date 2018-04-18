@@ -45,5 +45,4 @@ class Base extends Controller
             return false;
         }
     }
-
 }

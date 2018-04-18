@@ -17,11 +17,12 @@ class Tools {
     {
     	$errorInfo = array(
     		ReturnCode::SUCCESS              => '请求成功',
-    		ReturnCode::ERROR                => '请求成功',
+    		ReturnCode::ERROR                => '请求失败',
     		ReturnCode::NODATA               => '数据不存在',
     		ReturnCode::AUTH_ERROR           => '权限认证失败',
     		ReturnCode::UNKNOWN              => '未知错误',
     		ReturnCode::EXCEPTION            => '系统异常',
+            ReturnCode::VERIFICATIONFAILURE  => '数据验证失败',
     	);
     	return $code ? $errorInfo[$code] : '未知错误';
     }
@@ -171,7 +172,8 @@ class Tools {
             'qq'       => 'QQ',
             'wechat'   => '微信号',
             'reguid'   => '原ID',
-            'birthday' => '生日'
+            'birthday' => '生日',
+            'newtime'  => '添加时间',
         );
         $keyword = array_search($string,array_flip($array));
         return $keyword;

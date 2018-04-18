@@ -1,15 +1,97 @@
 <?php
 namespace app\index\controller;
-
-class Index
+use app\admin\model\Consumer;
+use app\util\Tools;
+use app\util\ReturnCode;
+class Index extends Base
 {
     public function index()
     {
-        return '<style type="text/css">*{ padding: 0; margin: 0; } div{ padding: 4px 48px;} a{color:#2E5CD5;cursor: pointer;text-decoration: none} a:hover{text-decoration:underline; } body{ background: #fff; font-family: "Century Gothic","Microsoft yahei"; color: #333;font-size:18px;} h1{ font-size: 100px; font-weight: normal; margin-bottom: 12px; } p{ line-height: 1.6em; font-size: 42px }</style><div style="padding: 24px 48px;"> <h1>:) </h1><p> ThinkPHP V5.1<br/><span style="font-size:30px">12载初心不改（2006-2018） - 你值得信赖的PHP框架</span></p></div><script type="text/javascript" src="https://tajs.qq.com/stats?sId=64890268" charset="UTF-8"></script><script type="text/javascript" src="https://e.topthink.com/Public/static/client.js"></script><think id="eab4b9f840753f8e7"></think>';
+        return json($data = [
+            'author'    => 'itarvin',
+            'ToYou'      => "I'm glad to meet you（终于等到你！）"
+        ]);
     }
-
-    public function hello($name = 'ThinkPHP5')
+    public function increased()
     {
-        return 'hello,' . $name;
+        $member = new Consumer;
+        $data = [];
+        if($this->AuthPermission == '200'){
+            $input = input('post.');
+            // 数据验证
+            $result = $this->validate($input,'app\admin\validate\Member');
+            if(!$result){
+                $data['status'] = ReturnCode::ERROR;
+                $data['info'] = $validate->getError();
+            }else{
+                $input['uid'] = $this->uid;
+                $input['newtime'] = date('Y-m-d H:i:s',time());
+                $lastid = $member->insertGetId($input);
+                // ------日志处理 ---start
+                writelog($lastid,Tools::logactKey('cus_insert'),$this->uid);
+                // -------------------end
+                if($lastid){
+                    $data['status'] = ReturnCode::SUCCESS;
+                    $data['info'] = Tools::errorCode(ReturnCode::SUCCESS);
+                }
+            }
+        }else {
+            $data['ToYou'] = "I'm glad to meet you（终于等到你！）";
+        }
+        return json($data);
+    }
+    // 修改数据
+    // public function increased()
+    // {
+    //     $member = new Consumer;
+    //     $data = [];
+    //     if($this->AuthPermission == '200'){
+    //         $input = input('post.');
+    //         // 数据验证
+    //         $result = $this->validate($input,'app\admin\validate\Member');
+    //         if(!$result){
+    //             $data['status'] = ReturnCode::ERROR;
+    //             $data['info'] = $validate->getError();
+    //         }else{
+    //             $input['uid'] = $this->uid;
+    //             $re = $member->upadte($input);
+    //             if($re){
+    //                 $data['status'] = ReturnCode::SUCCESS;
+    //                 $data['info'] = Tools::errorCode(ReturnCode::SUCCESS);
+    //             }
+    //         }
+    //     }else {
+    //         $data['ToYou'] = "I'm glad to meet you（终于等到你！）";
+    //     }
+    //     return json($data);
+    // }
+
+
+    // 获取详情信息
+    public function getinformation()
+    {
+        $member = new Consumer;
+        $input = input('post.');
+        $data = [];
+        if($this->AuthPermission == '200'){
+            $where = [];
+            if($input['type'] == 'all' || $input['type'] == ''){
+                $where[] = ['phone|weixin|qq','eq',$input['key']];
+            }else if($input['type'] == 'qq' || $input['type'] == 'phone' || $input['type'] == 'weixin'){
+                $where[] = [$input['type'],'eq',$input['key']];
+            }
+            $list = $member->where($where)->order('id desc')->select();
+            if(count($list) > 0){
+                $data['status'] = ReturnCode::SUCCESS;
+                $data['info'] = Tools::errorCode(ReturnCode::SUCCESS);
+                $data['data'] = $list;
+            }else {
+                $data['status'] = ReturnCode::NODATA;
+                $data['info'] = Tools::errorCode(ReturnCode::NODATA);
+            }
+        }else if($this->AuthPermission == '400') {
+            $data['ToYou'] = "I'm glad to meet you（终于等到你！）";
+        }
+        return json($data);
     }
 }

@@ -37,14 +37,14 @@ class Admin extends Base
             'count'=>$count,
             'uid'  => $this->uid,
         ));
-        return $this->fetch('admin/index');
+        return $this->fetch('Admin/index');
     }
 
 
     // 添加页
     public function add()
     {
-        return $this->fetch('admin/add');
+        return $this->fetch('Admin/add');
     }
 
 
@@ -79,7 +79,7 @@ class Admin extends Base
         $user = new Administrators;
         $data = $user->field('id,users,gender,isow,weixin,phone,qq1,qq2,qq3,qq4')->find($id);
         $this->assign('data',$data);
-        return $this->fetch('admin/edit');
+        return $this->fetch('Admin/edit');
     }
 
 
@@ -158,7 +158,7 @@ class Admin extends Base
             'uid'  => $this->uid,
             'users'=> $users
         ));
-        return $this->fetch('admin/custom');
+        return $this->fetch('Admin/custom');
     }
 
 

@@ -9,11 +9,11 @@ class Index extends Base
             'uid'  => $this->uid,
             'issuper' => $this->superman
         ));
-        return $this->fetch();
+        return $this->fetch('Index/index');
     }
 
     public function welcome()
     {
-        return $this->fetch();
+        return $this->fetch('Index/welcome');
     }
 }

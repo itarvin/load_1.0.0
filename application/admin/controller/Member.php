@@ -97,10 +97,10 @@ class Member extends Base{
                 }
             }
             if($count == $num){
-                $return['status'] = ReturnCode::SUCCESS;;
+                $return['status'] = ReturnCode::SUCCESS;
                 $return['success'] = $num;
             }else {
-                $return['status'] = ReturnCode::SUCCESS;;
+                $return['status'] = ReturnCode::SUCCESS;
                 $return['error'] = ($count - $num);
             }
         }
@@ -135,7 +135,7 @@ class Member extends Base{
             // -------------------end
             $re = $member->where('id',$id)->delete();
             if($re){
-                $data['status'] = ReturnCode::SUCCESS;;
+                $data['status'] = ReturnCode::SUCCESS;
             }
         }
         return json($data);
@@ -156,7 +156,7 @@ class Member extends Base{
         }else {
             $re = $member->where('id',$id)->update(array('is_delete' => '0'));
             if($re){
-                $data['status'] = ReturnCode::SUCCESS;;
+                $data['status'] = ReturnCode::SUCCESS;
             }
         }
         return json($data);

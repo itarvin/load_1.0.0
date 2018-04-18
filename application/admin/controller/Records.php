@@ -55,7 +55,7 @@ class Records extends Base
             'count' => $count,
             'uid'   => $uid
         ));
-        return $this->fetch('records/index');
+        return $this->fetch('Records/index');
     }
 
 

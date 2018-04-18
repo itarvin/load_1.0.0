@@ -15,6 +15,7 @@ class ReturnCode {
     const AUTH_ERROR = -14;
     const UNKNOWN = -998;
     const EXCEPTION = -999;
+    const VERIFICATIONFAILURE = -2;
 
     static public function getConstants() {
         $oClass = new \ReflectionClass(__CLASS__);
