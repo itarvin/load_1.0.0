@@ -23,6 +23,9 @@ class Tools {
     		ReturnCode::UNKNOWN              => '未知错误',
     		ReturnCode::EXCEPTION            => '系统异常',
             ReturnCode::VERIFICATIONFAILURE  => '数据验证失败',
+            ReturnCode::ACCOUNTEXPIRED       => '账户已过期',
+            ReturnCode::OCCUPIED             => '非您的客户！',
+
     	);
     	return $code ? $errorInfo[$code] : '未知错误';
     }

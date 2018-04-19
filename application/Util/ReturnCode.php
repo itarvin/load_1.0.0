@@ -16,7 +16,8 @@ class ReturnCode {
     const UNKNOWN = -998;
     const EXCEPTION = -999;
     const VERIFICATIONFAILURE = -2;
-
+    const ACCOUNTEXPIRED = -6;
+    const OCCUPIED = -8;
     static public function getConstants() {
         $oClass = new \ReflectionClass(__CLASS__);
         return $oClass->getConstants();

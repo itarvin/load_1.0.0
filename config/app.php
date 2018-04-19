@@ -153,4 +153,6 @@ return [
         'Access-Control-Allow-Headers'     => 'Token, User-Agent, Keep-Alive, Origin, No-Cache, X-Requested-With, If-Modified-Since, Pragma, Last-Modified, Cache-Control, Expires, Content-Type, X-E4M-With',
         'Access-Control-Allow-Credentials' => 'true'
     ],
+    //后台登录状态维持时间[目前只有登录和解锁会重置登录时间]
+    'ONLINE_TIME'  => 7200,
 ];

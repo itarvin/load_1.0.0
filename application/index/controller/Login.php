@@ -5,24 +5,10 @@ use think\facade\Request;
 use app\util\Tools;
 use app\util\ReturnCode;
 use think\Validate;
-use think\Controller;
-class Login extends Controller
+class Login extends Base
 {
     public function index()
     {
-        $allow_origin = config('TRENDS_ALLOW_ORIGIN');
-        // 跨域验证
-        if(is_array($allow_origin))
-        {
-            $origin = isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : '';
-            if(in_array($origin, $allow_origin)){
-                header('Access-Control-Allow-Origin:'.$origin);
-            }
-        }else if(is_string($allow_origin)){
-            header('Access-Control-Allow-Origin:'.$allow_origin);
-        }
-        header('Access-Control-Allow-Methods:POST,GET');
-        header('Access-Control-Allow-Headers:Token,X-Requested-With');
         $input = input('post.');
         $user = new Administrators;
         $rule = [
@@ -57,8 +43,7 @@ class Login extends Controller
                 // UID，加密账户密码。过期时间
                 $token = array(
                     'sid' => $sid,
-                    'salt' => $salt,
-                    'deadline' => (time()+3600*12)
+                    'salt' => $salt
                 );
                 $key = base64_encode(json_encode($token));
                 $user->where($where_query)->update(['lasttime' => $time]);
@@ -66,6 +51,10 @@ class Login extends Controller
                 $data['status'] = ReturnCode::SUCCESS;
                 $data['info'] = Tools::errorCode(ReturnCode::SUCCESS);
                 $data['token'] = $key;
+                $auth = md5(uniqid() . time());
+                // 缓存登录信息
+                // cache('Login:' . $user->id, $key, config('ONLINE_TIME'));
+                cache('Login:' . $user->id, $key);
             } else {
                 $data['status'] = ReturnCode::AUTH_ERROR;
                 $data['info'] = Tools::errorCode(ReturnCode::AUTH_ERROR);
@@ -74,9 +63,19 @@ class Login extends Controller
         return json($data);
     }
 
-
+    // 退出系统
     public function secede()
     {
-
+        // 从头信息中取出信息，清除登录信息
+        $token = Request::header('Token');
+        // 解析token验证
+        $key = json_decode(base64_decode($token, true),true);
+        $uid = json_decode(base64_decode($key['sid']));
+        cache('Login:' . $uid, null);
+        // 缓存登录信息
+        return json(array(
+            'status' => ReturnCode::SUCCESS,
+            'info'   => Tools::errorCode(ReturnCode::SUCCESS),
+        ));
     }
 }

@@ -27,7 +27,7 @@ class Member extends Base{
             $where[] = ['uid','EQ',$this->uid];
         }
         // 默认取出当天范围内的客户
-        $where[] = ['newtime','between',[date('Y-m-d',time()),date('Y-m-d H:i:s',time())]];
+        // $where[] = ['newtime','between',[date('Y-m-d',time()),date('Y-m-d H:i:s',time())]];
         if(request()->isPost())
         {
             $where = [];
@@ -456,7 +456,6 @@ class Member extends Base{
         if($this->uid != 1 && $input['uid'] != $this->uid){
             $this->error('对不起，非法访问！');
         }
-        $preview = $member->where(array('username'=>$input['username']))->find();
         // 数据验证
         $result = $this->validate($input,'app\admin\validate\Member');
         if(!$result){

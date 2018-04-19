@@ -26,12 +26,17 @@ class Base extends Controller
         $key = json_decode(base64_decode($token, true),true);
         $uid = json_decode(base64_decode($key['sid']));
         $this->uid = $uid;
-        $preview = Administrators::field('users,pwd')->find($uid);
-        // 验证全局标识
-        if(md5($preview['users'].$preview['pwd']) == $key['salt'] && $key['deadline'] >= time()){
+        $chronergy = cache('Login:' . $this->uid);
+        if($chronergy && $chronergy == $token){
             $this->AuthPermission = '200';
         }else {
-            $this->AuthPermission = '400';
+            $preview = Administrators::field('users,pwd')->find($uid);
+            // 验证全局标识是否合法
+            if(md5($preview['users'].$preview['pwd']) == $key['salt']){
+                $this->AuthPermission = '300';
+            }else {
+                $this->AuthPermission = '400';
+            }
         }
     }
 }

@@ -1,0 +1,166 @@
+﻿<!DOCTYPE HTML>
+<html>
+<head>
+<title>资讯列表</title>
+</head>
+<body>
+<div><button onclick="article_del()">登录系统</button></div>
+<div><button onclick="getinfo()">添加随机账户</button></div>
+<div><button onclick="editinfo()">修改id51776账户</button></div>
+<div><button onclick="getout()">退出系统</button></div>
+<div>
+	<select name="type" id="choose">
+		<option value="qq">QQ</option>
+		<option value="phone">手机</option>
+		<option value="weixin">微信</option>
+		<option value="all">全部</option>
+	</select>
+	<input name="keyword" type="text" value="2562514198" >
+	<button onclick="getall()">触发提交</button>
+</div>
+<table border="1">
+	<thead>
+	  <tr>
+	    <th>id</th>
+		<th>username</th>
+		<th>qq</th>
+		<th>phone</th>
+		<th>weixin</th>
+		<th>note</th>
+		<th>uid</th>
+		<th>is_delete</th>
+	    <th>newtime</th>
+	  </tr>
+	</thead>
+	<tbody id="body">
+
+	</tbody>
+</table>
+
+<script type="text/javascript" src="lib/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript">
+function article_del(){
+	var contentType ="application/x-www-form-urlencoded; charset=utf-8";
+	var data = {
+		users:'abc123',
+		pwd:'123456789'
+	};
+	$.ajax({
+		type: 'post',
+		url: 'http://leading.net/index.php/index/login/index.html',
+		dataType: 'json',
+		data:data,
+		contentType:contentType,
+		success: function(data){
+			console.log(data);
+		},
+		beforeSend: function(request) {
+			request.setRequestHeader("X-Requested-With","XMLHttpRequest");
+		}
+	});
+}
+function getinfo(){
+	var contentType ="application/x-www-form-urlencoded; charset=utf-8";
+	var qq = parseInt(10000000000*Math.random());
+	var username = parseInt(10000*Math.random());
+	var weixin = parseInt(10000000000*Math.random());
+	var phone = parseInt(100000000000*Math.random());
+	var data = {
+		username:username,
+		weixin  :weixin,
+		qq      :qq,
+		phone   :phone
+	};
+	$.ajax({
+		type: 'post',
+		url: 'http://leading.net/index.php/index/index/increased.html',
+		dataType: 'json',
+		data:data,
+		contentType:contentType,
+		success: function(data){
+			console.log(data);
+
+		},
+		beforeSend: function(request) {
+			request.setRequestHeader("Token","eyJzaWQiOiJNZz09Iiwic2FsdCI6IjI1Mzc3YWRiYTYzYjQwOGFiNTdiMTAxMzFiZmViYTg3In0=");
+			request.setRequestHeader("X-Requested-With","XMLHttpRequest");
+		}
+	});
+}
+function editinfo(){
+	var contentType ="application/x-www-form-urlencoded; charset=utf-8";
+	var qq = parseInt(1000000000*Math.random());
+	var username = parseInt(100000*Math.random());
+	var weixin = parseInt(100000000000*Math.random());
+	var phone = parseInt(100000000000*Math.random());
+	var data = {
+		id      :'51776',
+		username:username,
+		weixin  :weixin,
+		phone   :phone
+	};
+	$.ajax({
+		type: 'post',
+		url: 'http://leading.net/index.php/index/index/modify.html',
+		dataType: 'json',
+		data:data,
+		contentType:contentType,
+		success: function(data){
+			console.log(data);
+
+		},
+		beforeSend: function(request) {
+			request.setRequestHeader("Token","eyJzaWQiOiJNZz09Iiwic2FsdCI6IjI1Mzc3YWRiYTYzYjQwOGFiNTdiMTAxMzFiZmViYTg3In0=");
+			request.setRequestHeader("X-Requested-With","XMLHttpRequest");
+		}
+	});
+}
+function getall()
+{
+	var contentType ="application/x-www-form-urlencoded; charset=utf-8";
+	var choose=$('#choose').find("option:selected").val();
+	var value = $('input[name="keyword"]').val();
+	var data = {
+		type:choose,
+		key:value
+	};
+	$.ajax({
+		type: 'post',
+		url: 'http://leading.net/index.php/index/index/getinformation.html',
+		dataType: 'json',
+		data:data,
+		contentType:contentType,
+		success: function(msg){
+			// console.log(msg);
+			var html ='';
+			$.each(msg.data,function(index, el) {
+				html += "<tr><td>"+el.id+"</td><td>"+el.username+"</td><td>"+el.qq+"</td><td>"+el.phone+"</td><td>"+el.weixin+"</td><td>"+el.note+"</td><td>"+el.uid+"</td><td>"+el.is_delete+"</td><td>"+el.newtime+"</td></tr>";
+			});
+			$('#body').html(html);
+		},
+		beforeSend: function(request) {
+			request.setRequestHeader("Token","eyJzaWQiOiJNZz09Iiwic2FsdCI6IjI1Mzc3YWRiYTYzYjQwOGFiNTdiMTAxMzFiZmViYTg3In0=");
+			request.setRequestHeader("X-Requested-With","XMLHttpRequest");
+		}
+	});
+}
+function getout()
+{
+	var contentType ="application/x-www-form-urlencoded; charset=utf-8";
+	$.ajax({
+		type: 'post',
+		url: 'http://leading.net/index.php/index/login/secede.html',
+		dataType: 'json',
+		contentType:contentType,
+		success: function(msg){
+			console.log(msg);
+		},
+		beforeSend: function(request) {
+			request.setRequestHeader("Token","eyJzaWQiOiJNZz09Iiwic2FsdCI6IjI1Mzc3YWRiYTYzYjQwOGFiNTdiMTAxMzFiZmViYTg3In0=");
+			request.setRequestHeader("X-Requested-With","XMLHttpRequest");
+		}
+	});
+}
+</script>
+</body>
+</html>
