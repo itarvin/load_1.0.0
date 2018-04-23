@@ -4,7 +4,7 @@ use app\admin\model\Consumer;
 use app\util\Tools;
 use app\util\ReturnCode;
 use think\facade\Request;
-
+use think\Validate;
 
 class Index extends Base
 {
@@ -26,13 +26,24 @@ class Index extends Base
             $input = Request::param();
             // 数据验证
             $result = $this->validate($input,'app\admin\validate\Member');
-            if($result){
+            // 添加时做唯一索引处理
+            $rule = [
+                'qq|QQ号' => 'unique:member',
+                'phone|电话号' => 'unique:member',
+                'weixin|微信号' => 'unique:member',
+            ];
+            $validate = new Validate($rule);
+            $unresult = $validate->check($input);
+
+            if($result  !== true){
                 $data['status'] = ReturnCode::ERROR;
                 $data['info'] = $result;
+            }else if(!$unresult){
+                $data['status'] = ReturnCode::ERROR;
+                $data['info'] = $validate->getError();
             }else{
                 $input['uid'] = $this->uid;
                 $input['newtime'] = date('Y-m-d H:i:s',time());
-
                 $lastid = $member->insertGetId($input);
                 // ------日志处理 ---start
                 writelog($lastid,Tools::logactKey('cus_insert'),$this->uid);

@@ -142,10 +142,10 @@ function add()
 		data:data,
 		contentType:contentType,
 		success: function(msg){
-			if(msg.status  == '1')
-			{
+			if(msg.status  == '1'){
 				alert(msg.info);
-				layer.close();
+			}else{
+				alert(msg.info);
 			}
 		},
 		beforeSend: function(request) {

@@ -31,6 +31,20 @@
 			</div>
 			<div class="row cl">
 				<div class="formControls col-xs-8 col-xs-offset-3">
+					<input class="input-text size-L" type="text" placeholder="验证码" style="width:150px;" name="verify" id="verify">
+					<img src="http://leading.net/index.php/index/login/verify" onclick="refreshVerify()" id="verify_img" >
+					<!-- <a id="kanbuq" href="javascript:;">看不清，换一张</a> -->
+				</div>
+			</div>
+			<div class="row cl">
+				<div class="formControls col-xs-8 col-xs-offset-3">
+					<label for="online">
+						<input type="checkbox" name="online" id="online" value="1">
+						使我保持登录状态</label>
+				</div>
+			</div>
+			<div class="row cl">
+				<div class="formControls col-xs-8 col-xs-offset-3">
 					<button class="btn-success btn" onclick="login()" >登录</button>
 				</div>
 			</div>
@@ -39,15 +53,30 @@
 </div>
 <div class="footer">Copyright 你的公司名称 by H-ui.admin.page.v3.0</div>
 <script type="text/javascript" src="lib/jquery/1.9.1/jquery.min.js"></script>
-<script type="text/javascript" src="jquery.cookie.js"></script>
+<script type="text/javascript" src="./jquery.cookie.js"></script>
 <script>
+	window.onload=function(){
+		// var identity = $.cookie('identity');
+		var cookie = document.cookie;
+		console.log(cookie);
+	}
+
 	function login()
 	{
 		var name = $('#users').val();
 		var pwd = $('#pwd').val();
+		var verify = $('#verify').val();
+		// 判断checkbox是否选中
+		if ($('#online').attr('checked')) {
+		    var online = $('#online').val();
+		}else{
+			var online = 0;
+		}
 		var data = {
-			users : name,
-			pwd : pwd
+			users  : name,
+			pwd    : pwd,
+			verify : verify,
+			online : online
 		};
 		var contentType ="application/x-www-form-urlencoded; charset=utf-8";
 		$.ajax({
@@ -59,8 +88,6 @@
 			success: function(msg){
 				if(msg.status == 1)
 				{
-					console.log(msg.token);
-					$.cookie('token', msg.token, { expires: 7 });
 					window.location.href="/index.html";
 				}
 			},
@@ -69,6 +96,10 @@
 			}
 		});
 		return false;
+	}
+	function refreshVerify() {
+		var ts = Date.parse(new Date())/1000;
+		$('#verify_img').attr("src", "http://leading.net/index.php/index/login/verify?id="+ts);
 	}
 </script>
 </body>

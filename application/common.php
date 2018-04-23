@@ -9,6 +9,7 @@
 // | Author: 流年 <liu21st@gmail.com>
 // +----------------------------------------------------------------------
 use app\admin\model\Log;
+use app\util\Tools;
 // 应用公共文件
 function isMobile()
 {
@@ -185,3 +186,65 @@ function object_to_array($obj) {
 
     return $obj;
 }
+
+    // 对base64二次加密处理
+    function encryption($userid,$agent,$salt)
+    {
+        // 密码薄
+        $passwordBook = Tools::makeRandom();
+        // 加密UID
+        $uid = base64_encode(json_encode($userid));
+        $tokens = array(
+            'agent' => $agent,
+            'salt' => $salt
+        );
+        // 转为base64
+        $key = base64_encode(json_encode($tokens));
+        // 计算秘钥长度和用户id长度
+        $secretLen = strlen($key);
+        $uLen = strlen($uid);
+        $random = rand(0,25);
+        // 生成随机数
+        $start = $passwordBook[$random];
+        $end = $passwordBook[$uLen];
+        // 分隔字符串
+        $tokenStart = mb_substr($key, 0, ($secretLen/2), 'utf-8');
+        $uidStart = mb_substr($tokenStart, 0, $random, 'utf-8');
+        $uidEnd = mb_substr($tokenStart, $random, strlen($tokenStart), 'utf-8');
+        // 生成md5一个介质
+        $medium = md5('itarvin'.time());
+        // 结束后半部
+        $tokenEnd = mb_substr($key,($secretLen/2),$secretLen, 'utf-8');
+        // 拼装加密新字符串
+        $token = $start.$uidStart.$uid.$uidEnd.$medium.$tokenEnd.$end;
+        return $token;
+    }
+
+    // 对base64二次加密数据进行析出
+    function analysisCode($token)
+    {
+        // 析出当前数据对比验证
+        $passwordBook = Tools::makeRandom();
+        // 分离关键字母
+        $begin = substr($token,0,1);
+        $finish = substr($token,-1);
+        $middles = substr($token,1,-1);
+        // 定位出UID位置以及单位长度
+        $beginKey = array_search($begin,$passwordBook);
+        $finishKey = array_search($finish,$passwordBook);
+        // 析出用户id
+        $uidkey = substr($middles,$beginKey,$finishKey);
+        // 合并剩下的字符串
+        $all = substr($middles,0,$beginKey).substr($middles,($beginKey+$finishKey));
+        // 计算长度
+        $allLen = strlen($all);
+        // 取出32位介质分离出tokeb前半部和后半部
+        $reTokenStart = mb_substr($all, 0, (($allLen-32)/2), 'utf-8');
+        $reTokenEnd = mb_substr($all, (($allLen-32)/2) + 32);
+        // 合并数据返回
+        $result = $reTokenStart.$reTokenEnd;
+        return array(
+            'uid'   => $uidkey,
+            'token' => $result
+        );
+    }

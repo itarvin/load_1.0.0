@@ -20,22 +20,28 @@ class Base extends Controller
         }
         header('Access-Control-Allow-Methods:POST,GET');
         header('Access-Control-Allow-Headers:Token,X-Requested-With');
-        // 获取参数
-        $token = Request::header('Token');
+        // 取回cookie 信息
+        $token = $_COOKIE['identity'];
+        // 获取客户端设备
+        $agent = Request::header('User-Agent');
+        // 析出用户id和客户信息
+        $result = analysisCode($token);
         // 解析token验证
-        $key = json_decode(base64_decode($token, true),true);
-        $uid = json_decode(base64_decode($key['sid']));
+        $key = json_decode(base64_decode($result['token'], true),true);
+        $uid = json_decode(base64_decode($result['uid']));
+        $preview = Administrators::field('users,pwd')->find($uid);
         $this->uid = $uid;
-        $chronergy = cache('Login:' . $this->uid);
-        if($chronergy && $chronergy == $token){
+        // 验证是否当前用户设备与提交的用户设备一致.
+        if($key['agent'] == $agent && md5($preview['users'].$preview['pwd']) == $key['salt']){
             $this->AuthPermission = '200';
         }else {
-            $preview = Administrators::field('users,pwd')->find($uid);
-            // 验证全局标识是否合法
+            // 验证全局标识是否合法,可能被盗用cookie信息,清除身份信息
             if(md5($preview['users'].$preview['pwd']) == $key['salt']){
                 $this->AuthPermission = '300';
+                setcookie('identity', NULL);
             }else {
                 $this->AuthPermission = '400';
+                setcookie('identity', NULL);
             }
         }
     }
