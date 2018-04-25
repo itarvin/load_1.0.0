@@ -8,10 +8,9 @@
 // +----------------------------------------------------------------------
 // | Author: liu21st <liu21st@gmail.com>
 // +----------------------------------------------------------------------
-
 // [ 应用入口文件 ]
 namespace think;
-
+// ini_set('session.cookie_domain',".domain.com");//跨域访问Session 
 // 加载基础文件
 require __DIR__ . '/../thinkphp/base.php';
 

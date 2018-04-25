@@ -55,11 +55,6 @@
 <script type="text/javascript" src="lib/jquery/1.9.1/jquery.min.js"></script>
 <script type="text/javascript" src="./jquery.cookie.js"></script>
 <script>
-	window.onload=function(){
-		// var identity = $.cookie('identity');
-		var cookie = document.cookie;
-		console.log(cookie);
-	}
 
 	function login()
 	{
@@ -88,7 +83,8 @@
 			success: function(msg){
 				if(msg.status == 1)
 				{
-					window.location.href="/index.html";
+					$.cookie('identity', msg.identity, { expires: 7 });
+					window.location.href="/CrossDomain/index.html";
 				}
 			},
 			beforeSend: function(request) {

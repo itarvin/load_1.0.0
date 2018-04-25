@@ -18,6 +18,8 @@ class ReturnCode {
     const VERIFICATIONFAILURE = -2;
     const ACCOUNTEXPIRED = -6;
     const OCCUPIED = -8;
+    const LACKOFPARAM = -10;
+    const LOCKACCOUNT = -12;
     static public function getConstants() {
         $oClass = new \ReflectionClass(__CLASS__);
         return $oClass->getConstants();

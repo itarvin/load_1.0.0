@@ -154,6 +154,12 @@ function add()
 		}
 	});
 }
+window.onload=function(){
+	var identity = $.cookie('identity');
+	if(identity == null){
+		window.location.href="/CrossDomain/login.html";
+	}
+}
 </script>
 <!--/请在上方写此页面业务相关的脚本-->
 </body>

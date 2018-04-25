@@ -121,6 +121,10 @@
 					<tbody id="body">
 
 					</tbody>
+					<div class="">
+						<a id="prevPage">上一页</a>
+						<a id="nextPage">下一页</a>
+					</div>
 				</table>
 			</div>
 		</article>
@@ -160,9 +164,6 @@ function getinfo()
 		type:choose,
 		key:value
 	};
-	var token = $.cookie('token');
-	// console.log(data);
-	// console.log(token);
 	$.ajax({
 		type: 'post',
 		url: 'http://leading.net/index.php/index/index/getinformation.html',
@@ -170,18 +171,19 @@ function getinfo()
 		data:data,
 		contentType:contentType,
 		success: function(msg){
-			// console.log(msg);
 			var info = msg.data;
 			var html ='';
-			// $.each(msg.data,function(index, el) {
-			html += "<tr class='text-c'><td>"+info.id+"</td><td>"+info.username+"</td><td>"+info.sex+"</td><td>"+info.phone+"</td><td>"+info.weixin+"</td><td>"+info.qq+"</td><td>"+info.address+"</td><td>"+info.newtime+"</td><td><a id='edit'>修改</a><input type='hidden' id='ids' value="+info.key+"></td></tr>";
-			// });
-			$('#body').html(html);
-			var ids = $('#ids').val();
-			$('#edit').attr('href','member-edit.html?uid='+ids);
+			console.log(info);
+			if(info != ''){
+				html += "<tr class='text-c'><td>"+info.id+"</td><td>"+info.username+"</td><td>"+info.sex+"</td><td>"+info.phone+"</td><td>"+info.weixin+"</td><td>"+info.qq+"</td><td>"+info.address+"</td><td>"+info.newtime+"</td><td><a id='edit'>修改</a><input type='hidden' id='ids' value="+info.key+"></td></tr>";
+				$('#body').html(html);
+				var ids = $('#ids').val();
+				$('#edit').attr('href','member-edit.html?uid='+ids);
+			}else {
+				$('#body').html(html);
+			}
 		},
 		beforeSend: function(request) {
-			request.setRequestHeader("Token",token);
 			request.setRequestHeader("X-Requested-With","XMLHttpRequest");
 		}
 	});
@@ -189,7 +191,6 @@ function getinfo()
 function getout()
 {
 	var contentType ="application/x-www-form-urlencoded; charset=utf-8";
-	var token = $.cookie('token');
 	$.ajax({
 		type: 'post',
 		url: 'http://leading.net/index.php/index/login/secede.html',
@@ -197,10 +198,85 @@ function getout()
 		contentType:contentType,
 		success: function(msg){
 			console.log(msg);
-			window.location.href="/login.html";
+			window.location.href="/CrossDomain/login.html";
 		},
 		beforeSend: function(request) {
-			request.setRequestHeader("Token",token);
+			request.setRequestHeader("X-Requested-With","XMLHttpRequest");
+		}
+	});
+}
+window.onload=function(){
+	var identity = $.cookie('identity');
+	if(identity != null){
+		var contentType ="application/x-www-form-urlencoded; charset=utf-8";
+		$.ajax({
+			type: 'post',
+			url: 'http://leading.net/index.php/index/index/list.html',
+			dataType: 'json',
+			contentType:contentType,
+			success: function(msg){
+				var info = msg.data;
+				var prv = Number(info.page)-1;
+				var next = Number(info.page)+1;
+				var html ='';
+				var ids = [];
+				$.each(info.data,function(index, el) {
+					html += "<tr class='text-c'><td>"+el.id+"</td><td>"+el.username+"</td><td>"+el.sex+"</td><td>"+el.phone+"</td><td>"+el.weixin+"</td><td>"+el.qq+"</td><td>"+el.address+"</td><td>"+el.newtime+"</td><td><a id='edit_"+el.id+"'>修改</a><input type='hidden' id='ids_"+el.id+"' value="+el.key+"></td></tr>";
+					ids.push(el.id);
+				});
+				$('#body').html(html);
+				$('#prevPage').attr("onclick","changePage("+prv+");");
+				$('#nextPage').attr("onclick","changePage("+next+");");
+				var len = ids.length;
+				for (var i = 0; i < len; i++){
+					var iid = "#ids_"+ids[i];
+					var edit = "#edit_"+ids[i];
+					var idd = $(iid).val();
+					$(edit).attr('href','member-edit.html?uid='+idd);
+				}
+			},
+			beforeSend: function(request) {
+				request.setRequestHeader("X-Requested-With","XMLHttpRequest");
+			}
+		});
+	}else {
+		window.location.href="/CrossDomain/login.html";
+	}
+}
+function changePage(page)
+{
+	if(page < 1){
+		var page = 1;
+	}
+	var contentType ="application/x-www-form-urlencoded; charset=utf-8";
+	$.ajax({
+		type: 'post',
+		url: 'http://leading.net/index.php/index/index/list.html',
+		dataType: 'json',
+		data : {page : page},
+		contentType:contentType,
+		success: function(msg){
+			var info = msg.data;
+			var prv = Number(info.page)-1;
+			var next = Number(info.page)+1;
+			var html ='';
+			var ids = [];
+			$.each(info.data,function(index, el) {
+				html += "<tr class='text-c'><td>"+el.id+"</td><td>"+el.username+"</td><td>"+el.sex+"</td><td>"+el.phone+"</td><td>"+el.weixin+"</td><td>"+el.qq+"</td><td>"+el.address+"</td><td>"+el.newtime+"</td><td><a id='edit_"+el.id+"'>修改</a><input type='hidden' id='ids_"+el.id+"' value="+el.key+"></td></tr>";
+				ids.push(el.id);
+			});
+			$('#body').html(html);
+			$('#prevPage').attr("onclick","changePage("+prv+");");
+			$('#nextPage').attr("onclick","changePage("+next+");");
+			var len = ids.length;
+			for (var i = 0; i < len; i++){
+				var iid = "#ids_"+ids[i];
+				var edit = "#edit_"+ids[i];
+				var idd = $(iid).val();
+				$(edit).attr('href','member-edit.html?uid='+idd);
+			}
+		},
+		beforeSend: function(request) {
 			request.setRequestHeader("X-Requested-With","XMLHttpRequest");
 		}
 	});
