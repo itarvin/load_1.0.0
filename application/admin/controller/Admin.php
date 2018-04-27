@@ -5,6 +5,7 @@ use app\admin\model\Consumer;
 use app\admin\model\Hitcount;
 use think\facade\Request;
 use app\util\ReturnCode;
+
 class Admin extends Base
 {
     // 主页
@@ -12,18 +13,18 @@ class Admin extends Base
     {
         $user = new Administrators;
         $uid = $this->uid;
-        $where = array();
-        if(request()->isPost()){
-            $start = Request::param('start','','trim');
-            $end = Request::param('end','','trim');
-            $users = Request::param('users','','trim');
+        $where = [];
+        if( request()->isPost()){
+            $start = Request::param('start', '', 'trim');
+            $end = Request::param('end', '', 'trim');
+            $users = Request::param('users', '', 'trim');
             //check time
             if ($start && $end) {
-                $where[] = ['newtime','between',[$start,$end]];
-            }elseif($start){
-                $where[] = ['newtime','GT',$start];
+                $where[] = ['newtime', 'between', [$start, $end]];
+            }elseif( $start){
+                $where[] = ['newtime', 'GT', $start];
             }elseif ($end) {
-                $where[] = ['newtime','LT',$end];
+                $where[] = ['newtime', 'LT', $end];
             }
 
             if (!empty($users)) {
@@ -32,11 +33,11 @@ class Admin extends Base
         }
         $list = $user->where($where)->order('isow asc')->select();
         $count = $user->count();
-        $this->assign(array(
+        $this->assign([
             'list' => $list,
             'count'=>$count,
-            'uid'  => $this->uid,
-        ));
+            'uid'  => $this->uid
+        ]);
         return $this->fetch('Admin/index');
     }
 
@@ -53,8 +54,8 @@ class Admin extends Base
         $input = input('post.');
         $user = new Administrators;
         // 数据验证
-        $result = $this->validate($input,'app\admin\validate\User');
-        if(!$result){
+        $result = $this->validate($input, 'app\admin\validate\User');
+        if( !$result){
             $data['status'] = ReturnCode::ERROR;
             $data['info'] = $validate->getError();
         }else {
@@ -72,13 +73,13 @@ class Admin extends Base
     // 更新页
     public function edit()
     {
-        $id = Request::param('id','','trim');
-        if($this->superman != 'yes' && $this->uid != $id){
+        $id = Request::param('id', '', 'trim');
+        if( $this->superman != 'yes' && $this->uid != $id){
             $this->error('对不起，非法访问！');
         }
         $user = new Administrators;
-        $data = $user->field('id,users,gender,isow,weixin,phone,qq1,qq2,qq3,qq4')->find($id);
-        $this->assign('data',$data);
+        $data = $user->field('id, users, gender, isow, weixin, phone, qq1, qq2, qq3, qq4')->find($id);
+        $this->assign('data', $data);
         return $this->fetch('Admin/edit');
     }
 
@@ -88,17 +89,17 @@ class Admin extends Base
     {
         $input = input('post.');
         $user = new Administrators;
-        if($this->superman != 'yes' && $this->uid != $input['id']){
+        if( $this->superman != 'yes' && $this->uid != $input['id']){
             $this->error('对不起，非法访问！');
         }
         $preview = $user->where(array('users'=>$input['users']))->find();
         // 数据验证
-        $result = $this->validate($input,'app\admin\validate\User');
-        if(!$result){
+        $result = $this->validate($input, 'app\admin\validate\User');
+        if( !$result){
             $data['status'] = ReturnCode::ERROR;
             $data['info'] = $validate->getError();
         }else {
-            if($input['pwd'] != $preview['pwd'] && $input['pwd'] != ''){
+            if( $input['pwd'] != $preview['pwd'] && $input['pwd'] != ''){
     	        $input['pwd'] = $input['pwd'];
     	    }else{
     	    	unset($input['pwd']);
@@ -119,36 +120,36 @@ class Admin extends Base
     {
         // 员工id
         $member = new Consumer;
-        $users = Administrators::field('id,users')->order('id asc')->select();
+        $users = Administrators::field('id, users')->order('id asc')->select();
         // 预定义type 数组
-        $checktype = array('qq,phone,weixin');
+        $checktype = array('qq, phone, weixin');
         $where = array();
-        if($this->superman != 'yes'){
-            $where[] = ['uid','=',$this->uid];
+        if( $this->superman != 'yes'){
+            $where[] = ['uid', '=', $this->uid];
         }
-        if(request()->isPost()){
-            $start = Request::param('start','','trim');
-            $end = Request::param('end','','trim');
-            $type = Request::param('type','','trim');
-            $keyword = Request::param('keyword','','trim');
-            $uid = Request::param('uid','','trim');
+        if( request()->isPost()){
+            $start = Request::param('start', '', 'trim');
+            $end = Request::param('end', '', 'trim');
+            $type = Request::param('type', '', 'trim');
+            $keyword = Request::param('keyword', '', 'trim');
+            $uid = Request::param('uid', '', 'trim');
             //check time
             if ($start && $end) {
-                $where[] = ['newtime','between',[$start,$end]];
-            }elseif($start){
-                $where[] = ['newtime','GT',$start];
+                $where[] = ['newtime', 'between', [$start, $end]];
+            }elseif( $start){
+                $where[] = ['newtime', 'GT', $start];
             }elseif ($end) {
-                $where[] = ['newtime','LT',$end];
+                $where[] = ['newtime', 'LT', $end];
             }
             // check type
             if (!empty($keyword)) {
-                if($type && in_array($type,$checktype)){
-                    $where[] = [$type, 'EQ', $keyword];
+                if( $type && in_array($type, $checktype)){
+                    $where[] = [$type,  'EQ',  $keyword];
                 }else{
-                    $where[] = ['qq|phone|weixin', 'EQ', $keyword];
+                    $where[] = ['qq|phone|weixin',  'EQ',  $keyword];
                 }
             }
-            $where[] = ['uid','EQ',$uid];
+            $where[] = ['uid', 'EQ', $uid];
         }
         $list = $member->where($where)->order('id desc')->paginate();
         $count = $list->total();
@@ -166,11 +167,11 @@ class Admin extends Base
     public function dimission()
     {
         $uid = input('uid');
-        if($uid == 1){
+        if( $uid == 1){
             $data['status'] = ReturnCode::AUTH_ERROR;
         }else {
-            $re = Administrators::where('id','EQ',$uid)->update(array('isow' => '1'));
-            if($re){
+            $re = Administrators::where('id', 'EQ', $uid)->update(array('isow' => '1'));
+            if( $re){
                 $data['status'] = ReturnCode::SUCCESS;
             }else {
                 $data['status'] = ReturnCode::ERROR;
@@ -184,20 +185,20 @@ class Admin extends Base
     //修改状态
     public function status()
     {
-        $uid = Request::param('uid','','trim');
+        $uid = Request::param('uid', '', 'trim');
         $user = new Administrators;
         $chuqin = $user->field('chuqin')->find($uid);
         switch ($chuqin['chuqin']) {
             case '0':
-                $re = $user->where('id','eq',$uid)->update(array('chuqin' => '1'));
+                $re = $user->where('id', 'eq', $uid)->update(array('chuqin' => '1'));
                 $chuqin = '1';
                 break;
             case '1':
-                $re = $user->where('id','eq',$uid)->update(array('chuqin' => '0'));
+                $re = $user->where('id', 'eq', $uid)->update(array('chuqin' => '0'));
                 $chuqin = '0';
                 break;
         }
-        if($re){
+        if( $re){
             $data['status'] = ReturnCode::SUCCESS;
             $data['chuqin'] = $chuqin;
         }else {
@@ -214,37 +215,37 @@ class Admin extends Base
         $date = input('date');
         // 获取当前所有出勤销售
         $user = new Administrators;
-        $userIds = $user->field('id')->where('chuqin','eq','1')->select();
+        $userIds = $user->field('id')->where('chuqin', 'eq', '1')->select();
         $where = [];
-        $end = date('Y-m-d H:i:s',time());
+        $end = date('Y-m-d H:i:s', time());
         switch ($date) {
             case 'today':
-                $start = date('Y-m-d 0:0:0',time());
-                $where[] = ['date','between',[$start,$end]];
+                $start = date('Y-m-d 0:0:0', time());
+                $where[] = ['date', 'between', [$start, $end]];
                 break;
             case 'week':
-                $start = date("Y-m-d",strtotime("-1 week"));
-                $where[] = ['date','between',[$start,$end]];
+                $start = date("Y-m-d", strtotime("-1 week"));
+                $where[] = ['date', 'between', [$start, $end]];
                 break;
             case 'halfmonth':
-                $start = date("Y-m-d",strtotime("-15 day"));
-                $where[] = ['date','between',[$start,$end]];
+                $start = date("Y-m-d", strtotime("-15 day"));
+                $where[] = ['date', 'between', [$start, $end]];
                 break;
             case 'month':
-                $start = date("Y-m-d",strtotime("-1 month"));
-                $where[] = ['date','between',[$start,$end]];
+                $start = date("Y-m-d", strtotime("-1 month"));
+                $where[] = ['date', 'between', [$start, $end]];
                 break;
             case 'threemonth':
-                $start = date("Y-m-d",strtotime("-3 month"));
-                $where[] = ['date','between',[$start,$end]];
+                $start = date("Y-m-d", strtotime("-3 month"));
+                $where[] = ['date', 'between', [$start, $end]];
                 break;
             default:
-                $start = date('Y-m-d 0:0:0',time());
-                $where[] = ['date','between',[$start,$end]];
+                $start = date('Y-m-d 0:0:0', time());
+                $where[] = ['date', 'between', [$start, $end]];
                 break;
         }
         foreach ($userIds as $k => $v) {
-            $list[$v['id']] = Hitcount::field('pv')->where('uid','EQ',$v['id'])->where($where)->select();
+            $list[$v['id']] = Hitcount::field('pv')->where('uid', 'EQ', $v['id'])->where($where)->select();
         }
         foreach ($list as $key => $value) {
             $pv = 0;
@@ -253,7 +254,7 @@ class Admin extends Base
             }
             $da[$key] = $pv;
         }
-        if($da){
+        if( $da){
             $data['status'] = ReturnCode::SUCCESS;
             $data['data']  = $da;
         }else{

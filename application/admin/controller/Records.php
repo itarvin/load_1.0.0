@@ -15,46 +15,46 @@ class Records extends Base
         $where = [];
         // 检测是否是超管
         if($this->superman != 'yes'){
-            $where[] = ['a.uid','eq',$this->uid];
+            $where[] = ['a.uid', 'eq', $this->uid];
         }
         // 默认取出当天范围内的客户
-        $where[] = ['a.newtime','between',[date('Y-m-d',time()),date('Y-m-d H:i:s',time())]];
+        $where[] = ['a.newtime', 'between', [date('Y-m-d', time()), date('Y-m-d H:i:s', time())]];
         // 处理查询
         if(request()->isPost()){
             // 重新处理条件
             $where = [];
             // 检测是否是超管
             if($this->superman != 'yes'){
-                $where[] = ['a.uid','eq',$this->uid];
+                $where[] = ['a.uid', 'eq', $this->uid];
             }
-            $start = Request::param('start','','trim');
-            $end = Request::param('end','','trim');
-            $keyword = Request::param('keyword','','trim');
+            $start = Request::param('start', '', 'trim');
+            $end = Request::param('end', '', 'trim');
+            $keyword = Request::param('keyword', '', 'trim');
             //check time
             if ($start && $end) {
-                $where[] = ['a.newtime','between',[$start,$end]];
+                $where[] = ['a.newtime', 'between', [$start, $end]];
             }elseif($start){
-                $where[] = ['a.newtime','GT',$start];
+                $where[] = ['a.newtime', 'GT', $start];
             }elseif ($end) {
-                $where[] = ['a.newtime','LT',$end];
+                $where[] = ['a.newtime', 'LT', $end];
             }
             //  check keyword
             if (!empty($keyword)) {
-                $where[] = ['a.product|a.price', 'LIKE', "%$keyword%"];
+                $where[] = ['a.product|a.price',  'LIKE',  "%$keyword%"];
             }
         }
         $list = $record->alias('a')
-        ->field('a.*,b.username,c.users')
-        ->join('member b','b.id = a.khid')
-        ->join('admin c','c.id = a.uid')
+        ->field('a.*, b.username, c.users')
+        ->join('member b', 'b.id = a.khid')
+        ->join('admin c', 'c.id = a.uid')
         ->where($where)
         ->order('id desc')->paginate();
         $count = $list->total();
-        $this->assign(array(
+        $this->assign([
             'list'  => $list,
             'count' => $count,
             'uid'   => $uid
-        ));
+        ]);
         return $this->fetch('Records/index');
     }
 
@@ -70,8 +70,8 @@ class Records extends Base
             exit;
         }
         $check['users'] = $this->name;
-        $this->assign('data',$check);
-        $this->assign('khid',$khid);
+        $this->assign('data', $check);
+        $this->assign('khid', $khid);
         return $this->fetch('Records/addrecord');
     }
 
@@ -87,12 +87,12 @@ class Records extends Base
             $da['note'] = $input['note'][$i];
             $da['khid'] = $input['khid'];
             $da['uid'] = $this->uid;
-            $da['newtime'] = date('Y-m-d H:i:s',time());
+            $da['newtime'] = date('Y-m-d H:i:s', time());
             $data[] = $da;
         }
         // ------日志处理 ---start
         foreach ($data as $key => $value) {
-            writelog($value,Tools::logactKey('buy_insert'),$this->uid);
+            writelog($value, Tools::logactKey('buy_insert'), $this->uid);
         }
         // -------------------end
         $record = new Record;
@@ -108,13 +108,13 @@ class Records extends Base
         $id = input('post.deleid');
         $record = new Record;
         // 先判断当前是删除数据是否为当前用户的订单。
-        $have = $record->where('id',$id)->find();
+        $have = $record->where('id', $id)->find();
         if($have['uid']  != $this->uid){
             $data['status'] = ReturnCode::ERROR;
             $data['msg'] = '当前订单您不能操作！';
         }else {
-            writelog($id,Tools::logactKey('buy_delete'),$this->uid);
-            $re = $record->where('id',$id)->delete();
+            writelog($id, Tools::logactKey('buy_delete'), $this->uid);
+            $re = $record->where('id', $id)->delete();
             if($re){
                 $data['status'] = ReturnCode::SUCCESS;;
             }

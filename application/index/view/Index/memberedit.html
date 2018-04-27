@@ -108,7 +108,6 @@ function getQueryVariable(variable)
        return(false);
 }
 window.onload=function(){
-	var token = $.cookie('token');
 	var contentType ="application/x-www-form-urlencoded; charset=utf-8";
 	var uid = getQueryVariable("uid");
 	$.ajax({
@@ -132,7 +131,6 @@ window.onload=function(){
 			}
 		},
 		beforeSend: function(request) {
-			request.setRequestHeader("Token",token);
 			request.setRequestHeader("X-Requested-With","XMLHttpRequest");
 		}
 	});
@@ -152,7 +150,6 @@ function edit()
 	};
 	// console.log(data);
 	// 从cookie中获取token
-	var token = $.cookie('token');
 	var contentType ="application/x-www-form-urlencoded; charset=utf-8";
 	$.ajax({
 		type: 'post',
@@ -167,7 +164,6 @@ function edit()
 			}
 		},
 		beforeSend: function(request) {
-			request.setRequestHeader("Token",token);
 			request.setRequestHeader("X-Requested-With","XMLHttpRequest");
 		}
 	});

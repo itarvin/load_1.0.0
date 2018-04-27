@@ -33,8 +33,9 @@
           <!-- 暂不开放当前功能 -->
         <!-- {if $superman != 'yes'}
         <button class="layui-btn layui-btn-danger" onclick="delAll()"><i class="layui-icon"></i>批量回收站</button>
-        <button class="layui-btn" onclick="x_admin_show('添加用户','{:url('Member/add')}',600,400)"><i class="layui-icon"></i>添加</button>
         {/if} -->
+        <button class="layui-btn" onclick="x_admin_show('添加用户','{:url('Member/add')}',600,400)"><i class="layui-icon"></i>添加</button>
+
         <span class="x-right" style="line-height:40px">共有数据：{$count} 条</span>
       </xblock>
       <table class="layui-table">

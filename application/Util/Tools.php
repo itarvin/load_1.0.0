@@ -180,6 +180,10 @@ class Tools {
             'reguid'   => '原ID',
             'birthday' => '生日',
             'newtime'  => '添加时间',
+            'id'       => '新增id',
+            'sex'      => '性别',
+            'uid'      => '销售id',
+            'weixin'   => '微信',
         );
         $keyword = array_search($string,array_flip($array));
         return $keyword;

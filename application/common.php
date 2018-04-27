@@ -67,7 +67,7 @@ function isMobile()
 
 
 // 写入日志
-function writelog($data,$act,$uid)
+function writelog($data,$act,$uid,$edits = '')
 {
     if($act == 10){
         $note = ',';
@@ -96,8 +96,10 @@ function writelog($data,$act,$uid)
             'note'=> $data['note'],
         ));
         $da['qq'] = $kh['qq'];
+        $da['weixin'] = $kh['weixin'];
+        $da['phone'] = $kh['phone'];
     }else if($act == 3 || $act == 5 || $act == 1){
-        $kh = Db::name('member')->field('username,qq,newtime,birthday,weixin,phone')->where('id',$data)->find();
+        $kh = Db::name('member')->where('id',$data)->find();
         if($act == 3){
             $price = Db::name('record')->field('price')->where('khid','EQ',$data)->select();
             $sum = 0;
@@ -110,29 +112,40 @@ function writelog($data,$act,$uid)
                 'birthday'=> $kh['birthday'],
             ));
         }else if($act == 5){
-            $note = json_encode(array(
-                'reguid'  => $data,
-                'username'=> $kh['username'],
-                'newtime'=> $kh['newtime'],
-            ));
+            $jsons = [];
+            foreach ($kh as $key => $output) {
+                foreach ($edits as $key2 => $input) {
+                    if($key == $key2){
+                        if($output != $input && !empty($input)){
+                            $jsons[$key] = $input;
+                        }
+                    }
+                }
+            }
+            $note = json_encode($jsons);
         }else if($act == 1){
-            $note = json_encode(array(
-                'username'=> $kh['username'],
-                'weixin'=> $kh['weixin'],
-                'phone'=> $kh['phone'],
-                'newtime'=> $kh['newtime'],
-            ));
+            $jsons = [];
+            foreach ($kh as $key => $value) {
+                if(!empty($value)){
+                    $jsons[$key] = $value;
+                }
+            }
+            $note = json_encode($jsons);
         }
         $da['qq'] = $kh['qq'];
+        $da['weixin'] = $kh['weixin'];
+        $da['phone'] = $kh['phone'];
     }else if($act = 4){
         $info = Db::name('record')->field('price,product,khid')->find($data);
-        $kh = Db::name('member')->field('qq,username')->find($info['khid']);
+        $kh = Db::name('member')->field('qq,username,weixin,phone')->find($info['khid']);
         $note = json_encode(array(
             'username' => $kh['username'],
             'product'=> $info['product'],
             'price'=> $info['price'],
         ));
         $da['qq'] = $kh['qq'];
+        $da['weixin'] = $kh['weixin'];
+        $da['phone'] = $kh['phone'];
     }
     $da['act'] = $act;
     $da['newtime'] = date('Y-m-d H:i:s',time());

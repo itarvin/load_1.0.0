@@ -36,7 +36,7 @@ class  Backdoor extends controller
         if( !$captcha->check($data['verify']))
         {
         	// 验证失败
-            $this->error('验证码错误！','Backdoor/login');
+            $this->error('验证码错误！', 'Backdoor/login');
         }
         $rule = [
             //管理员登陆字段验证
@@ -46,14 +46,14 @@ class  Backdoor extends controller
         // 数据验证
         $validate = new Validate($rule);
         $result   = $validate->check($data);
-        if(!$result){
+        if( !$result){
             return $validate->getError();
         }
         $preview = $user->where(array(
-            'users'=>$data['users']
+            'users' => $data['users']
         ))->find();
-        if(!$preview){
-            $this->error('当前用户不存在','Backdoor/login');
+        if( !$preview){
+            $this->error('当前用户不存在', 'Backdoor/login');
         }
         $where_query = array(
             'users' => $data['users'],
@@ -62,21 +62,21 @@ class  Backdoor extends controller
         if ($user = $user->where($where_query)->find()) {
             //注册session
             $sid = base64_encode(json_encode($user->id));
-            session('uid',$sid);
-            session('u_name',$user->users);
+            session('uid', $sid);
+            session('u_name', $user->users);
             $salt = md5($user->users.$user->pwd);
             // 设置cookie 前缀为think_
-            Cookie::set('auth_'.md5($sid),$salt,['expire'=> 3600 * 12 ]);
+            Cookie::set('auth_'.md5($sid), $salt, ['expire'=> 3600 * 12 ]);
             //更新最后请求IP及时间
-            $time = date('Y-m-d H:i:s',time());
+            $time = date('Y-m-d H:i:s', time());
             $user->where($where_query)->update(['lasttime' => $time]);
             return $this->success('登录成功', 'Index/index');
         } else {
-            $this->error('登录失败:账号或密码错误','Backdoor/login');
+            $this->error('登录失败:账号或密码错误', 'Backdoor/login');
         }
     }
 
-    
+
     // 退出
     public function logout()
     {

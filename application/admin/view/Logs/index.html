@@ -43,9 +43,10 @@
             <th>销　　售</th>
             <th>操作行为</th>
             <th>Q　　Q</th>
+            <th>微　　信</th>
+            <th>电 话 号</th>
             <th>备　　注</th>
             <th>操作时间</th>
-            <th>ip地址</th>
             <th>查看详情</th>
         </tr>
         </thead>
@@ -56,14 +57,15 @@
             <td>{$vo.users}</td>
             <th>{$vo.act_name}</th>
             <td>{$vo.qq}</td>
+            <td>{$vo.weixin}</td>
+            <td>{$vo.phone}</td>
             {if $vo.k == '1'}
             <td>......{$vo.note|msubstr=($vo.position-12),($vo.lenght+1),'utf-8',false}<span style="color:green;font-size:25px;">{$vo.note|msubstr=($vo.position),($vo.lenght),'utf-8',false}</span>{$vo.note|msubstr=($vo.position+$vo.lenght),($vo.lenght+10),'utf-8',false}......</td>
             {else/}
-            <td>{$vo.note|msubstr=0,80,'utf-8',false}</td>
+            <td>{$vo.note|msubstr=0,40,'utf-8',false}</td>
             {/if}
             <td style="display:none;" id="note_{$vo.id}">{$vo.note}</td>
             <td>{$vo.newtime}</td>
-            <td>{$vo.ip}</td>
             <td onclick="getinfo({$vo.id})">详情</td>
           </tr>
         {/volist}
@@ -100,46 +102,42 @@
         //     }
         // });
       });
-      /*用户-删除*/
-      function member_del(obj,id){
-          layer.confirm('确认要删除吗？',function(index){
-              //发异步删除数据
-              $.ajax({
-                  url:"{:url('Records/delete')}",
-                  type:'post',
-                  dataType:'json',
-                  data: {deleid: id},
-                  success:function(msg){
-                      if(msg.status == 1)
-                      {
-                          $(obj).parents("tr").remove();
-                          layer.msg('已删除!',{icon:1,time:1000});
-                      }else {
-                          layer.msg(msg.error+'禁止操作！', {icon: 1});
-                      }
-                  },
-              });
-
-          });
-      }
+      // 提取信息
       function getinfo(id)
       {
-          var x = '#note_'+id;
-          var text = $(x).text();
-          layer.open({
-              type: 1
-              ,title: false //不显示标题栏
-              ,closeBtn: false
-              ,area: ['300px', '360px']
-              ,shade: 0.8
-              ,id: 'itarvin' //设定一个id，防止重复弹出
-              ,btn: ['关闭']
-              ,btnAlign: 'c'
-              ,moveType: 1 //拖拽模式，0或者1
-              ,content: '<div style="padding: 40px; line-height: 22px; background-color: #393D49; color: #fff; font-weight: 300;word-wrap:break-word; text-align:center;">详细内容:'+text+'</div>'
-              ,success: function(layero){
-              }
+          //发异步删除数据
+          $.ajax({
+              url:"{:url('Logs/extractDetail')}",
+              type:'post',
+              dataType:'json',
+              data: {logid: id},
+              success:function(msg){
+                  if(msg.status == 1)
+                  {
+                      var x = '#note_'+id;
+                      var text = $(x).text();
+                      var info = msg.data;
+                      html = '';
+                      html = "<table width='100%' border='1'><tr><th>操作IP</th><th>"+info['ip']+"</th></tr><tr><td>操作时间</td><td>"+info['newtime']+"</td></tr><tr><td>QQ</td><td>"+info['qq']+"</td></tr><tr><td>微信号</td><td>"+info['weixin']+"</td></tr><tr><td>手机号</td><td>"+info['phone']+"</td></tr><tr><td colspan='2'>备注</td></tr><tr><td colspan='2'>"+text+"</td></tr></table>";
+                      layer.open({
+                          type: 1
+                          ,title: false //不显示标题栏
+                          ,closeBtn: false
+                          ,area: ['300px', '360px']
+                          ,shade: 0.8
+                          ,id: 'itarvin' //设定一个id，防止重复弹出
+                          ,btn: ['关闭']
+                          ,btnAlign: 'c'
+                          ,moveType: 1 //拖拽模式，0或者1
+                          ,content: '<div style="padding: 40px; line-height: 22px; background-color: #393D49; color: #fff; font-weight: 300;word-wrap:break-word; text-align:center;">'+html+'</div>'
+                          ,success: function(layero){
+                          }
+                      });
+                  }
+              },
           });
+
+
       }
       function changelogo()
       {

@@ -12,13 +12,13 @@ class Base extends Controller
 {
     // 初始化方法
     protected function initialize(){
-        // 解密session,对比权限
-        $this->uid = json_decode(base64_decode(session('uid'), true),true);
-        if(array_key_exists('load_auth_'.md5(session('uid')),$_COOKIE)){
-            $auth = $_COOKIE['load_auth_'.md5(session('uid'))] ? $_COOKIE['load_auth_'.md5(session('uid'))] : '';
-            if($auth){
-                $user = Administrators::field('users,pwd')->find($this->uid);
-                if(md5($user['users'].$user['pwd']) != $auth){
+        // 解密session, 对比权限
+        $this->uid = json_decode(base64_decode(session('uid'),  true), true);
+        if( array_key_exists('auth_'.md5(session('uid')), $_COOKIE)){
+            $auth = $_COOKIE['auth_'.md5(session('uid'))] ? $_COOKIE['auth_'.md5(session('uid'))] : '';
+            if( $auth){
+                $user = Administrators::field('users, pwd')->find($this->uid);
+                if( md5($user['users'].$user['pwd']) != $auth){
                     $this->redirect(url('Backdoor/login'));
                 }
             }else {
@@ -28,7 +28,7 @@ class Base extends Controller
             $this->redirect(url('Backdoor/login'));
         }
         $this->name = session('u_name');
-        if($this->checksuperman()){
+        if( $this->checksuperman()){
             $this->superman = 'yes';
         }else {
             $this->superman = 'no';
@@ -39,7 +39,7 @@ class Base extends Controller
     protected function checksuperman()
     {
         $superlist = config('IS_SUPERMAN');
-        if(in_array($this->uid,$superlist)){
+        if( in_array($this->uid, $superlist)){
             return true;
         }else {
             return false;
