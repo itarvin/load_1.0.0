@@ -1,17 +1,17 @@
 <?php
 namespace app\admin\controller;
-use app\admin\model\Administrators;
-use app\admin\model\Consumer;
-use app\admin\model\Hitcount;
+use app\common\model\Admin;
+use app\common\model\Member;
+use app\common\model\Hitcount;
 use think\facade\Request;
 use app\util\ReturnCode;
 
-class Admin extends Base
+class Admins extends Base
 {
     // 主页
     public function index()
     {
-        $user = new Administrators;
+        $user = new Admin;
         $uid = $this->uid;
         $where = [];
         if( request()->isPost()){
@@ -38,21 +38,21 @@ class Admin extends Base
             'count'=>$count,
             'uid'  => $this->uid
         ]);
-        return $this->fetch('Admin/index');
+        return $this->fetch('Admins/index');
     }
 
 
     // 添加页
     public function add()
     {
-        return $this->fetch('Admin/add');
+        return $this->fetch('Admins/add');
     }
 
 
     public function create()
     {
         $input = input('post.');
-        $user = new Administrators;
+        $user = new Admin;
         // 数据验证
         $result = $this->validate($input, 'app\admin\validate\User');
         if( !$result){
@@ -77,10 +77,10 @@ class Admin extends Base
         if( $this->superman != 'yes' && $this->uid != $id){
             $this->error('对不起，非法访问！');
         }
-        $user = new Administrators;
+        $user = new Admin;
         $data = $user->field('id, users, gender, isow, weixin, phone, qq1, qq2, qq3, qq4')->find($id);
         $this->assign('data', $data);
-        return $this->fetch('Admin/edit');
+        return $this->fetch('Admins/edit');
     }
 
 
@@ -88,7 +88,7 @@ class Admin extends Base
     public function update()
     {
         $input = input('post.');
-        $user = new Administrators;
+        $user = new Admin;
         if( $this->superman != 'yes' && $this->uid != $input['id']){
             $this->error('对不起，非法访问！');
         }
@@ -119,8 +119,8 @@ class Admin extends Base
     public function custom()
     {
         // 员工id
-        $member = new Consumer;
-        $users = Administrators::field('id, users')->order('id asc')->select();
+        $member = new Member;
+        $users = Admin::field('id, users')->order('id asc')->select();
         // 预定义type 数组
         $checktype = array('qq, phone, weixin');
         $where = array();
@@ -159,7 +159,7 @@ class Admin extends Base
             'uid'  => $this->uid,
             'users'=> $users
         ));
-        return $this->fetch('Admin/custom');
+        return $this->fetch('Admins/custom');
     }
 
 
@@ -170,7 +170,7 @@ class Admin extends Base
         if( $uid == 1){
             $data['status'] = ReturnCode::AUTH_ERROR;
         }else {
-            $re = Administrators::where('id', 'EQ', $uid)->update(array('isow' => '1'));
+            $re = Admin::where('id', 'EQ', $uid)->update(array('isow' => '1'));
             if( $re){
                 $data['status'] = ReturnCode::SUCCESS;
             }else {
@@ -186,7 +186,7 @@ class Admin extends Base
     public function status()
     {
         $uid = Request::param('uid', '', 'trim');
-        $user = new Administrators;
+        $user = new Admin;
         $chuqin = $user->field('chuqin')->find($uid);
         switch ($chuqin['chuqin']) {
             case '0':
@@ -214,7 +214,7 @@ class Admin extends Base
         // 接收时间传参
         $date = input('date');
         // 获取当前所有出勤销售
-        $user = new Administrators;
+        $user = new Admin;
         $userIds = $user->field('id')->where('chuqin', 'eq', '1')->select();
         $where = [];
         $end = date('Y-m-d H:i:s', time());

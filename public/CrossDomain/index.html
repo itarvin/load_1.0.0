@@ -166,22 +166,27 @@ function getinfo()
 	};
 	$.ajax({
 		type: 'post',
-		url: 'http://leading.net/index.php/index/index/getinformation.html',
+		url: 'http://leading.net/index.php/api/Members/getinfo.html',
 		dataType: 'json',
 		data:data,
 		contentType:contentType,
 		success: function(msg){
-			var info = msg.data;
-			var html ='';
 			console.log(info);
-			if(info != ''){
-				html += "<tr class='text-c'><td>"+info.id+"</td><td>"+info.username+"</td><td>"+info.sex+"</td><td>"+info.phone+"</td><td>"+info.weixin+"</td><td>"+info.qq+"</td><td>"+info.address+"</td><td>"+info.newtime+"</td><td><a id='edit'>修改</a><input type='hidden' id='ids' value="+info.key+"></td></tr>";
-				$('#body').html(html);
-				var ids = $('#ids').val();
-				$('#edit').attr('href','member-edit.html?uid='+ids);
+			if(msg.status == 1){
+				var info = msg.data;
+				var html ='';
+				if(info != ''){
+					html += "<tr class='text-c'><td>"+info.id+"</td><td>"+info.username+"</td><td>"+info.sex+"</td><td>"+info.phone+"</td><td>"+info.weixin+"</td><td>"+info.qq+"</td><td>"+info.address+"</td><td>"+info.newtime+"</td><td><a id='edit'>修改</a><input type='hidden' id='ids' value="+info.key+"></td></tr>";
+					$('#body').html(html);
+					var ids = $('#ids').val();
+					$('#edit').attr('href','member-edit.html?uid='+ids);
+				}else {
+					$('#body').html(html);
+				}
 			}else {
-				$('#body').html(html);
+				alert(msg.info);
 			}
+
 		},
 		beforeSend: function(request) {
 			request.setRequestHeader("X-Requested-With","XMLHttpRequest");
@@ -193,7 +198,7 @@ function getout()
 	var contentType ="application/x-www-form-urlencoded; charset=utf-8";
 	$.ajax({
 		type: 'post',
-		url: 'http://leading.net/index.php/index/login/secede.html',
+		url: 'http://leading.net/index.php/api/Login/logout.html',
 		dataType: 'json',
 		contentType:contentType,
 		success: function(msg){
@@ -211,7 +216,7 @@ window.onload=function(){
 		var contentType ="application/x-www-form-urlencoded; charset=utf-8";
 		$.ajax({
 			type: 'post',
-			url: 'http://leading.net/index.php/index/index/list.html',
+			url: 'http://leading.net/index.php/api/Members/index.html',
 			dataType: 'json',
 			contentType:contentType,
 			success: function(msg){
@@ -221,7 +226,7 @@ window.onload=function(){
 				var html ='';
 				var ids = [];
 				$.each(info.data,function(index, el) {
-					html += "<tr class='text-c'><td>"+el.id+"</td><td>"+el.username+"</td><td>"+el.sex+"</td><td>"+el.phone+"</td><td>"+el.weixin+"</td><td>"+el.qq+"</td><td>"+el.address+"</td><td>"+el.newtime+"</td><td><a id='edit_"+el.id+"'>修改</a><input type='hidden' id='ids_"+el.id+"' value="+el.key+"></td></tr>";
+					html += "<tr class='text-c'><td>"+el.id+"</td><td>"+el.username+"</td><td>"+el.sex+"</td><td>"+el.phone+"</td><td>"+el.weixin+"</td><td>"+el.qq+"</td><td>"+el.address+"</td><td>"+el.newtime+"</td><td><a id='edit_"+el.id+"'>修改</a><input type='hidden' id='ids_"+el.id+"' value="+el.id+"></td></tr>";
 					ids.push(el.id);
 				});
 				$('#body').html(html);
@@ -251,7 +256,7 @@ function changePage(page)
 	var contentType ="application/x-www-form-urlencoded; charset=utf-8";
 	$.ajax({
 		type: 'post',
-		url: 'http://leading.net/index.php/index/index/list.html',
+		url: 'http://leading.net/index.php/api/Members/index.html',
 		dataType: 'json',
 		data : {page : page},
 		contentType:contentType,

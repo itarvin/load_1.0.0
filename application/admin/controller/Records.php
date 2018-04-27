@@ -1,7 +1,7 @@
 <?php
 namespace app\admin\controller;
-use app\admin\model\Consumer;
-use app\admin\model\Record;
+use app\common\model\Member;
+use app\common\model\Record;
 use app\util\ReturnCode;
 use app\util\Tools;
 use think\facade\Request;
@@ -64,7 +64,7 @@ class Records extends Base
     {
         $khid = input('reid');
         // 先检测当前客户是否为当前销售
-        $check = Consumer::find($khid);
+        $check = Member::find($khid);
         if($check['uid'] != $this->uid){
             $this->error('当前客户您无法操作！');
             exit;

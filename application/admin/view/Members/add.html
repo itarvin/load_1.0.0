@@ -21,7 +21,7 @@
         <form class="layui-form">
           <div class="layui-form-item from-div">
               <button class="layui-btn from-button" id="test2">
-                  <a href="{:url('Member/downMould')}">
+                  <a href="{:url('Members/downMould')}">
                       <i class="layui-icon">&#xe61d;</i>下载模板
                       <br/>
                       <span>（请先下载导入数据的模板，不要改动第一行）</span>
@@ -41,7 +41,7 @@
         //指定允许上传的文件类型
         upload.render({
             elem: '#test3'
-            ,url: '{:url("Member/loadmember")}'
+            ,url: '{:url("Members/loadmember")}'
             ,before: function(input){
                 //加载层
                 $('#test3').hide();
@@ -128,7 +128,7 @@
             deal : deal,
         };
         $.ajax({
-			url:"{:url('Member/batchMember')}",
+			url:"{:url('Members/batchMember')}",
 			type:'post',
 			dataType:'json',
 			data: data,

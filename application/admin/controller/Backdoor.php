@@ -2,7 +2,7 @@
 namespace app\admin\controller;
 use think\Controller;
 use think\captcha\Captcha;
-use app\admin\model\Administrators;
+use app\common\model\Admin;
 use think\facade\Cookie;
 use think\Validate;
 class  Backdoor extends controller
@@ -29,7 +29,7 @@ class  Backdoor extends controller
 
     public function do_login()
     {
-        $user = new Administrators;
+        $user = new Admin;
         $data = input('post.');
         // 先验证验证码是否正确
         $captcha = new Captcha();

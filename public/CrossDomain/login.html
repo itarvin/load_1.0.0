@@ -32,7 +32,7 @@
 			<div class="row cl">
 				<div class="formControls col-xs-8 col-xs-offset-3">
 					<input class="input-text size-L" type="text" placeholder="验证码" style="width:150px;" name="verify" id="verify">
-					<img src="http://leading.net/index.php/index/login/verify" onclick="refreshVerify()" id="verify_img" >
+					<img src="http://leading.net/index.php/api/Login/verify" onclick="refreshVerify()" id="verify_img" >
 					<!-- <a id="kanbuq" href="javascript:;">看不清，换一张</a> -->
 				</div>
 			</div>
@@ -76,14 +76,16 @@
 		var contentType ="application/x-www-form-urlencoded; charset=utf-8";
 		$.ajax({
 			type: 'post',
-			url: 'http://leading.net/index.php/index/login/index.html',
+			url: 'http://leading.net/index.php/api/Login/login.html',
 			dataType: 'json',
 			data:data,
 			contentType:contentType,
 			success: function(msg){
+				console.log(msg);
 				if(msg.status == 1)
 				{
-					$.cookie('identity', msg.identity, { expires: 7 });
+					alert(msg.info);
+					// $.cookie('identity', msg.identity, { expires: 7 });
 					window.location.href="/CrossDomain/index.html";
 				}
 			},
@@ -95,7 +97,7 @@
 	}
 	function refreshVerify() {
 		var ts = Date.parse(new Date())/1000;
-		$('#verify_img').attr("src", "http://leading.net/index.php/index/login/verify?id="+ts);
+		$('#verify_img').attr("src", "http://leading.net/index.php/api/Login/verify?id="+ts);
 	}
 </script>
 </body>

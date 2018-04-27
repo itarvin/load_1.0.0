@@ -1,10 +1,10 @@
 <?php
 namespace app\admin\validate;
 use think\Validate;
-class User extends Validate
+class Admin extends Validate
 {
     protected $rule =   [
-        'users|用户名' => 'require|min:2|token',
+        'users|用户名' => 'require|min:2',
         'phone|手机号'   => 'length:11|number',
         'weixin|微信号'  => 'between:6,20',
     ];
@@ -14,5 +14,10 @@ class User extends Validate
         'phone.number'  => '手机号必须是数字',
         'phone.length'  => '手机号长度在11位',
         'weixin.between'=> '微信号在6-20位字符',
+    ];
+
+    //定义场景
+    protected $scene = [
+      'do_login'   =>  ['users'],
     ];
 }

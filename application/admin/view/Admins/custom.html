@@ -101,7 +101,7 @@
           layer.confirm('确认要删除吗？',function(index){
               //发异步删除数据
               $.ajax({
-                  url:"{:url('Member/delete')}",
+                  url:"{:url('Members/delete')}",
                   type:'post',
                   dataType:'json',
                   data: {deleid: id},

@@ -6,7 +6,7 @@
  */
 
 namespace app\util;
-use app\admin\model\Logact;
+use app\common\model\Logact;
 class Tools {
      /**
      * 错误码对比
@@ -184,6 +184,7 @@ class Tools {
             'sex'      => '性别',
             'uid'      => '销售id',
             'weixin'   => '微信',
+            'address'  => '地址',
         );
         $keyword = array_search($string,array_flip($array));
         return $keyword;

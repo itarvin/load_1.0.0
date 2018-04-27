@@ -2,7 +2,7 @@
     <div class="x-nav">
       <span class="layui-breadcrumb">
         <a href="">首页</a>
-        <a href="{:url('member/index')}">会员管理</a>
+        <a href="{:url('Members/index')}">会员管理</a>
         <a>
           <cite>我的回收站</cite></a>
       </span>
@@ -11,7 +11,7 @@
     </div>
     <div class="x-body">
       <div class="layui-row">
-        <form class="layui-form layui-col-md12 x-so"  action="{:url('Member/recycle')}" method="post">
+        <form class="layui-form layui-col-md12 x-so"  action="{:url('Members/recycle')}" method="post">
           <input class="layui-input" placeholder="开始日期" name="start" id="start" value="{:input('post.start')}">
           <input class="layui-input" placeholder="截止日期" name="end" id="end" value="{:input('post.end')}">
           <div class="layui-input-inline">
@@ -101,7 +101,7 @@
           layer.confirm('确认要删除吗？',function(index){
               //发异步删除数据
               $.ajax({
-                  url:"{:url('Member/delete')}",
+                  url:"{:url('Members/delete')}",
                   type:'post',
                   dataType:'json',
                   data: {deleid: id},
@@ -121,7 +121,7 @@
       {
           //发异步删除数据
           $.ajax({
-              url:"{:url('Member/renew')}",
+              url:"{:url('Members/renew')}",
               type:'post',
               dataType:'json',
               data: {newid: id},

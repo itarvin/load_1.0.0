@@ -1,7 +1,7 @@
 <?php
 namespace app\admin\controller;
-use app\admin\model\Log;
-use app\admin\model\Logact;
+use app\common\model\Log;
+use app\common\model\Logact;
 use think\facade\Request;
 use app\util\Tools;
 use app\util\ReturnCode;
@@ -40,20 +40,20 @@ class Logs extends Base{
             if (!empty($aid) && !empty($keyword)) {
                 switch ($aid) {
                     case '11':
-                        $where[] = ['a.qq',  'LIKE',  "%$keyword%"];
+                        $where[] = ['a.qq|a.phone|a.weixin', 'EQ', $keyword];
                         // 对应的(sql in)数组
                         $li = Tools::logactKey('cus_insert').', '.Tools::logactKey('buy_insert').', '.Tools::logactKey('cus_delete').', '.Tools::logactKey('buy_delete').', '.Tools::logactKey('cus_change').', '.Tools::logactKey('cus_isdelete');
                         $where[] = ['a.act', 'in', $li];
                         break;
                     case 'all':
-                        $where[] = ['a.qq', 'LIKE', "%$keyword%"];
+                        $where[] = ['a.qq|a.phone|a.weixin', 'eq', $keyword];
                         $map[] = ['a.note', 'LIKE', "%, $keyword, %"];
                         break;
                     case Tools::logactKey('delete_import'):
                         $where[] = ['a.note', 'LIKE', "%, $keyword, %"];
                         break;
                     default:
-                        $where[] = ['a.qq', 'LIKE', "%$keyword%"];
+                        $where[] = ['a.qq|a.phone|a.weixin', 'EQ', $keyword];
                         $where[] = ['a.act', 'EQ', $aid];
                         break;
                 }

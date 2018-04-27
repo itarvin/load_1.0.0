@@ -58,15 +58,16 @@
 			</div>
 		</div>
 		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">生日:</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" value="" placeholder="" id="birthday" name="birthday">
+			</div>
+		</div>
+		<div class="row cl">
 			<label class="form-label col-xs-4 col-sm-3">所在城市：</label>
-			<div class="formControls col-xs-8 col-sm-9"> <span class="select-box">
-				<select class="select" size="1" name="address" id="address">
-					<option value="" selected>请选择城市</option>
-					<option value="1">北京</option>
-					<option value="2">上海</option>
-					<option value="3">广州</option>
-				</select>
-				</span> </div>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" value="" placeholder="" id="address" name="address">
+			</div>
 		</div>
 		<div class="row cl">
 			<label class="form-label col-xs-4 col-sm-3">备注：</label>
@@ -128,16 +129,15 @@ function add()
 		phone: $('input[name="phone"]').val(),
 		qq   : $('input[name="qq"]').val(),
 		weixin : $('input[name="weixin"]').val(),
-		address : $('#address').find("option:selected").val(),
+		// address : $('#address').find("option:selected").val(),
+		address : $('input[name="address"]').val(),
+		birthday : $('input[name="birthday"]').val(),
 		note : $('#note').val(),
 	};
-	// console.log(data);
-	// 从cookie中获取token
-	var token = $.cookie('token');
 	var contentType ="application/x-www-form-urlencoded; charset=utf-8";
 	$.ajax({
 		type: 'post',
-		url: 'http://leading.net/index.php/index/index/increased.html',
+		url: 'http://leading.net/index.php/api/Members/add.html',
 		dataType: 'json',
 		data:data,
 		contentType:contentType,
@@ -149,7 +149,6 @@ function add()
 			}
 		},
 		beforeSend: function(request) {
-			request.setRequestHeader("Token",token);
 			request.setRequestHeader("X-Requested-With","XMLHttpRequest");
 		}
 	});

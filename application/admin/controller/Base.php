@@ -7,7 +7,7 @@ namespace app\admin\controller;
  * @author  itarvin itarvin@163.com
  */
 use think\Controller;
-use app\admin\model\Administrators;
+use app\common\model\Admin;
 class Base extends Controller
 {
     // 初始化方法
@@ -17,7 +17,7 @@ class Base extends Controller
         if( array_key_exists('auth_'.md5(session('uid')), $_COOKIE)){
             $auth = $_COOKIE['auth_'.md5(session('uid'))] ? $_COOKIE['auth_'.md5(session('uid'))] : '';
             if( $auth){
-                $user = Administrators::field('users, pwd')->find($this->uid);
+                $user = Admin::field('users, pwd')->find($this->uid);
                 if( md5($user['users'].$user['pwd']) != $auth){
                     $this->redirect(url('Backdoor/login'));
                 }

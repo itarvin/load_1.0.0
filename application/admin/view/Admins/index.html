@@ -7,7 +7,7 @@
     <div class="x-nav">
       <span class="layui-breadcrumb">
         <a href="{:url('Index/index')}">首页</a>
-        <a href="{:url('Admin/index')}">销售管理</a>
+        <a href="{:url('Admins/index')}">销售管理</a>
         <a><cite>销售列表</cite></a>
       </span>
       <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新">
@@ -15,7 +15,7 @@
     </div>
     <div class="x-body">
       <div class="layui-row">
-        <form class="layui-form layui-col-md12 x-so" action="{:url('Admin/index')}" method="post">
+        <form class="layui-form layui-col-md12 x-so" action="{:url('Admins/index')}" method="post">
           <input class="layui-input" placeholder="开始日期" name="start" id="start" value="{:input('post.start')}">
           <input class="layui-input" placeholder="截止日期" name="end" id="end" value="{:input('post.end')}">
           <input type="text" name="users"  placeholder="请输入用户名" autocomplete="off" class="layui-input" value="{:input('post.users')}">
@@ -26,7 +26,7 @@
       </div>
       <xblock>
           {if $uid == '1'}
-          <button class="layui-btn" onclick="x_admin_show('添加用户','{:url('Admin/add')}')"><i class="layui-icon"></i>添加</button>
+          <button class="layui-btn" onclick="x_admin_show('添加用户','{:url('Admins/add')}')"><i class="layui-icon"></i>添加</button>
           {/if}
           <span class="x-right" style="line-height:40px">共有数据：{$count} 条</span>
       </xblock>
@@ -64,13 +64,13 @@
                 </td>
                 <td class="td-manage">
 
-                  <a  href="{:url('Admin/custom')}"  title="员工客户">
+                  <a  href="{:url('Admins/custom')}"  title="员工客户">
                       <button class="layui-btn layui-btn-sm layui-btn-primary">
                           <i class="layui-icon">&#xe613;</i>
                       </button>
                   </a>
 
-                  <a title="编辑"  onclick="x_admin_show('编辑','{:url('Admin/edit',array('id' => $vo.id))}')" href="javascript:;">
+                  <a title="编辑"  onclick="x_admin_show('编辑','{:url('Admins/edit',array('id' => $vo.id))}')" href="javascript:;">
                       <button class="layui-btn layui-btn-sm layui-btn-primary">
                           <i class="layui-icon">编辑</i>
                       </button>
@@ -105,7 +105,7 @@
           layer.confirm('确认要离职吗？',function(index){
               //发异步删除数据
               $.ajax({
-                  url:"{:url('Admin/dimission')}",
+                  url:"{:url('Admins/dimission')}",
                   type:'post',
                   dataType:'json',
                   data: {uid:id},
@@ -155,7 +155,7 @@
               uid : userid
           };
           $.ajax({
-              url:"{:url('Admin/status')}",
+              url:"{:url('Admins/status')}",
               type:'post',
               dataType:'json',
               data: data,
@@ -191,7 +191,7 @@
               date : opt
           };
           $.ajax({
-              url:"{:url('Admin/getHit')}",
+              url:"{:url('Admins/getHit')}",
               type:'post',
               dataType:'json',
               data: data,

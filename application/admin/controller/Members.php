@@ -1,23 +1,22 @@
 <?php
 namespace app\admin\controller;
-use app\admin\model\Consumer;
-use app\admin\model\Administrators;
-use app\admin\model\Log;
+use app\common\model\Member;
+use app\common\model\Log;
 use think\File;
 use think\facade\Cache;
 use app\util\ReturnCode;
-use app\admin\model\Record;
+use app\common\model\Record;
 use app\util\Tools;
 use think\facade\Request;
 
-class Member extends Base{
+class Members extends Base{
     /**
      * 主页显示
      *获取当前管理员的客户会员
      */
     public function index()
     {
-        $member = new Consumer;
+        $member = new Member;
         // 预定义type 数组
         $checktype = array('qq', 'phone', 'weixin');
         $where = [];
@@ -63,7 +62,7 @@ class Member extends Base{
             'uid'  => $this->uid,
             'superman'  => $this->superman,
         ));
-        return $this->fetch('Member/index');
+        return $this->fetch('Members/index');
     }
 
 
@@ -71,7 +70,7 @@ class Member extends Base{
     public function batchdelete()
     {
         $data = input('post.');
-        $member = new Consumer;
+        $member = new Member;
         $nums = 0;
         foreach($data['deleid'] as $k => $v){
             $have = $member->where('id', $v)->find();
@@ -122,7 +121,7 @@ class Member extends Base{
     public function delete()
     {
         $id = input('post.deleid');
-        $member = new Consumer;
+        $member = new Member;
         // 先判断当前是删除数据是否为本人的客户。
         $have = $member->where('id', $id)->find();
         if($have['uid']  != $this->uid){
@@ -147,7 +146,7 @@ class Member extends Base{
     public function renew()
     {
         $id = input('post.newid');
-        $member = new Consumer;
+        $member = new Member;
         // 先判断当前是删除数据是否为本人的客户。
         $have = $member->where('id', $id)->find();
         if($have['uid']  != $this->uid){
@@ -166,7 +165,7 @@ class Member extends Base{
      * 添加操作
      */
     public function add(){
-        return $this->fetch('Member/add');
+        return $this->fetch('Members/add');
     }
 
     /**
@@ -302,7 +301,7 @@ class Member extends Base{
                 }
             }
             // 读取一次数据库所有数据
-            $model = new Consumer;
+            $model = new Member;
             $haveqq = $model->field('qq, phone')->where('qq', 'in', $qq)->select();
             $haveph = $model->field('qq, phone')->where('phone', 'in', $ph)->select();
             // 如果已经存在，返回键
@@ -338,7 +337,7 @@ class Member extends Base{
      * @return json
      */
     public function batchMember(){
-        $model = new Consumer;
+        $model = new Member;
         $maxItem = config('maxitem');
         $success = Request::param('success', '', 'trim');
         $error = Request::param('error', '', 'trim');
@@ -394,7 +393,7 @@ class Member extends Base{
      */
     public function recycle()
     {
-        $member = new Consumer;
+        $member = new Member;
         // 预定义type 数组
         $checktype = ['qq, phone, weixin'];
         $where = [];
@@ -431,7 +430,7 @@ class Member extends Base{
             'count'=>$count,
             'uid'  => $this->uid,
         ]);
-        return $this->fetch('Member/recycle');
+        return $this->fetch('Members/recycle');
     }
 
 
@@ -439,7 +438,7 @@ class Member extends Base{
     public function edit()
     {
         $id = Request::param('id', '', 'trim');
-        $consumer = new Consumer;
+        $consumer = new Member;
         $data = $consumer->find($id);
         if($this->uid != 1 && $data['uid'] != $this->uid){
             $this->error('对不起，非法访问！');
@@ -452,7 +451,7 @@ class Member extends Base{
     public function update()
     {
         $input = input('post.');
-        $member = new Consumer;
+        $member = new Member;
         if($this->uid != 1 && $input['uid'] != $this->uid){
             $this->error('对不起，非法访问！');
         }

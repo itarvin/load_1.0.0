@@ -55,19 +55,20 @@
 			<label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>微信：</label>
 			<div class="formControls col-xs-8 col-sm-9">
 				<input type="text" class="input-text" value="" placeholder="" id="mobile" name="weixin">
-				<input type="hidden" name="key" >
+				<input type="hidden" name="id" >
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">生日:</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" value="" placeholder="" id="birthday" name="birthday">
 			</div>
 		</div>
 		<div class="row cl">
 			<label class="form-label col-xs-4 col-sm-3">所在城市：</label>
-			<div class="formControls col-xs-8 col-sm-9"> <span class="select-box">
-				<select class="select" size="1" name="address" id="address">
-					<option value="" selected>请选择城市</option>
-					<option value="1">北京</option>
-					<option value="2">上海</option>
-					<option value="3">广州</option>
-				</select>
-				</span> </div>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" value="" placeholder="" id="address" name="address">
+			</div>
 		</div>
 		<div class="row cl">
 			<label class="form-label col-xs-4 col-sm-3">备注：</label>
@@ -107,12 +108,24 @@ function getQueryVariable(variable)
        }
        return(false);
 }
+// function GetRequest() {
+//    var url = location.search; //获取url中"?"符后的字串
+//    console.log(url);
+//    var theRequest = new Object();
+//    if (url.indexOf("?") != -1) {
+//       var str = url.substr(1);
+//       strs = str.split("&");
+//       for(var i = 0; i < strs.length; i ++) {
+//          theRequest[strs[i].split("=")[0]]=unescape(strs[i].split("=")[1]);
+//       }
+//    }
+//    return theRequest;
+// }
 window.onload=function(){
-	var token = $.cookie('token');
 	var contentType ="application/x-www-form-urlencoded; charset=utf-8";
 	var uid = getQueryVariable("uid");
 	$.ajax({
-		url:"http://leading.net/index.php/index/index/geteditinfo.html",
+		url:"http://leading.net/index.php/api/Members/info.html",
 		type:'post',
 		dataType:'json',
 		data : {uid:uid},
@@ -122,17 +135,18 @@ window.onload=function(){
 			{
 				var text = msg.data;
 				$('input[name="username"]').val(text.username);
-				$('input[name="key"]').val(text.key);
+				$('input[name="id"]').val(text.id);
 				$("input[name='sex'][value="+text.sex+"]").attr("checked",true);
 				$('input[name="phone"]').val(text.phone);
 				$('input[name="qq"]').val(text.qq);
 				$('input[name="weixin"]').val(text.weixin);
-				$("#address").find("option[text="+text.address+"]").attr("selected",true);
+				$('input[name="address"]').val(text.address);
+				$('input[name="birthday"]').val(text.birthday);
+				// $("#address").find("option[text="+text.address+"]").attr("selected",true);
 				$('#note').val(text.note);
 			}
 		},
 		beforeSend: function(request) {
-			request.setRequestHeader("Token",token);
 			request.setRequestHeader("X-Requested-With","XMLHttpRequest");
 		}
 	});
@@ -141,13 +155,15 @@ window.onload=function(){
 function edit()
 {
 	var data = {
-		key      : $('input[name="key"]').val(),
+		id       : $('input[name="id"]').val(),
 		username : $('input[name="username"]').val(),
 		sex      : $('input[name="sex"]').val(),
 		phone    : $('input[name="phone"]').val(),
 		qq       : $('input[name="qq"]').val(),
 		weixin   : $('input[name="weixin"]').val(),
-		address  : $('#address').find("option:selected").val(),
+		address   : $('input[name="address"]').val(),
+		birthday   : $('input[name="birthday"]').val(),
+		// address  : $('#address').find("option:selected").val(),
 		note     : $('#note').val(),
 	};
 	// console.log(data);
@@ -156,13 +172,15 @@ function edit()
 	var contentType ="application/x-www-form-urlencoded; charset=utf-8";
 	$.ajax({
 		type: 'post',
-		url: 'http://leading.net/index.php/index/index/modify.html',
+		url: 'http://leading.net/index.php/api/Members/edit.html',
 		dataType: 'json',
 		data:data,
 		contentType:contentType,
 		success: function(msg){
 			if(msg.status  == '1')
 			{
+				alert(msg.info);
+			}else{
 				alert(msg.info);
 			}
 		},
@@ -172,12 +190,12 @@ function edit()
 		}
 	});
 }
-window.onload=function(){
-	var identity = $.cookie('identity');
-	if(identity == null){
-		window.location.href="/CrossDomain/login.html";
-	}
-}
+// window.onload=function(){
+// 	var identity = $.cookie('identity');
+// 	if(identity == null){
+// 		window.location.href="/CrossDomain/login.html";
+// 	}
+// }
 </script>
 <!--/请在上方写此页面业务相关的脚本-->
 </body>
