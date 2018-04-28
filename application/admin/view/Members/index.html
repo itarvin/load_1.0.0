@@ -34,8 +34,9 @@
         <!-- {if $superman != 'yes'}
         <button class="layui-btn layui-btn-danger" onclick="delAll()"><i class="layui-icon"></i>批量回收站</button>
         {/if} -->
+        {if $superman != 'yes'}
         <button class="layui-btn" onclick="x_admin_show('添加用户','{:url('Members/add')}',600,400)"><i class="layui-icon"></i>添加</button>
-
+        {/if} 
         <span class="x-right" style="line-height:40px">共有数据：{$count} 条</span>
       </xblock>
       <table class="layui-table">
@@ -52,10 +53,14 @@
             <th>微信</th>
             <th>手机</th>
             <th>QQ</th>
+            {if $superman == 'yes'}
+            <th>谁的客户</th>
+            {/if}
             <th>加入时间</th>
             {if $superman != 'yes'}
-            <th>操作</th></tr>
+            <th>操作</th>
             {/if}
+        </tr>
         </thead>
         <tbody>
         {volist name="list" id="vo"}
@@ -71,10 +76,13 @@
             <td>{$vo.weixin}</td>
             <td>{$vo.phone}</td>
             <td>{$vo.qq}</td>
+            {if $superman == 'yes'}
+            <td>{$vo.users}</td>
+            {/if}
             <td>{$vo.newtime}</td>
             {if $superman != 'yes'}
             <td class="td-manage">
-                <a title="编辑"  onclick="x_admin_show('编辑','{:url('member/edit',array('id' => $vo.id))}')" href="javascript:;">
+                <a title="编辑"  onclick="x_admin_show('编辑','{:url('Members/edit',array('id' => $vo.id))}')" href="javascript:;">
                     <button class="layui-btn layui-btn-sm layui-btn-primary">
                         <i class="layui-icon">编辑</i>
                     </button>

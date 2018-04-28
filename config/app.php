@@ -56,7 +56,7 @@ return [
     // +----------------------------------------------------------------------
 
     // 默认模块名
-    'default_module'         => 'index',
+    'default_module'         => 'admin',
     // 禁止访问模块
     'deny_module_list'       => ['common'],
     // 默认控制器名
@@ -144,15 +144,6 @@ return [
     'IS_SUPERMAN'           => array('1'),
     // 定义导入最大处理数
     'maxitem'                => 1001,
-    // 动态获取允许跨域地址
-    'TRENDS_ALLOW_ORIGIN'   =>  '*',
-    //向外跨域配置
-    'CROSS_DOMAIN' => [
-        'Access-Control-Allow-Origin'      => '*',
-        'Access-Control-Allow-Methods'     => 'POST,GET',
-        'Access-Control-Allow-Headers'     => 'Token, User-Agent, Keep-Alive, Origin, No-Cache, X-Requested-With, If-Modified-Since, Pragma, Last-Modified, Cache-Control, Expires, Content-Type, X-E4M-With',
-        'Access-Control-Allow-Credentials' => 'true'
-    ],
     //后台登录状态维持时间[目前只有登录和解锁会重置登录时间]
     'ONLINE_TIME'  => 7200,
 ];

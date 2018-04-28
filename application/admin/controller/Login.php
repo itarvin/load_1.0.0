@@ -1,17 +1,28 @@
 <?php
 namespace app\admin\controller;
+/**
+ * 后台登录类
+ * @author  itarvin itarvin@163.com
+ */
 use think\Controller;
-use think\captcha\Captcha;
 use app\common\model\Admin;
 use think\facade\Cookie;
 use think\Validate;
-class  Backdoor extends controller
+use think\captcha\Captcha;
+class  Login extends controller
 {
+    /**
+     * 登录静态页
+     */
     public function login()
     {
-        return $this->fetch('Backdoor/login');
+        return $this->fetch('Login/login');
     }
 
+    /**
+     * 验证码输出
+     * @return img
+     */
     public function verify()
     {
         $config = [
@@ -26,17 +37,16 @@ class  Backdoor extends controller
         return $captcha->entry();
     }
 
-
+    /**
+     * 处理数据登录
+     */
     public function do_login()
     {
         $user = new Admin;
         $data = input('post.');
         // 先验证验证码是否正确
-        $captcha = new Captcha();
-        if( !$captcha->check($data['verify']))
-        {
-        	// 验证失败
-            $this->error('验证码错误！', 'Backdoor/login');
+        if( !captcha_check($data['verify'])){
+            $this->error('验证码错误！', 'Login/login');
         }
         $rule = [
             //管理员登陆字段验证
@@ -53,13 +63,13 @@ class  Backdoor extends controller
             'users' => $data['users']
         ))->find();
         if( !$preview){
-            $this->error('当前用户不存在', 'Backdoor/login');
+            $this->error('当前用户不存在', 'Login/login');
         }
         $where_query = array(
             'users' => $data['users'],
             'pwd' => $data['pwd'],
         );
-        if ($user = $user->where($where_query)->find()) {
+        if( $user = $user->where($where_query)->find()) {
             //注册session
             $sid = base64_encode(json_encode($user->id));
             session('uid', $sid);
@@ -72,16 +82,18 @@ class  Backdoor extends controller
             $user->where($where_query)->update(['lasttime' => $time]);
             return $this->success('登录成功', 'Index/index');
         } else {
-            $this->error('登录失败:账号或密码错误', 'Backdoor/login');
+            $this->error('登录失败:账号或密码错误', 'Login/login');
         }
     }
 
 
-    // 退出
+    /**
+     * 退出
+     */
     public function logout()
     {
         $request = request();
         session(null);
-        return $this->success('已成功登出', 'Backdoor/login');
+        return $this->success('已成功登出', 'Login/login');
     }
 }

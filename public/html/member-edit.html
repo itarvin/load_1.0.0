@@ -166,8 +166,6 @@ function edit()
 		// address  : $('#address').find("option:selected").val(),
 		note     : $('#note').val(),
 	};
-	// console.log(data);
-	// 从cookie中获取token
 	var token = $.cookie('token');
 	var contentType ="application/x-www-form-urlencoded; charset=utf-8";
 	$.ajax({
@@ -185,7 +183,6 @@ function edit()
 			}
 		},
 		beforeSend: function(request) {
-			request.setRequestHeader("Token",token);
 			request.setRequestHeader("X-Requested-With","XMLHttpRequest");
 		}
 	});

@@ -30,32 +30,21 @@ class Base extends Controller
             $preview = Admin::field('users, pwd')->find($uid);
             $this->uid = $uid;
             // 验证是否当前用户设备与提交的用户设备一致.
-            if( $key['agent'] != $agent || md5($preview['users'].$preview['pwd']) != $key['salt']){
-                return $this->returnRes(400, 'true');
-                cookie('identity', null);
-            }else if( md5($preview['users'].$preview['pwd']) == $key['salt']){
-                return $this->returnRes(300, 'true');
-                cookie('identity', null);
+            if( $key['agent'] == $agent && md5($preview['users'].$preview['pwd']) == $key['salt']){
+                $this->AuthPermission = '200';
+            }else{
+                if( md5($preview['users'].$preview['pwd']) == $key['salt']){
+                    $this->AuthPermission = '300';
+                    cookie('identity', null);
+                }else {
+                    $this->AuthPermission = '400';
+                    cookie('identity', null);
+                }
             }
         }else {
-            return $this->returnRes(400, 'true');
+            $this->AuthPermission = '400';
         }
     }
-
-
-    // /**
-    //  * 统一接口输出值
-    //  * @param $res
-    //  * @return json
-    //  */
-    // public function buildReturn($res) {
-    //     $result = [
-    //         'status' => $res['status'],
-    //         'info'   => $res['info'],
-    //         'data'   => isset($res['data']) ? $res['data'] : []
-    //     ];
-    //     return json($result);
-    // }
 
 
     /**
@@ -66,16 +55,19 @@ class Base extends Controller
     public function returnRes($AuthPermission, $isCheck = 'false')
     {
         if( $isCheck == 'true'){
-            if( $AuthPermission == '400'){
-                return buildReturn([ReturnCode::ACCOUNTEXPIRED, "请您先登录账户！"]);
-            }else if( $AuthPermission == '300'){
-                return buildReturn([ReturnCode::ACCOUNTEXPIRED, Tools::errorCode(ReturnCode::ACCOUNTEXPIRED)]);
+            if( $AuthPermission == "400"){
+                return buildReturn(['status' =>ReturnCode::ACCOUNTEXPIRED,'info' => "请您先登录账户！"]);
+            }else if( $AuthPermission == "300"){
+                return buildReturn(['status' =>ReturnCode::AUTH_ERROR,'info' => Tools::errorCode(ReturnCode::AUTH_ERROR)]);
             }
         }
     }
 
 
-    // 对base64二次加密数据进行析出
+    /**
+     * base64二次加密数据进行析出
+     * @return array
+     */
     private function analysisCode($token)
     {
         // 析出当前数据对比验证
@@ -103,5 +95,4 @@ class Base extends Controller
             'token' => $result
         );
     }
-
 }

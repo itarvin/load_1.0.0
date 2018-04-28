@@ -1,5 +1,9 @@
 <?php
 namespace app\api\controller;
+/**
+ * 登录处理类
+ * @author  itarvin itarvin@163.com
+ */
 use app\common\model\Admin;
 use think\facade\Request;
 use think\facade\Cookie;
@@ -7,8 +11,7 @@ use think\captcha\Captcha;
 use app\util\Tools;
 use app\util\ReturnCode;
 use think\Validate;
-use think\Controller;
-class Login extends Controller
+class Login extends Base
 {
     /**
      * 登录处理
@@ -16,78 +19,86 @@ class Login extends Controller
      */
     public function login()
     {
-        $input = Request::param();
-        // 获取客户端设备
-        $agent = Request::header('User-Agent');
-        if( !captcha_check($input['verify'] ))
-        {
-            return buildReturn(['status' => ReturnCode::SUCCESS, 'info' => '验证码错误！']);
-        }
-        $rule = [
-            //管理员登陆字段验证
-            'users|管理员账号' => 'require|min:5',
-            'pwd|管理员密码'   => 'require|min:5',
-        ];
-        $user = new Admin;
-        $name = $input["users"];
-        // 数据验证
-        $validate = new Validate($rule);
-
-        if( !$validate->check($input)){
-            return buildReturn(['status' => ReturnCode::VERIFICATIONFAILURE,'info'=> $validate->getError()]);
-        }
-
-        $preview = $user->where(array(
-            'users'=> $name
-        ))->find();
-
-        if( !$preview){
-
-            $this->checkLogin($name);
-            return buildReturn(['status' => ReturnCode::AUTH_ERROR,'info'=>  Tools::errorCode(ReturnCode::AUTH_ERROR)]);
-        }else if( $preview['status'] == 1){
-
-            $this->checkLogin($name);
-            return buildReturn(['status' => ReturnCode::LOCKACCOUNT,'info'=>  Tools::errorCode(ReturnCode::LOCKACCOUNT)]);
-        }else {
-
-            $where_query = [
-                'users' => $name,
-                'pwd'   => $input["pwd"]
+        if(request()->isPost()){
+            $input = Request::param();
+            // 获取客户端设备
+            $agent = Request::header('User-Agent');
+            if(isset($input['verify']) && !captcha_check($input['verify'] ))
+            {
+                return buildReturn(['status' => ReturnCode::SUCCESS, 'info' => '验证码错误！']);
+            }
+            $rule = [
+                //管理员登陆字段验证
+                'users|管理员账号' => 'require',
+                'pwd|管理员密码'   => 'require',
             ];
-            if( $user = $user->where($where_query)->find()) {
-                //更新最后请求IP及时间
-                $time = date('Y-m-d H:i:s', time());
-                // 加密账户密码
-                $salt = md5($user->users.$user->pwd);
-                // 对数据二次加密
-                $token = $this->encryption($user->id, $agent, $salt);
-                // 更新时间
-                $user->where($where_query)->update(['lasttime' => $time]);
+            $user = new Admin;
+            $name = $input["users"];
+            // 数据验证
+            $validate = new Validate($rule);
 
-                if( $input['online'] == 1){
-                    // 标识存入cookie
-                    Cookie::set('identity', $token, ['expire'=> 3600 * 12 * 30 ]);
-                }else if( $input['online'] == 0) {
-                    Cookie::set('identity', $token, ['expire'=> 3600 * 12]);
-                }
+            if( !$validate->check($input)){
+                return buildReturn(['status' => ReturnCode::VERIFICATIONFAILURE,'info'=> $validate->getError()]);
+            }
 
-                // 返回状态
-                return buildReturn(['status' => ReturnCode::SUCCESS,'info'=>  Tools::errorCode(ReturnCode::SUCCESS)]);
-            } else {
+            $preview = $user->where(array(
+                'users'=> $name
+            ))->find();
+
+            if( !$preview){
 
                 $this->checkLogin($name);
                 return buildReturn(['status' => ReturnCode::AUTH_ERROR,'info'=>  Tools::errorCode(ReturnCode::AUTH_ERROR)]);
+            }else if( $preview['status'] == 1){
+
+                $this->checkLogin($name);
+                return buildReturn(['status' => ReturnCode::LOCKACCOUNT,'info'=>  Tools::errorCode(ReturnCode::LOCKACCOUNT)]);
+            }else {
+
+                $where_query = [
+                    'users' => $name,
+                    'pwd'   => $input["pwd"]
+                ];
+                if( $user = $user->where($where_query)->find()) {
+                    //更新最后请求IP及时间
+                    $time = date('Y-m-d H:i:s', time());
+                    // 加密账户密码
+                    $salt = md5($user->users.$user->pwd);
+                    // 对数据二次加密
+                    $token = $this->encryption($user->id, $agent, $salt);
+                    // 更新时间
+                    $user->where($where_query)->update(['lasttime' => $time]);
+
+                    if( $input['online'] == 1){
+                        // 标识存入cookie
+                        Cookie::set('identity', $token, ['expire'=> 3600 * 12 * 30 ]);
+                    }else if( $input['online'] == 0) {
+                        Cookie::set('identity', $token, ['expire'=> 3600 * 12]);
+                    }
+
+                    // 返回状态
+                    return buildReturn(['status' => ReturnCode::SUCCESS,'info'=>  Tools::errorCode(ReturnCode::SUCCESS)]);
+                } else {
+
+                    $this->checkLogin($name);
+                    return buildReturn(['status' => ReturnCode::AUTH_ERROR,'info'=>  Tools::errorCode(ReturnCode::AUTH_ERROR)]);
+                }
             }
+        }else {
+            return buildReturn(['status' =>ReturnCode::ACCOUNTEXPIRED,'info' => "请您先登录账户！"]);
         }
     }
 
+
+    /**
+     * 检测登录信息，是否恶意
+     * @return json
+     */
     private function checkLogin($name, $timestamp)
     {
         $timestamp = $timestamp != '' ? $timestamp : time();
         $attack = cache($name) != null ? cache($name) : [];
         array_push($attack, $timestamp);
-
         if( cache($name) != null){
             if( count($attack) > 2){
                 // 锁当前用户
@@ -117,8 +128,12 @@ class Login extends Controller
      */
     public function logout()
     {
-        cookie('identity', null);
-        return buildReturn(['status' => ReturnCode::SUCCESS,'info'=>  Tools::errorCode(ReturnCode::SUCCESS)]);
+        if($this->AuthPermission == '200'){
+            cookie('identity', null);
+            return buildReturn(['status' => ReturnCode::SUCCESS,'info'=>  Tools::errorCode(ReturnCode::SUCCESS)]);
+        }else {
+            return $this->returnRes($this->AuthPermission, 'true');
+        }
     }
 
     /**
@@ -140,7 +155,10 @@ class Login extends Controller
     }
 
 
-    // 对base64二次加密处理
+    /**
+     * base64二次加密处理
+     * @return string
+     */
     private function encryption($userid,$agent,$salt)
     {
         // 密码薄
@@ -172,5 +190,4 @@ class Login extends Controller
         $token = $start.$uidStart.$uid.$uidEnd.$medium.$tokenEnd.$end;
         return $token;
     }
-
 }

@@ -83,23 +83,23 @@
                elem: '#date'
              });
           //自定义验证规则
-          form.verify({
-              weixin: function(value){
-                var reg=/^[a-zA-Z\d_]{5,20}$/;
-                if(value.length < 6 || value.length > 20){
-                    return '微信号必须6到20位';
-                }
-                if (!reg.test(value)) {
-                    return '微信号格式不正确！';
-                }
-            }
-            ,qq : function(value){
-                var reg = /^[1-9][0-9]{4,9}$/;
-                if (!reg.test(value)) {
-                    return 'QQ号格式不正确！';
-                }
-            }
-          });
+          // form.verify({
+          //     weixin: function(value){
+          //       var reg=/^[a-zA-Z\d_]{5,20}$/;
+          //       if(value.length < 6 || value.length > 20){
+          //           return '微信号必须6到20位';
+          //       }
+          //       if (!reg.test(value)) {
+          //           return '微信号格式不正确！';
+          //       }
+          //   }
+          //   ,qq : function(value){
+          //       var reg = /^[1-9][0-9]{4,9}$/;
+          //       if (!reg.test(value)) {
+          //           return 'QQ号格式不正确！';
+          //       }
+          //   }
+          // });
           //监听提交
           form.on('submit(add)', function(data){
             //发异步，把数据提交给php

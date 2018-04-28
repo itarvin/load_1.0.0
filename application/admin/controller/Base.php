@@ -1,6 +1,5 @@
 <?php
 namespace app\admin\controller;
-
 /**
  * app基类
  * @since   2018/03/17 创建
@@ -19,13 +18,13 @@ class Base extends Controller
             if( $auth){
                 $user = Admin::field('users, pwd')->find($this->uid);
                 if( md5($user['users'].$user['pwd']) != $auth){
-                    $this->redirect(url('Backdoor/login'));
+                    $this->redirect(url('Login/login'));
                 }
             }else {
-                $this->redirect(url('Backdoor/login'));
+                $this->redirect(url('Login/login'));
             }
         }else {
-            $this->redirect(url('Backdoor/login'));
+            $this->redirect(url('Login/login'));
         }
         $this->name = session('u_name');
         if( $this->checksuperman()){
@@ -35,7 +34,10 @@ class Base extends Controller
         }
     }
 
-
+    /**
+     * 检测是否当前用户是超管
+     * @return Boole
+     */
     protected function checksuperman()
     {
         $superlist = config('IS_SUPERMAN');

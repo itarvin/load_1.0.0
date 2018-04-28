@@ -1,5 +1,9 @@
 <?php
 namespace app\api\controller;
+/**
+ * 接口客户处理类
+ * @author  itarvin itarvin@163.com
+ */
 use app\common\model\Member;
 use app\util\Tools;
 use app\util\ReturnCode;
@@ -10,18 +14,62 @@ use \Think\Db;
 class Members extends Base
 {
     /**
+     * 分页数据接口
+     * @param page(post)
+     * @return json
+     */
+    public function index()
+    {
+        if($this->AuthPermission == '200'){
+            $member = new Member;
+            $where = [];
+            $where[] = ['uid', 'EQ', $this->uid];
+            $start = Request::param('start', '', 'trim');
+            $end = Request::param('end', '', 'trim');
+            $key = Request::param('key', '', 'trim');
+            $type = Request::param('type', '', 'trim');
+            $note = Request::param('note', '', 'trim');
+            if($start != '' || $end != '' || ($key != '' && $type != '') || $note != ''){
+                //check time
+                if ($start && $end) {
+                    $where[] = ['newtime', 'between', [$start, $end]];
+                }elseif( $start){
+                    $where[] = ['newtime', 'GT', $start];
+                }elseif ($end) {
+                    $where[] = ['newtime', 'LT', $end];
+                }
+                // check type查询key
+                if($type == 'all' || $type == ''){
+                    $where[] = ['phone|weixin|qq', 'eq', $key];
+                }else if($type == 'qq' || $type == 'phone' || $type == 'weixin'){
+                    $where[] = [$type, 'eq', $key];
+                }
+                if($note != ''){
+                    $where[] = ['note', 'LIKE', $note];
+                }
+            }
+            $list = $member->field('id,username,sex,calendar,birthday,qq,phone,weixin,note,newtime,address')->where($where)->order('id desc')->paginate();
+            return buildReturn(['status' => ReturnCode::SUCCESS,'info'=>  Tools::errorCode(ReturnCode::SUCCESS),'data' => $list]);
+        }else {
+            return $this->returnRes($this->AuthPermission, 'true');
+        }
+    }
+
+    /**
      * 添加客户信息接口
      * @return json
      */
     public function add()
     {
-        if(request()->isPost()){
+        if($this->AuthPermission == '200'){
             $member = new Member;
             $data = Request::param();
             $data['uid'] = $this->uid;
             $data['newtime'] = date('Y-m-d H:i:s', time());
             $result = $member->store($data);
             return buildReturn(['status' => $result['code'],'info'=> $result['msg']]);
+        }else {
+            return $this->returnRes($this->AuthPermission, 'true');
         }
     }
 
@@ -32,47 +80,15 @@ class Members extends Base
      */
     public function edit()
     {
-        if(request()->isPost()){
+        if($this->AuthPermission == '200'){
             $member = new Member;
             // 接收所有参数
             $data = Request::param();
             $data['uid'] = $this->uid;
             $result = $member->store($data);
             return buildReturn(['status' => $result['code'],'info'=> $result['msg']]);
-        }
-    }
-
-    /**
-     * 查询信息接口
-     * @return json
-     */
-    public function getinfo()
-    {
-        if(request()->isPost()){
-            $member = new Member;
-            $input = Request::param();
-            // 验证
-            if(!empty($input['key']) && !empty($input['type'])){
-                // 拼接查询条件
-                $where = [];
-                if($input['type'] == 'all' || $input['type'] == ''){
-                    $where[] = ['phone|weixin|qq', 'eq', $input['key']];
-                }else if($input['type'] == 'qq' || $input['type'] == 'phone' || $input['type'] == 'weixin'){
-                    $where[] = [$input['type'], 'eq', $input['key']];
-                }
-                // 查询对象
-                $list = $member->where($where)->find();
-                // 对象存在且为操作人的客户，返回数据
-                if(!empty($list) && $list['uid'] == $this->uid){
-                    return buildReturn(['status' => ReturnCode::SUCCESS,'info'=> Tools::errorCode(ReturnCode::SUCCESS), 'data' => $list]);
-                }else if($list['uid'] != $this->uid) {
-                    return buildReturn(['status' => ReturnCode::OCCUPIED,'info'=> Tools::errorCode(ReturnCode::OCCUPIED)]);
-                }else if(empty($list)) {
-                    return buildReturn(['status' => ReturnCode::NODATA,'info'=> Tools::errorCode(ReturnCode::NODATA)]);
-                }
-            }else {
-                return buildReturn(['status' => ReturnCode::LACKOFPARAM,'info'=> Tools::errorCode(ReturnCode::LACKOFPARAM)]);
-            }
+        }else {
+            return $this->returnRes($this->AuthPermission, 'true');
         }
     }
 
@@ -83,34 +99,19 @@ class Members extends Base
      */
     public function info()
     {
-        if(request()->isPost()){
+        if($this->AuthPermission == '200'){
             $member = new Member;
             $uid = Request::param('uid', '', 'strip_tags', 'trim');
-            $list = $member->find($uid);
+            $list = $member->field('id,username,sex,calendar,birthday,qq,phone,weixin,note,newtime,address,uid')->find($uid);
             // 验证客户的操作者
             if($list['uid'] == $this->uid){
+                unset($list['uid']);
                 return buildReturn(['status' => ReturnCode::SUCCESS,'info'=> Tools::errorCode(ReturnCode::SUCCESS), 'data' => $list]);
             }else {
                 return buildReturn(['status' => ReturnCode::OCCUPIED,'info'=> Tools::errorCode(ReturnCode::OCCUPIED)]);
             }
-        }
-    }
-
-    /**
-     * 分页数据接口
-     * @param page(post)
-     * @return json
-     */
-    public function index()
-    {
-        if(request()->isPost()){
-            // 传值默认取
-            $page = Request::param('page', '1', 'strip_tags', 'trim');
-            $member = new Member;
-            $lists = $member->where(array('uid' => $this->uid))->order('id desc')->page($page, 15)->select();
-            $list['data'] = $lists;
-            $list['page'] = $page;
-            return buildReturn(['status' => ReturnCode::SUCCESS,'info'=>  Tools::errorCode(ReturnCode::SUCCESS),'data' => $list]);
+        }else {
+            return $this->returnRes($this->AuthPermission, 'true');
         }
     }
 }

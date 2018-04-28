@@ -1,18 +1,20 @@
 <?php
 namespace app\admin\controller;
+/**
+ * 后台客户处理类
+ * @author  itarvin itarvin@163.com
+ */
 use app\common\model\Member;
-use app\common\model\Log;
 use think\File;
 use think\facade\Cache;
 use app\util\ReturnCode;
 use app\common\model\Record;
 use app\util\Tools;
 use think\facade\Request;
-
 class Members extends Base{
     /**
      * 主页显示
-     *获取当前管理员的客户会员
+     * 获取当前管理员的客户会员
      */
     public function index()
     {
@@ -38,11 +40,11 @@ class Members extends Base{
 
             //check time
             if ($start && $end) {
-                $where[] = ['newtime', 'between', [$start, $end]];
+                $where[] = ['a.newtime', 'between', [$start, $end]];
             }elseif($start){
-                $where[] = ['newtime', 'GT', $start];
+                $where[] = ['a.newtime', 'GT', $start];
             }elseif ($end) {
-                $where[] = ['newtime', 'LT', $end];
+                $where[] = ['a.newtime', 'LT', $end];
             }
 
             // check type
@@ -50,23 +52,29 @@ class Members extends Base{
                 if($type && in_array($type, $checktype)){
                     $where[] = [$type,  'EQ',  $keyword];
                 }else{
-                    $where[] = ['qq|phone|weixin',  'EQ',  $keyword];
+                    $where[] = ['a.qq|a.phone|a.weixin',  'EQ',  $keyword];
                 }
             }
         }
-        $list = $member->where($where)->order('id desc')->paginate();
+        $list = $member->alias('a')
+        ->field('a.*, b.users')
+        ->join('admin b', 'a.uid = b.id')
+        ->where($where)->order('id desc')->paginate();
         $count = $list->total();
-        $this->assign(array(
+        $this->assign([
             'list' => $list,
             'count'=>$count,
             'uid'  => $this->uid,
-            'superman'  => $this->superman,
-        ));
+            'superman'  => $this->superman
+        ]);
         return $this->fetch('Members/index');
     }
 
 
-    // 批量删除
+    /**
+     * 批量回收
+     * @return json
+     */
     public function batchdelete()
     {
         $data = input('post.');
@@ -107,7 +115,9 @@ class Members extends Base{
     }
 
 
-    // 删除客户清除消费记录
+    /**
+     * 删除客户清除消费记录
+     */
     private function shiftCustom($memberid)
     {
         $list = Record::field('id')->where('khid', 'EQ', $memberid)->select();
@@ -117,7 +127,10 @@ class Members extends Base{
     }
 
 
-    // 单条删除
+    /**
+     * 单条删除
+     * @return json
+     */
     public function delete()
     {
         $id = input('post.deleid');
@@ -125,8 +138,7 @@ class Members extends Base{
         // 先判断当前是删除数据是否为本人的客户。
         $have = $member->where('id', $id)->find();
         if($have['uid']  != $this->uid){
-            $data['status'] = ReturnCode::ERROR;
-            $data['msg'] = '当前客户非您的客户！';
+            return buildReturn(['status' => ReturnCode::ERROR,'info'=> '当前客户非您的客户！']);
         }else {
             $this->shiftCustom($id);
             // ------日志处理 ---start
@@ -134,15 +146,17 @@ class Members extends Base{
             // -------------------end
             $re = $member->where('id', $id)->delete();
             if($re){
-                $data['status'] = ReturnCode::SUCCESS;
+                return buildReturn(['status' => ReturnCode::SUCCESS,'info'=> Tools::errorCode(ReturnCode::SUCCESS)]);
             }
         }
-        return json($data);
     }
 
 
 
-    // 回收站恢复
+    /**
+     * 回收站恢复
+     * @return json
+     */
     public function renew()
     {
         $id = input('post.newid');
@@ -150,15 +164,15 @@ class Members extends Base{
         // 先判断当前是删除数据是否为本人的客户。
         $have = $member->where('id', $id)->find();
         if($have['uid']  != $this->uid){
-            $data['status'] = ReturnCode::ERROR;
-            $data['msg'] = '当前客户非您的客户！';
+            return buildReturn(['status' => ReturnCode::ERROR,'info'=> '当前客户非您的客户！']);
         }else {
             $re = $member->where('id', $id)->update(array('is_delete' => '0'));
             if($re){
-                $data['status'] = ReturnCode::SUCCESS;
+                return buildReturn(['status' => ReturnCode::SUCCESS,'info'=> Tools::errorCode(ReturnCode::SUCCESS)]);
+            }else{
+                return buildReturn(['status' => ReturnCode::ERROR,'info'=> Tools::errorCode(ReturnCode::ERROR)]);
             }
         }
-        return json($data);
     }
 
     /**
@@ -318,9 +332,12 @@ class Members extends Base{
                 }
                 Cache::set('scv_'.$this->uid.'_'.$filename, $error);
             }
-            // ------日志处理 ---start
-            writelog($data, Tools::logactKey('delete_import'), $this->uid);
-            // -------------------end
+            // 不存在数据的不存入日志
+            if(!empty($data)){
+                // ------日志处理 ---start
+                writelog($data, Tools::logactKey('delete_import'), $this->uid);
+                // -------------------end
+            }
             // -------------------批量新增数据
             $success = $model->limit(100)->insertAll($data);
             return array(
@@ -372,7 +389,10 @@ class Members extends Base{
         return json($data);
     }
 
-    // 根据值查询数组返回键
+
+    /**
+     * 根据值查询数组返回键
+     */
     private function arraySearch($exist, $array, $have, $ke)
     {
         foreach ($exist as $key => $value) {
@@ -434,7 +454,9 @@ class Members extends Base{
     }
 
 
-
+    /**
+     * 修改静态页
+     */
     public function edit()
     {
         $id = Request::param('id', '', 'trim');
@@ -444,33 +466,25 @@ class Members extends Base{
             $this->error('对不起，非法访问！');
         }
         $this->assign('data', $data);
-        return $this->fetch('member/edit');
+        return $this->fetch('members/edit');
     }
 
-
+    /**
+     * 更新数据
+     * @return json
+     */
     public function update()
     {
-        $input = input('post.');
-        $member = new Member;
-        if($this->uid != 1 && $input['uid'] != $this->uid){
-            $this->error('对不起，非法访问！');
-        }
-        // 数据验证
-        $result = $this->validate($input, 'app\admin\validate\Member');
-        if(!$result){
-            $data['status'] = ReturnCode::ERROR;
-            $data['info'] = $validate->getError();
-        }else {
-            // ------日志处理 ---start
-            writelog($input['id'], Tools::logactKey('cus_change'), $this->uid, $input);
-            // -------------------end
-            if ($member->update($input)) {
-                $data['status'] = ReturnCode::SUCCESS;
-            } else {
-                $data['status'] = ReturnCode::ERROR;
-                $data['info'] = '更新失败了！';
+        if(request()->isPost()){
+            $member = new Member;
+            // 接收所有参数
+            $data = Request::param();
+            if($this->uid != 1 && $data['uid'] != $this->uid){
+                $this->error('对不起，非法访问！');
             }
+            $data['uid'] = $this->uid;
+            $result = $member->store($data);
+            return buildReturn(['status' => $result['code'],'info'=> $result['msg']]);
         }
-        return json($data);
     }
 }

@@ -102,7 +102,7 @@ function writelog($data,$act,$uid,$edits = '')
         }
     }else if($act == 2) {
         $note = [];
-        $kh = Db::name('member')->field('username,qq')->where('id',$data['khid'])->find();
+        $kh = Db::name('member')->where('id',$data['khid'])->find();
         $note = json_encode(array(
             'username'=> $kh['username'],
             'product'=> $data['product'],

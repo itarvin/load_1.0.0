@@ -1,5 +1,9 @@
 <?php
 namespace app\admin\controller;
+/**
+ * 订单记录类
+ * @author  itarvin itarvin@163.com
+ */
 use app\common\model\Member;
 use app\common\model\Record;
 use app\util\ReturnCode;
@@ -7,7 +11,10 @@ use app\util\Tools;
 use think\facade\Request;
 class Records extends Base
 {
-    // 主页
+    /**
+     * 主页
+     * @return array
+     */
     public function index()
     {
         $record = new Record;
@@ -59,7 +66,10 @@ class Records extends Base
     }
 
 
-    // 添加消费页
+    /**
+     * 添加消费页
+     * @return array
+     */
     public function addrecord()
     {
         $khid = input('reid');
@@ -70,55 +80,65 @@ class Records extends Base
             exit;
         }
         $check['users'] = $this->name;
-        $this->assign('data', $check);
-        $this->assign('khid', $khid);
+        $this->assign([
+            'data' => $check,
+            'khid' => $khid
+        ]);
         return $this->fetch('Records/addrecord');
     }
 
-    // 处理添加订单数据
+    /**
+     * 处理添加订单数据
+     */
     public function record()
     {
-        $input = input('post.');
-        $lenght = count($input['product']);
-        for($i = 0; $i < $lenght;$i++)
-        {
-            $da['product'] = $input['product'][$i];
-            $da['price'] = $input['price'][$i];
-            $da['note'] = $input['note'][$i];
-            $da['khid'] = $input['khid'];
-            $da['uid'] = $this->uid;
-            $da['newtime'] = date('Y-m-d H:i:s', time());
-            $data[] = $da;
-        }
-        // ------日志处理 ---start
-        foreach ($data as $key => $value) {
-            writelog($value, Tools::logactKey('buy_insert'), $this->uid);
-        }
-        // -------------------end
-        $record = new Record;
-        $re = $record->insertAll($data);
-        if($re){
-            $this->success('添加'.$re.'条订单成功！');
+        if(request()->isPost()){
+            $input = Request::param();
+            $lenght = count($input['product']);
+            for($i = 0; $i < $lenght; $i++)
+            {
+                $da['product'] = $input['product'][$i];
+                $da['price'] = $input['price'][$i];
+                $da['note'] = $input['note'][$i];
+                $da['khid'] = $input['khid'];
+                $da['uid'] = $this->uid;
+                $da['newtime'] = date('Y-m-d H:i:s', time());
+                $data[] = $da;
+            }
+            // ------日志处理 ---start
+            foreach ($data as $key => $value) {
+                writelog($value, Tools::logactKey('buy_insert'), $this->uid);
+            }
+            // -------------------end
+            $record = new Record;
+            $re = $record->insertAll($data);
+            if($re){
+                $this->success('添加'.$re.'条订单成功！');
+            }
         }
     }
 
-    //删除订单
+
+    /**
+     * 删除订单
+     * @return json
+     */
     public function delete()
     {
-        $id = input('post.deleid');
-        $record = new Record;
-        // 先判断当前是删除数据是否为当前用户的订单。
-        $have = $record->where('id', $id)->find();
-        if($have['uid']  != $this->uid){
-            $data['status'] = ReturnCode::ERROR;
-            $data['msg'] = '当前订单您不能操作！';
-        }else {
-            writelog($id, Tools::logactKey('buy_delete'), $this->uid);
-            $re = $record->where('id', $id)->delete();
-            if($re){
-                $data['status'] = ReturnCode::SUCCESS;;
+        if(request()->isPost()){
+            $id = input('post.deleid');
+            $record = new Record;
+            // 先判断当前是删除数据是否为当前用户的订单。
+            $have = $record->where('id', $id)->find();
+            if($have['uid']  != $this->uid){
+                return buildReturn(['status' => ReturnCode::ERROR,'info'=> '当前订单您不能操作！']);
+            }else {
+                writelog($id, Tools::logactKey('buy_delete'), $this->uid);
+                $re = $record->where('id', $id)->delete();
+                if($re){
+                    return buildReturn(['status' => ReturnCode::SUCCESS,'info'=> Tools::errorCode(ReturnCode::SUCCESS)]);
+                }
             }
         }
-        return json($data);
     }
 }

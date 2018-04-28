@@ -10,8 +10,8 @@
             <a href="javascript:;">{$name}</a>
             <dl class="layui-nav-child"> <!-- 二级菜单 -->
               <dd><a onclick="x_admin_show('个人信息','{:url('admin/edit',array('id'=> $uid))}')">个人信息</a></dd>
-              <dd><a href="{:url('Backdoor/login')}">切换帐号</a></dd>
-              <dd><a href="{:url('Backdoor/logout')}">退出</a></dd>
+              <dd><a href="{:url('Login/login')}">切换帐号</a></dd>
+              <dd><a href="{:url('Login/logout')}">退出</a></dd>
             </dl>
           </li>
           <li class="layui-nav-item to-index"><a href="/">前台首页</a></li>
@@ -67,7 +67,7 @@
             <li>
                 <a href="javascript:;">
                     <i class="iconfont">&#xe726;</i>
-                    <cite>销售订单</cite>
+                    <cite>销售管理</cite>
                     <i class="iconfont nav_right">&#xe697;</i>
                 </a>
                 <ul class="sub-menu">
