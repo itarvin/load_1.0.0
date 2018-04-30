@@ -4,8 +4,8 @@ namespace app\admin\controller;
  * 订单记录类
  * @author  itarvin itarvin@163.com
  */
-use app\common\model\Member;
-use app\common\model\Record;
+use app\model\Member;
+use app\model\Record;
 use app\util\ReturnCode;
 use app\util\Tools;
 use think\facade\Request;

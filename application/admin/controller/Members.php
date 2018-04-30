@@ -4,11 +4,11 @@ namespace app\admin\controller;
  * 后台客户处理类
  * @author  itarvin itarvin@163.com
  */
-use app\common\model\Member;
+use app\model\Member;
 use think\File;
 use think\facade\Cache;
 use app\util\ReturnCode;
-use app\common\model\Record;
+use app\model\Record;
 use app\util\Tools;
 use think\facade\Request;
 class Members extends Base{

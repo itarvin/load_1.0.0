@@ -7,12 +7,6 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
 <meta http-equiv="Cache-Control" content="no-siteapp" />
-<link rel="Bookmark" href="favicon.ico" >
-<link rel="Shortcut Icon" href="favicon.ico" />
-<!--[if lt IE 9]>
-<script type="text/javascript" src="lib/html5.js"></script>
-<script type="text/javascript" src="lib/respond.min.js"></script>
-<![endif]-->
 <link rel="stylesheet" type="text/css" href="static/h-ui/css/H-ui.min.css" />
 <link rel="stylesheet" type="text/css" href="static/h-ui.admin/css/H-ui.admin.css" />
 <link rel="stylesheet" type="text/css" href="lib/Hui-iconfont/1.0.8/iconfont.css" />
@@ -24,6 +18,47 @@
 <meta name="description" content="H-ui.admin v3.0，是一款由国人开发的轻量级扁平化网站后台模板，完全免费开源的网站后台管理系统模版，适合中小型CMS后台系统。">
 </head>
 <body>
+	<!-- 自定义分页样式 -->
+	<style>
+	#page ul
+	{
+	    list-style:none; /* 去掉ul前面的符号 */
+	    margin: 0px; /* 与外界元素的距离为0 */
+	    padding: 0px; /* 与内部元素的距离为0 */
+	    width: auto; /* 宽度根据元素内容调整 */
+	}
+	/* 所有class为menu的div中的ul中的li样式 */
+	#page ul li
+	{
+	    float:left; /* 向左漂移，将竖排变为横排 */
+	}
+	/* 所有class为menu的div中的ul中的a样式(包括尚未点击的和点击过的样式) */
+	#page ul li a, #page ul li a:visited
+	{
+	    background-color: #465c71; /* 背景色 */
+	    border: 1px #4e667d solid; /* 边框 */
+	    color: #dde4ec; /* 文字颜色 */
+	    display: block; /* 此元素将显示为块级元素，此元素前后会带有换行符 */
+	    line-height: 1.35em; /* 行高 */
+	    padding: 4px 20px; /* 内部填充的距离 */
+	    text-decoration: none; /* 不显示超链接下划线 */
+	    white-space: nowrap; /* 对于文本内的空白处，不会换行，文本会在在同一行上继续，直到遇到 <br> 标签为止。 */
+	}
+	/* 所有class为menu的div中的ul中的a样式(鼠标移动到元素中的样式) */
+	#page ul li a:hover
+	{
+	    background-color: #bfcbd6; /* 背景色 */
+	    color: #465c71; /* 文字颜色 */
+	    text-decoration: none; /* 不显示超链接下划线 */
+	}
+	/* 所有class为menu的div中的ul中的a样式(鼠标点击元素时的样式) */
+	#page ul li a:active
+	{
+	    background-color: #465c71; /* 背景色 */
+	    color: #cfdbe6; /* 文字颜色 */
+	    text-decoration: none; /* 不显示超链接下划线 */
+	}
+	</style>
 <!--_header 作为公共模版分离出去-->
 <header class="navbar-wrapper">
 	<div class="navbar navbar-fixed-top">
@@ -99,7 +134,7 @@
 					</select>
 				</span>
 				<input type="text" class="input-text" style="width:250px" placeholder="qq,weixin.phone" id="" name="keyword">
-				<button type="submit" class="btn btn-success radius" onclick="getinfo()"><i class="Hui-iconfont">&#xe665;</i> 搜用户</button>
+				<button type="submit" class="btn btn-success radius" onclick="search()"><i class="Hui-iconfont">&#xe665;</i> 搜用户</button>
 			</div>
 			<div class="cl pd-5 bg-1 bk-gray mt-20"> <span class="l">
 				 <a href="javascript:;" onclick="member_add('添加用户','member-add.html','','510')" class="btn btn-primary radius"><i class="Hui-iconfont">&#xe600;</i> 添加用户</a></span> <span class="r">共有数据：<strong>88</strong> 条</span> </div>
@@ -121,9 +156,7 @@
 					<tbody id="body">
 
 					</tbody>
-					<div class="">
-						<a id="prevPage">上一页</a>
-						<a id="nextPage">下一页</a>
+					<div id="page">
 					</div>
 				</table>
 			</div>
@@ -155,49 +188,28 @@ function member_show(title,url,id,w,h){
 function member_edit(title,url,id,w,h){
 	layer_show(title,url,w,h);
 }
-function getinfo()
-{
-	var contentType ="application/x-www-form-urlencoded; charset=utf-8";
-	var choose=$('#choose').find("option:selected").val();
-	var value = $('input[name="keyword"]').val();
-	var data = {
-		type:choose,
-		key:value
-	};
-	$.ajax({
-		type: 'post',
-		url: 'http://leading.net/index.php/api/Members/index.html',
-		dataType: 'json',
-		data:data,
-		contentType:contentType,
-		success: function(msg){
-			console.log(info);
-			if(msg.status == 1){
-				var info = msg.data;
-				var html ='';
-				var ids = [];
-				$.each(info.data,function(index, el) {
-					html += "<tr class='text-c'><td>"+el.id+"</td><td>"+el.username+"</td><td>"+el.sex+"</td><td>"+el.phone+"</td><td>"+el.weixin+"</td><td>"+el.qq+"</td><td>"+el.address+"</td><td>"+el.newtime+"</td><td><a id='edit_"+el.id+"'>修改</a><input type='hidden' id='ids_"+el.id+"' value="+el.id+"></td></tr>";
-					ids.push(el.id);
-				});
-				$('#body').html(html);
-				var len = ids.length;
-				for (var i = 0; i < len; i++){
-					var iid = "#ids_"+ids[i];
-					var edit = "#edit_"+ids[i];
-					var idd = $(iid).val();
-					$(edit).attr('href','member-edit.html?uid='+idd);
+function del(obj,id){
+	layer.confirm('确认要删除吗？',function(index){
+		$.ajax({
+			type: 'POST',
+			url: 'http://leading.net/index.php/api/members/delete',
+			dataType: 'json',
+			data : {kid:id},
+			success: function(data){
+				if(data.status == '1'){
+					$(obj).parents("tr").remove();
+					layer.msg(data.info,{icon:1,time:1000});
+				}else {
+					layer.msg(data.info,{icon:6,time:1000});
 				}
-			}else {
-				alert(msg.info);
-			}
-
-		},
-		beforeSend: function(request) {
-			request.setRequestHeader("X-Requested-With","XMLHttpRequest");
-		}
+			},
+			error:function(data) {
+				console.log(data.info);
+			},
+		});
 	});
 }
+
 function getout()
 {
 	var contentType ="application/x-www-form-urlencoded; charset=utf-8";
@@ -215,30 +227,43 @@ function getout()
 		}
 	});
 }
-window.onload=function(){
+function search(){
 	var identity = $.cookie('identity');
+	var choose=$('#choose').find("option:selected").val();
+		var value = $('input[name="keyword"]').val();
+		var data = {
+			type:choose,
+			key:value
+		};
 	if(identity != null){
 		var contentType ="application/x-www-form-urlencoded; charset=utf-8";
 		$.ajax({
 			type: 'post',
 			url: 'http://leading.net/index.php/api/Members/index.html',
 			dataType: 'json',
+			data:data,
 			contentType:contentType,
 			success: function(msg){
-				var info = msg.data;
-				var html ='';
-				var ids = [];
-				$.each(info.data,function(index, el) {
-					html += "<tr class='text-c'><td>"+el.id+"</td><td>"+el.username+"</td><td>"+el.sex+"</td><td>"+el.phone+"</td><td>"+el.weixin+"</td><td>"+el.qq+"</td><td>"+el.address+"</td><td>"+el.newtime+"</td><td><a id='edit_"+el.id+"'>修改</a><input type='hidden' id='ids_"+el.id+"' value="+el.id+"></td></tr>";
-					ids.push(el.id);
-				});
-				$('#body').html(html);
-				var len = ids.length;
-				for (var i = 0; i < len; i++){
-					var iid = "#ids_"+ids[i];
-					var edit = "#edit_"+ids[i];
-					var idd = $(iid).val();
-					$(edit).attr('href','member-edit.html?uid='+idd);
+				if(msg.status == 1){
+					var info = msg.data;
+					var html ='';
+					var ids = [];
+					$.each(info.data,function(index, el) {
+						html += "<tr class='text-c'><td>"+el.id+"</td><td>"+el.username+"</td><td>"+el.sex+"</td><td>"+el.phone+"</td><td>"+el.weixin+"</td><td>"+el.qq+"</td><td>"+el.address+"</td><td>"+el.newtime+"</td><td><a id='edit_"+el.id+"'>修改</a><input type='hidden' id='ids_"+el.id+"' value="+el.id+"><a id='de_"+el.id+"' onclick='del(this,"+el.id+")'>删除</a></td></tr>";
+						ids.push(el.id);
+					});
+					$('#body').html(html);
+					var len = ids.length;
+					for (var i = 0; i < len; i++){
+						var iid = "#ids_"+ids[i];
+						var edit = "#edit_"+ids[i];
+						var idd = $(iid).val();
+						$(edit).attr('href','member-edit.html?uid='+idd);
+					}
+					var pa = info.data;
+					$('#page').html(pa.pages);
+				}else{
+					alert(msg.info);
 				}
 			},
 			beforeSend: function(request) {
@@ -249,39 +274,44 @@ window.onload=function(){
 		window.location.href="/html/login.html";
 	}
 }
-function changePage(page)
-{
-	if(page < 1){
-		var page = 1;
-	}
-	var contentType ="application/x-www-form-urlencoded; charset=utf-8";
-	$.ajax({
-		type: 'post',
-		url: 'http://leading.net/index.php/api/Members/index.html',
-		dataType: 'json',
-		data : {page : page},
-		contentType:contentType,
-		success: function(msg){
-			var info = msg.data;
-			var html ='';
-			var ids = [];
-			$.each(info.data,function(index, el) {
-				html += "<tr class='text-c'><td>"+el.id+"</td><td>"+el.username+"</td><td>"+el.sex+"</td><td>"+el.phone+"</td><td>"+el.weixin+"</td><td>"+el.qq+"</td><td>"+el.address+"</td><td>"+el.newtime+"</td><td><a id='edit_"+el.id+"'>修改</a><input type='hidden' id='ids_"+el.id+"' value="+el.id+"></td></tr>";
-				ids.push(el.id);
-			});
-			$('#body').html(html);
-			var len = ids.length;
-			for (var i = 0; i < len; i++){
-				var iid = "#ids_"+ids[i];
-				var edit = "#edit_"+ids[i];
-				var idd = $(iid).val();
-				$(edit).attr('href','member-edit.html?uid='+idd);
+window.onload=function(){
+	var identity = $.cookie('identity');
+	if(identity != null){
+		var contentType ="application/x-www-form-urlencoded; charset=utf-8";
+		$.ajax({
+			type: 'post',
+			url: 'http://leading.net/index.php/api/Members/index.html',
+			dataType: 'json',
+			contentType:contentType,
+			success: function(msg){
+				if(msg.status == '1'){
+					var info = msg.data;
+					var html ='';
+					var ids = [];
+					$.each(info.data.data,function(index, el) {
+						html += "<tr class='text-c'><td>"+el.id+"</td><td>"+el.username+"</td><td>"+el.sex+"</td><td>"+el.phone+"</td><td>"+el.weixin+"</td><td>"+el.qq+"</td><td>"+el.address+"</td><td>"+el.newtime+"</td><td><a id='edit_"+el.id+"'>修改</a><input type='hidden' id='ids_"+el.id+"' value="+el.id+"><a id='de_"+el.id+"' onclick='del(this,"+el.id+")'>删除</a></td></tr>";
+						ids.push(el.id);
+					});
+					$('#body').html(html);
+					var len = ids.length;
+					for (var i = 0; i < len; i++){
+						var iid = "#ids_"+ids[i];
+						var edit = "#edit_"+ids[i];
+						var idd = $(iid).val();
+						$(edit).attr('href','member-edit.html?uid='+idd);
+					}
+					$('#page').html(info.pages);
+				}else {
+					alert(msg.info);
+				}
+			},
+			beforeSend: function(request) {
+				request.setRequestHeader("X-Requested-With","XMLHttpRequest");
 			}
-		},
-		beforeSend: function(request) {
-			request.setRequestHeader("X-Requested-With","XMLHttpRequest");
-		}
-	});
+		});
+	}else {
+		window.location.href="/html/login.html";
+	}
 }
 </script>
 <!--/请在上方写此页面业务相关的脚本-->

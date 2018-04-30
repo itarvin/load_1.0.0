@@ -4,8 +4,8 @@ namespace app\admin\controller;
  * 日志处理类
  * @author  itarvin itarvin@163.com
  */
-use app\common\model\Log;
-use app\common\model\Logact;
+use app\model\Log;
+use app\model\Logact;
 use think\facade\Request;
 use app\util\Tools;
 use app\util\ReturnCode;

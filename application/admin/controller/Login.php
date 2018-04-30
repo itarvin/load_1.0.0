@@ -5,7 +5,7 @@ namespace app\admin\controller;
  * @author  itarvin itarvin@163.com
  */
 use think\Controller;
-use app\common\model\Admin;
+use app\model\Admin;
 use think\facade\Cookie;
 use think\Validate;
 use think\captcha\Captcha;

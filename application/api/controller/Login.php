@@ -4,7 +4,7 @@ namespace app\api\controller;
  * 登录处理类
  * @author  itarvin itarvin@163.com
  */
-use app\common\model\Admin;
+use app\model\Admin;
 use think\facade\Request;
 use think\facade\Cookie;
 use think\captcha\Captcha;
@@ -85,7 +85,7 @@ class Login extends Base
                 }
             }
         }else {
-            return buildReturn(['status' =>ReturnCode::ACCOUNTEXPIRED,'info' => "请您先登录账户！"]);
+            return buildReturn(['status' => ReturnCode::LACKOFPARAM,'info'=>  Tools::errorCode(ReturnCode::LACKOFPARAM)]);
         }
     }
 

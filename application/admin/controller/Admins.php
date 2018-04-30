@@ -4,9 +4,9 @@ namespace app\admin\controller;
  * 后台用户类
  * @author  itarvin itarvin@163.com
  */
-use app\common\model\Admin;
-use app\common\model\Member;
-use app\common\model\Hitcount;
+use app\model\Admin;
+use app\model\Member;
+use app\model\Hitcount;
 use think\facade\Request;
 use app\util\ReturnCode;
 use app\util\Tools;

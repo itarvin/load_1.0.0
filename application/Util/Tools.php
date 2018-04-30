@@ -6,7 +6,7 @@
  */
 
 namespace app\util;
-use app\common\model\Logact;
+use app\model\Logact;
 class Tools {
      /**
      * 错误码对比

@@ -8,8 +8,8 @@
 // +----------------------------------------------------------------------
 // | Author: 流年 <liu21st@gmail.com>
 // +----------------------------------------------------------------------
-use app\admin\model\Log;
-use app\util\Tools;
+use app\model\Log;
+use app\Util\Tools;
 /**
  * 统一接口输出值
  * @param $res

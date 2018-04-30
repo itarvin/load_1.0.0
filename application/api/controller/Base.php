@@ -6,7 +6,7 @@ namespace app\api\controller;
  * @author  itarvin itarvin@163.com
  */
 use think\Controller;
-use app\common\model\Admin;
+use app\model\Admin;
 use think\facade\Request;
 use think\facade\Cookie;
 use app\util\ReturnCode;
