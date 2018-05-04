@@ -50,14 +50,14 @@ class  Login extends controller
         }
         $rule = [
             //管理员登陆字段验证
-            'users|管理员账号' => 'require|min:5',
-            'pwd|管理员密码' => 'require|min:5',
+            'users|管理员账号' => 'require',
+            'pwd|管理员密码' => 'require',
         ];
         // 数据验证
         $validate = new Validate($rule);
         $result   = $validate->check($data);
         if( !$result){
-            return $validate->getError();
+            $this->error($validate->getError(), 'Login/login');;
         }
         $preview = $user->where(array(
             'users' => $data['users']
@@ -95,5 +95,18 @@ class  Login extends controller
         $request = request();
         session(null);
         return $this->success('已成功登出', 'Login/login');
+    }
+
+
+    /**
+     * 空操作返回状态
+     * @return json
+     */
+    public function _empty($name)
+    {
+        return json(array(
+            'status' => '404',
+            'info' => '你想要的操作对象！程序员小哥哥没找到！(╯﹏╰)'
+        ));
     }
 }

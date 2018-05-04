@@ -248,7 +248,7 @@ function search(){
 					var info = msg.data;
 					var html ='';
 					var ids = [];
-					$.each(info.data,function(index, el) {
+					$.each(info.data.data,function(index, el) {
 						html += "<tr class='text-c'><td>"+el.id+"</td><td>"+el.username+"</td><td>"+el.sex+"</td><td>"+el.phone+"</td><td>"+el.weixin+"</td><td>"+el.qq+"</td><td>"+el.address+"</td><td>"+el.newtime+"</td><td><a id='edit_"+el.id+"'>修改</a><input type='hidden' id='ids_"+el.id+"' value="+el.id+"><a id='de_"+el.id+"' onclick='del(this,"+el.id+")'>删除</a></td></tr>";
 						ids.push(el.id);
 					});

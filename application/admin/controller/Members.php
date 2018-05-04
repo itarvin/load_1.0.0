@@ -22,10 +22,10 @@ class Members extends Base{
         // 预定义type 数组
         $checktype = array('qq', 'phone', 'weixin');
         $where = [];
-        $where[] = ['is_delete', 'EQ', '0'];
+        $where[] = ['a.is_delete', 'EQ', '0'];
         // check Admin
         if($this->superman != 'yes'){
-            $where[] = ['uid', 'EQ', $this->uid];
+            $where[] = ['a.uid', 'EQ', $this->uid];
         }
         // 默认取出当天范围内的客户
         // $where[] = ['newtime', 'between', [date('Y-m-d', time()), date('Y-m-d H:i:s', time())]];
@@ -50,7 +50,7 @@ class Members extends Base{
             // check type
             if (!empty($keyword)) {
                 if($type && in_array($type, $checktype)){
-                    $where[] = [$type,  'EQ',  $keyword];
+                    $where[] = ['a.'.$type,  'EQ',  $keyword];
                 }else{
                     $where[] = ['a.qq|a.phone|a.weixin',  'EQ',  $keyword];
                 }
@@ -252,7 +252,7 @@ class Members extends Base{
                             'status'  => ReturnCode::SUCCESS,
                             'success' => $result['success'],
                             'error'   => $result['error'],
-                            'deal'    => ($dealLine - 1),
+                            'deal'    => $result['success'] + $result['error'],
                             'total'   => ($line - 1)
                         ];
                     }
@@ -276,6 +276,9 @@ class Members extends Base{
     private function checkdata($file, $fields, $filename)
     {
         if($file){
+            $qq = [];
+            $ph = [];
+            $wx = [];
             // 根据字段拼接其键
             foreach($file as $k => $v) {
                 foreach($fields as $k1 => $v1) {
@@ -284,6 +287,8 @@ class Members extends Base{
                         $qq[$k] = $v[$k1];
                     }else if($v1 == 'phone') {
                         $ph[$k] = $v[$k1];
+                    }else if($v1 == 'weixin'){
+                        $wx[$k] = $v[$k1];
                     }
                 }
                 $data[$k]['uid'] = $this->uid;
@@ -293,34 +298,29 @@ class Members extends Base{
             $have = [];
             // 验证数据合法性
             foreach($data as $k => $v){
-                if(strlen($v['qq']) < 5 || is_numeric($v['qq'] || is_numeric($v['phone']) || strlen($v['qq']) > 10 || strlen($v['phone'] != 11))){
+                if(strlen($v['qq']) < 5 || is_numeric($v['qq'] || is_numeric($v['phone']) || strlen($v['qq']) > 11 || strlen($v['phone'] != 11))){
                     $have[] = $k;
                 }
             }
             // 去重
-            $newqq = array_unique($qq);
-            $newph = array_unique($ph);
-            foreach (array_flip($qq) as $key => $value) {
-                if(!in_array($value, array_flip($newqq))){
-                    if(!in_array($value, $have)){
-                        $have[] = $value;
-                    }
-                }
-            }
-            foreach (array_flip($ph) as $key => $value) {
-                if(!in_array($value, array_flip($newph))){
-                    if(!in_array($value, $have)){
-                        $have[] = $value;
-                    }
-                }
-            }
+            $have = isset($qq) ? $this->checkUnique($qq,$have) : $have;
+            $have = isset($ph) ? $this->checkUnique($ph,$have) : $have;
+            $have = isset($wx) ? $this->checkUnique($wx,$have) : $have;
             // 读取一次数据库所有数据
             $model = new Member;
-            $haveqq = $model->field('qq, phone')->where('qq', 'in', $qq)->select();
-            $haveph = $model->field('qq, phone')->where('phone', 'in', $ph)->select();
+            if(count($qq) > 0){
+                $haveqq = $model->field('qq, phone, weixin')->where('qq', 'in', $qq)->select();
+                $have = $this->arraySearch($haveqq, $qq, $have, 'qq');
+            }
+            if(count($ph) > 0){
+                $haveph = $model->field('qq, phone, weixin')->where('phone', 'in', $ph)->select();
+                $have = $this->arraySearch($haveph, $ph, $have, 'phone');
+            }
+            if(count($wx) > 0){
+                $havewx = $model->field('qq, phone, weixin')->where('weixin', 'in', $wx)->select();
+                $have = $this->arraySearch($havewx, $wx, $have, 'weixin');
+            }
             // 如果已经存在，返回键
-            $have = $this->arraySearch($haveqq, $qq, $have, 'qq');
-            $have = $this->arraySearch($haveph, $ph, $have, 'phone');
             array_unique($have);
             // -------------------对合法数据进行重新排列，清理已存在，不合法数据
             $errors = count($have);
@@ -347,6 +347,26 @@ class Members extends Base{
         }
     }
 
+    /**
+     * 检测数据。深度去重~！
+     * @return have 重复的键名
+     */
+    private function checkUnique($data,$have){
+        $key = isset($data) ? $data : [];
+        if(!empty($key)){
+            $newkey = array_unique($key);
+            foreach (array_flip($data) as $key => $value) {
+                if(!in_array($value, array_flip($newkey))){
+                    if(!in_array($value, $have)){
+                        $have[] = $value;
+                    }
+                }
+            }
+            return $have;
+        }
+        return $have;
+    }
+
 
     /**
      * 检测CSV文件与存在数据有哪些已存在
@@ -362,26 +382,26 @@ class Members extends Base{
         // 拼接文件路径
         $way = config('upload_path').'/custom';
         $filename = Cache::get('scv_'.$this->uid);
-        $fields = Cache::get('scv_field') ? Cache::get('scv_field') : config('upload_field');;
+        $fields = Cache::get('scv_field') ? Cache::get('scv_field') : config('upload_field');
         $line = count(file($way.'/'.$filename));
         // 起始行根据客户端处理了多少数据
         $start = $deals ? $deals : $maxItem;
-        // 读取行数，判断总行数减去已经处理的，如还大于1000，则只处理1000，反之处理剩余的条数
-        $dealLine = ($line - $start) > $maxItem ? $maxItem : $line - $start;
-        $deal = ($dealLine == $maxItem) ? ($maxItem - 1) : ($line - $start - 1);
+        // 读取行数，判断总行数减去已经处理的，如还大于系统最大处理数，则只处理系统最大处理数，反之处理剩余的条数
+        $dealLine = ($line - $start) > $maxItem ? $maxItem : ($line - $start - 1);
+        $deal = ($dealLine == $maxItem) ? $maxItem : ($line - $start);
         $content = Tools::read_csv_lines($way.'/'.$filename, $dealLine, $start);
         if($content){
             $result = $this->checkdata($content, $fields, $filename);
             // 最后一次执行文件后删除文件
-            if($deal < 1000){
+            if($deal < $maxItem){
                 unlink($way.'/'.$filename);
             }
             $data = [
                 'status'  => ReturnCode::SUCCESS,
                 'success' => ($result['success'] + $success),
                 'error'   => ($result['error'] + $error),
-                'deal'    => $deal + $deals,
-                'total'   => ($line - 1),
+                'deal'    => ($result['success'] + $success) + ($result['error'] + $error),
+                'total'   => ($line-1),
             ];
         }else {
             $data['status'] = ReturnCode::ERROR;

@@ -47,4 +47,17 @@ class Base extends Controller
             return false;
         }
     }
+
+
+    /**
+     * 空操作返回状态
+     * @return json
+     */
+    public function _empty($name)
+    {
+        return json(array(
+            'status' => '404',
+            'info' => '你想要的操作对象！程序员小哥哥没找到！(╯﹏╰)'
+        ));
+    }
 }

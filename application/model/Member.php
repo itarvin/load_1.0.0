@@ -26,12 +26,18 @@ class Member extends Model
         'weixin.length'                              => '微信号在6-20位',
         // 'weixin./^[a-zA-Z]{1}[-_a-zA-Z0-9]{5,19}+$/' => '请输入正确的微信号',
     ];
-
+    /**
+     * 新增，修改数据时的数据验证与处理，日志添加
+     * @param string $data    所有数据
+     * @return array
+     */
     public function store($data)
     {
         // 先检测当前数据是否存在其他行列
         $id = isset($data['id']) ? $data['id'] : '';
+        // echo 'stert'.date('Y-m-d H:i:s',time());
         $result = $this->checkValue($data, $id);
+        // echo 'end'.date('Y-m-d H:i:s',time());die;
         if($result){
             if($result['uid'] == $data['uid']){
                 $info = '已被你登记存在';
@@ -79,8 +85,13 @@ class Member extends Model
         }
     }
 
-    // 检测是否QQ，phone，weixin列是否存在当前值
-    protected function checkValue($value,$id = '')
+    /**
+     * 检测是否QQ，phone，weixin其余列是否存在当前值
+     * @param string $value    所有数据
+     * @param int $id   更新数据时的id
+     * @return array
+     */
+    protected function checkValue($value, $id = '')
     {
         $qq = [];
         $phone = [];
@@ -88,26 +99,61 @@ class Member extends Model
         $qv = isset($value['qq']) ? $value['qq'] : '';
         $pv = isset($value['phone']) ? $value['phone'] : '';
         $wv = isset($value['weixin']) ? $value['weixin'] : '';
-        $qq[] = ['qq|weixin|phone', 'EQ', $qv];
-        $phone[] = ['qq|weixin|phone', 'EQ', $pv];
-        $weixin[] = ['qq|weixin|phone', 'EQ', $wv];
-        $check = $this->whereOr($qq)->whereOr($weixin)->whereOr($phone)->find();
-        if($check){
-            $user = Admin::field('users')->where('id', 'EQ', $check['uid'])->find();
-            // 处理修改时
-            if(!empty($id) && $check['id'] != $id){
-                // 当前条件为有且并不是当前操作
-                return $result = array(
-                    'user' => $user['users'],
-                    'uid' => $check['uid']
-                );
+        // echo 'stert'.date('Y-m-d H:i:s',time());
+        // $result = $this->deepCheck($wv, $weixin, $id, $value);
+        // echo 'end'.date('Y-m-d H:i:s',time());die;
+        if($result = $this->deepCheck($qv, $qq, $id, $value)){
+            return $result;
+        }else if($result = $this->deepCheck($pv, $phone, $id, $value)){
+            return $result;
+        }else if($result = $this->deepCheck($wv, $weixin, $id, $value)){
+            return $result;
+        }
+    }
+
+    /**
+     * 深度查询
+     * @param string $value    精准字段
+     * @param array $key       索引数组
+     * @param id $id           更新id
+     * @param array $data      提交数据
+     * @return array|bool
+     */
+    private function deepCheck($value, $key, $id, $data){
+        if($value != ''){
+            $key[] = ['qq|weixin|phone', 'EQ', $value];
+            // 查询所有满足条件的数据
+            $check = $this->where($key)->select();
+            if(count($check) > 0){
+                $exist = [];
+                // 遍历数据
+                foreach ($check as $key => $value) {
+                    $user = Admin::field('users')->where('id', 'EQ', $value['uid'])->find();
+                    // 若为修改同时满足id不为空且跳过当前操作的列 。或同时满足查询的数列的操作人不为当前操作者
+                    if(!empty($id) && $value['id'] != $id){
+                        $exist[$key] = array(
+                            'id' => $value['id'],
+                            'user' => $user['users'],
+                            'uid' => $value['uid']
+                        );
+                    }else if($value['uid'] != $data['uid']){
+                        $exist[$key] = array(
+                            'id' => $value['id'],
+                            'user' => $user['users'],
+                            'uid' => $value['uid']
+                        );
+                    }
+                }
+                if(count($exist) > 0){
+                    // 默认返回第一个错误表达式
+                    return $exist[0];
+                }
             }else {
                 return false;
             }
-        }else{
-            return false;
         }
     }
+
 
     /**
      * 自定义软删除

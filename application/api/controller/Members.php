@@ -107,4 +107,6 @@ class Members extends Base
             return $this->returnRes($this->AuthPermission, 'true');
         }
     }
+
+
 }

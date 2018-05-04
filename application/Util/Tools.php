@@ -78,7 +78,7 @@ class Tools {
             break;
         }
         $data = [];
-        while (($j++ < $lines) && !feof($fp)) {
+        while (($j++ <= $lines) && !feof($fp)) {
             $re = fgetcsv($fp);
             for ($i = 0; $i < count($re); $i++) {
                 $da[$i] = iconv('gbk','utf-8',$re[$i]);
