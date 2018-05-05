@@ -10,6 +10,21 @@
 // +----------------------------------------------------------------------
 use app\model\Log;
 use app\Util\Tools;
+
+
+/**
+ * 检测是否当前用户是超管
+ * @return Boole
+ */
+function checksuperman($uid){
+    $superlist = config('IS_SUPERMAN');
+    if( in_array($uid, $superlist)){
+        return true;
+    }else {
+        return false;
+    }
+}
+
 /**
  * 统一接口输出值
  * @param $res

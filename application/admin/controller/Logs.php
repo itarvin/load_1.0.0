@@ -7,8 +7,9 @@ namespace app\admin\controller;
 use app\model\Log;
 use app\model\Logact;
 use think\facade\Request;
-use app\util\Tools;
-use app\util\ReturnCode;
+use app\Util\Tools;
+use app\Util\ReturnCode;
+use think\facade\Debug;
 class Logs extends Base
 {
     /**
@@ -17,6 +18,8 @@ class Logs extends Base
     public function index()
     {
         if($this->superman == 'yes'){
+            // Debug::remark('begin');
+
             $log = new Log;
             $acts = Logact::field('id, act_name')->select();
             // 获取当前管理员的客户会员
@@ -102,6 +105,11 @@ class Logs extends Base
                 }
             }
             $count = $list->total();
+            // ...其他代码段
+            // Debug::remark('end');
+            // // ...也许这里还有其他代码
+            // // 进行统计区间
+            // echo Debug::getRangeTime('begin','end').'s';
             $this->assign([
                 'list' => $list,
                 'count'=>$count,

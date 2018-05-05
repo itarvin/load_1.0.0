@@ -24,3 +24,16 @@ return [
     // 是否自动开启 SESSION
     'auto_start'     => true,
 ];
+
+// 可配置session共享
+// return [
+//     'type'       => 'redis',
+//     'prefix'     => 'session:',
+//     'auto_start' => true,
+//      // redis主机
+//     'host'       => '127.0.0.1',
+//      // redis端口
+//     'port'       => 6379,
+//      // 密码
+//     'password'   => '',
+// ];

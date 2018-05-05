@@ -9,8 +9,8 @@ use think\Controller;
 use app\model\Admin;
 use think\facade\Request;
 use think\facade\Cookie;
-use app\util\ReturnCode;
-use app\util\Tools;
+use app\Util\ReturnCode;
+use app\Util\Tools;
 class Base extends Controller
 {
     /**

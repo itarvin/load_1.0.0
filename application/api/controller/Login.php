@@ -8,8 +8,8 @@ use app\model\Admin;
 use think\facade\Request;
 use think\facade\Cookie;
 use think\captcha\Captcha;
-use app\util\Tools;
-use app\util\ReturnCode;
+use app\Util\Tools;
+use app\Util\ReturnCode;
 use think\Validate;
 class Login extends Base
 {
@@ -189,5 +189,12 @@ class Login extends Base
         // 拼装加密新字符串
         $token = $start.$uidStart.$uid.$uidEnd.$medium.$tokenEnd.$end;
         return $token;
+    }
+
+    // TEST
+    public function testmysql()
+    {
+        $list = Admin::select();
+        return json($list);
     }
 }

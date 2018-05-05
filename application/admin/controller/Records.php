@@ -6,8 +6,8 @@ namespace app\admin\controller;
  */
 use app\model\Member;
 use app\model\Record;
-use app\util\ReturnCode;
-use app\util\Tools;
+use app\Util\ReturnCode;
+use app\Util\Tools;
 use think\facade\Request;
 class Records extends Base
 {

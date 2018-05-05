@@ -2,8 +2,8 @@
 namespace app\model;
 use think\Model;
 use think\Validate;
-use app\util\ReturnCode;
-use app\util\Tools;
+use app\Util\ReturnCode;
+use app\Util\Tools;
 class Admin extends Model
 {
     //主键

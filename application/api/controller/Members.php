@@ -5,8 +5,8 @@ namespace app\api\controller;
  * @author  itarvin itarvin@163.com
  */
 use app\model\Member;
-use app\util\Tools;
-use app\util\ReturnCode;
+use app\Util\Tools;
+use app\Util\ReturnCode;
 use think\facade\Request;
 use think\Validate;
 use think\facade\Cookie;

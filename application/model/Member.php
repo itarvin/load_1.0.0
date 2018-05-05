@@ -2,8 +2,8 @@
 namespace app\model;
 use think\Model;
 use think\Validate;
-use app\util\ReturnCode;
-use app\util\Tools;
+use app\Util\ReturnCode;
+use app\Util\Tools;
 use app\model\Admin;
 class Member extends Model
 {
@@ -26,6 +26,7 @@ class Member extends Model
         'weixin.length'                              => '微信号在6-20位',
         // 'weixin./^[a-zA-Z]{1}[-_a-zA-Z0-9]{5,19}+$/' => '请输入正确的微信号',
     ];
+
     /**
      * 新增，修改数据时的数据验证与处理，日志添加
      * @param string $data    所有数据

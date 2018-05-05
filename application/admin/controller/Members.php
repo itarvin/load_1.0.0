@@ -7,9 +7,9 @@ namespace app\admin\controller;
 use app\model\Member;
 use think\File;
 use think\facade\Cache;
-use app\util\ReturnCode;
+use app\Util\ReturnCode;
 use app\model\Record;
-use app\util\Tools;
+use app\Util\Tools;
 use think\facade\Request;
 class Members extends Base{
     /**
@@ -486,7 +486,7 @@ class Members extends Base{
             $this->error('对不起，非法访问！');
         }
         $this->assign('data', $data);
-        return $this->fetch('members/edit');
+        return $this->fetch('Members/edit');
     }
 
     /**

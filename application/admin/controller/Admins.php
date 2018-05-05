@@ -8,8 +8,8 @@ use app\model\Admin;
 use app\model\Member;
 use app\model\Hitcount;
 use think\facade\Request;
-use app\util\ReturnCode;
-use app\util\Tools;
+use app\Util\ReturnCode;
+use app\Util\Tools;
 class Admins extends Base
 {
     /**
