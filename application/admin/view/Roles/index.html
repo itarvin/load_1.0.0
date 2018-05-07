@@ -19,7 +19,7 @@
             <xblock>
                 <button class="layui-btn layui-btn-danger" onclick="delAll()"><i class="layui-icon"></i>批量删除</button>
                 <button class="layui-btn" onclick="x_admin_show('添加角色','{:url('Roles/add')}')"><i class="layui-icon"></i>添加</button>
-                <span class="x-right" style="line-height:40px">共有数据：88 条</span>
+                <span class="x-right" style="line-height:40px">共有数据：{$count} 条</span>
             </xblock>
             <table class="layui-table">
                 <thead>
@@ -29,47 +29,57 @@
                         </th>
                         <th>ID</th>
                         <th>角色名</th>
-                        <th>拥有权限规则</th>
+                        <!-- <th>拥有权限规则</th> -->
                         <th>描述</th>
                         <th>状态</th>
                         <th>操作</th>
                     </thead>
                     <tbody>
+                        {volist name='data' id="vo"}
+                        {if $vo.id neq null}
                         <tr>
                             <td>
                                 <div class="layui-unselect layui-form-checkbox" lay-skin="primary" data-id='2'><i class="layui-icon">&#xe605;</i></div>
                             </td>
-                            <td>1</td>
-                            <td>超级管理员</td>
-                            <td>会员列表，问题列表</td>
-                            <td>具有至高无上的权利</td>
+                            <td>{$vo.id}</td>
+                            <td>{$vo.role_name}</td>
+                            <!-- <td>{$vo.pri_name}</td> -->
+                            <td>{$vo.role_desc}</td>
                             <td class="td-status">
+                                {if $vo['role_status'] eq '0'}
                                 <span class="layui-btn layui-btn-normal layui-btn-mini">已启用</span></td>
-                                <td class="td-manage">
-                                    <a onclick="member_stop(this,'10001')" href="javascript:;"  title="启用">
-                                        <i class="layui-icon">&#xe601;</i>
-                                    </a>
-                                    <a title="编辑"  onclick="x_admin_show('编辑','role-add.html')" href="javascript:;">
-                                        <i class="layui-icon">&#xe642;</i>
-                                    </a>
-                                    <a title="删除" onclick="member_del(this,'要删除的id')" href="javascript:;">
-                                        <i class="layui-icon">&#xe640;</i>
-                                    </a>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div class="page">
-                        <div>
-                            <a class="prev" href="">&lt;&lt;</a>
-                            <a class="num" href="">1</a>
-                            <span class="current">2</span>
-                            <a class="num" href="">3</a>
-                            <a class="num" href="">489</a>
-                            <a class="next" href="">&gt;&gt;</a>
-                        </div>
+                                {elseif $vo['role_status'] eq '1'/}
+                                <span class="layui-btn layui-btn-normal layui-btn-mini layui-btn-disabled">已停用</span></td>
+                                {/if}
+                            <td class="td-manage">
+                                {if $vo['role_status'] eq '0'}
+                                <a onclick="member_stop(this,{$vo.id})" href="javascript:;"  title="停用">
+                                    <i class="layui-icon">&#xe601;</i>
+                                </a>
+                                {elseif $vo['role_status'] eq '1'/}
+                                <a onclick="member_stop(this,{$vo.id})" href="javascript:;"  title="启用">
+                                    <i class="layui-icon">&#xe62f;</i>
+                                </a>
+                                {/if}
+
+                                <a title="编辑"  onclick="x_admin_show('编辑','{:url('Roles/edit',array('rid' => $vo.id))}')" href="javascript:;">
+                                    <i class="layui-icon">&#xe642;</i>
+                                </a>
+                                <a title="删除" onclick="member_del(this,{$vo.id})" href="javascript:;">
+                                    <i class="layui-icon">&#xe640;</i>
+                                </a>
+                            </td>
+                        </tr>
+                        {/if}
+                        {/volist}
+                    </tbody>
+                </table>
+                <div class="page">
+                    <div>
+                        {$pages}
                     </div>
                 </div>
+            </div>
 <script>
 layui.use('laydate', function(){
     var laydate = layui.laydate;
@@ -86,32 +96,51 @@ layui.use('laydate', function(){
 
 /*用户-停用*/
 function member_stop(obj,id){
-    layer.confirm('确认要停用吗？',function(index){
-        if($(obj).attr('title')=='启用'){
-
-            //发异步把用户状态进行更改
-            $(obj).attr('title','停用')
-            $(obj).find('i').html('&#xe62f;');
-
-            $(obj).parents("tr").find(".td-status").find('span').addClass('layui-btn-disabled').html('已停用');
-            layer.msg('已停用!',{icon: 5,time:1000});
-
-        }else{
-            $(obj).attr('title','启用')
-            $(obj).find('i').html('&#xe601;');
-
-            $(obj).parents("tr").find(".td-status").find('span').removeClass('layui-btn-disabled').html('已启用');
-            layer.msg('已启用!',{icon: 5,time:1000});
-        }
+    var title = $(obj).attr('title');
+    layer.confirm('确认要'+title+'吗？',function(index){
+        $.ajax({
+            url:"{:url('Roles/changeStatus')}",
+            type:'post',
+            dataType:'json',
+            data: {rid:id},
+            success:function(msg){
+                if(msg.status == 1){
+                    if(title == '启用'){
+                        $(obj).attr('title','停用')
+                        $(obj).find('i').html('&#xe62f;');
+                        $(obj).parents("tr").find(".td-status").find('span').addClass('layui-btn-disabled').html('已停用');
+                        layer.msg('已'+title+'!',{icon: 1,time:1000});
+                    }else {
+                        $(obj).attr('title','启用');
+                        $(obj).find('i').html('&#xe601;');
+                        $(obj).parents("tr").find(".td-status").find('span').removeClass('layui-btn-disabled').html('已启用');
+                        layer.msg('已'+title+'!',{icon: 1,time:1000});
+                    }
+                }else {
+                    layer.msg(msg.info,{icon:1,time:1000});
+                }
+            }
+        });
     });
 }
 
 /*用户-删除*/
 function member_del(obj,id){
     layer.confirm('确认要删除吗？',function(index){
-         //发异步删除数据
-         $(obj).parents("tr").remove();
-         layer.msg('已删除!',{icon:1,time:1000});
+        $.ajax({
+            url:"{:url('Roles/delete')}",
+            type:'post',
+            dataType:'json',
+            data: {rid:id},
+            success:function(msg){
+                if(msg.status == 1){
+                    $(obj).parents("tr").remove();
+                    layer.msg(msg.info,{icon:1,time:1000});
+                }else {
+                    layer.msg(msg.info,{icon:1,time:1000});
+                }
+            }
+        });
      });
  }
 

@@ -47,9 +47,7 @@
             <th>手　　机</th>
             <th>Q　　Q</th>
             <th>加入时间</th>
-            {if $uid != '1'}
             <th>操　　作</th></tr>
-            {/if}
         </thead>
         <tbody>
         {volist name="list" id="vo"}
@@ -60,7 +58,6 @@
             <td>{$vo.phone}</td>
             <td>{$vo.qq}</td>
             <td>{$vo.newtime}</td>
-            {if $uid != '1'}
             <td class="td-manage">
                 <a title="订单"  onclick="x_admin_show('添加订单','{:url('Records/addrecord',array('reid' => $vo.id))}',1000,600)" href="javascript:;">
                     <button class="layui-btn layui-btn-sm layui-btn-primary">
@@ -73,7 +70,6 @@
                     </button>
                 </a>
             </td>
-            {/if}
           </tr>
         {/volist}
         </tbody>

@@ -3,126 +3,61 @@
         <form class="layui-form">
           <div class="layui-form-item">
               <label for="username" class="layui-form-label">
-                  <span class="x-red">*</span>登录名
+                  <span class="x-red">*</span>角色名称
               </label>
               <div class="layui-input-inline">
-                  <input type="text" id="username" name="users" required="" lay-verify="required" autocomplete="off" class="layui-input" value="{$data.users}">
-                  <input type="hidden" name="id" value="{$data.id}">
+                  <input type="text" name="role_name" value="{$data.role_name}" required="" lay-verify="required" autocomplete="off" class="layui-input">
               </div>
-              <div class="layui-form-mid layui-word-aux">
-                  <span class="x-red">*</span>将会成为您唯一的登入名
+          </div>
+          <input type="hidden" name="id" value="{$data.id}" >
+          <div class="layui-form-item">
+              <label for="phone" class="layui-form-label">
+                  <span class="x-red">*</span>角色状态
+              </label>
+              <div class="layui-input-inline">
+                  <input type="radio" name="role_status" value="0" {if $data['role_status'] eq '0'}checked{/if} title="启用" >
+                  <input type="radio" name="role_status" {if $data['role_status'] eq '1'}checked{/if}  value="1" title="禁用" >
               </div>
           </div>
           <div class="layui-form-item">
               <label for="phone" class="layui-form-label">
-                  <span class="x-red">*</span>性　别
+                  <span class="x-red">*</span>角色描述
               </label>
-              <div class="layui-input-inline">
-                  <input type="radio" name="gender" value="0" title="男" {if $data['gender'] == '0'}checked=''{/if}>
-                  <input type="radio" name="gender" value="1" title="女" {if $data['gender'] == '1'}checked=''{/if}>
+              <div class="layui-input-block">
+                  <textarea placeholder="请输入内容" class="layui-textarea" name="role_desc">{$data.role_desc}</textarea>
               </div>
           </div>
           <div class="layui-form-item">
               <label for="phone" class="layui-form-label">
-                  <span class="x-red">*</span>状  态
+                  <span class="x-red">*</span>权限列表
               </label>
-              <div class="layui-input-inline">
-                  <input type="radio" name="isow" value="1" title="离职" {if $data['isow'] == '1'}checked=''{/if}>
-                  <input type="radio" name="isow" value="0" title="在职" {if $data['isow'] == '0'}checked=''{/if}>
+              <div class="layui-input-block">
+                  <td>
+
+					{volist name="priData" id="vo"}
+						{:str_repeat('-', 16*$vo['level'])}
+						<input level_id="{$vo['level']}" type="checkbox" id="che_{$vo.id}" name="pri_id[{$vo.id}]" value="{$vo['id']}" {if in_array($vo['id'],$rpData)}checked{/if} />
+						<label for="che_{$vo.id}">{$vo['pri_name']}</label><br />
+					{/volist}
+
+                </td>
               </div>
-          </div>
-          <div class="layui-form-item">
-              <label for="phone" class="layui-form-label">
-                  <span class="x-red">*</span>手　机
-              </label>
-              <div class="layui-input-inline">
-                  <input type="text" id="phone" name="phone" required="" lay-verify="phone"
-                  autocomplete="off" class="layui-input" value="{$data.phone}">
-              </div>
-          </div>
-          <div class="layui-form-item">
-              <label for="phone" class="layui-form-label">
-                  <span class="x-red">*</span>微信号
-              </label>
-              <div class="layui-input-inline">
-                  <input type="text" id="weixin" name="weixin" required="" lay-verify="weixin"
-                  autocomplete="off" class="layui-input" value="{$data.weixin}">
-              </div>
-              <div class="layui-form-mid layui-word-aux">
-                  <span class="x-red">*</span>
-              </div>
-          </div>
-          <div class="layui-form-item">
-              <label for="phone" class="layui-form-label">
-                  <span class="x-red">*</span>QQ1
-              </label>
-              <div class="layui-input-inline">
-                  <input type="text"  name="qq1" required="" lay-verify="qq1"
-                  autocomplete="off" class="layui-input" value="{$data.qq1}">
-              </div>
-          </div>
-          <div class="layui-form-item">
-              <label for="phone" class="layui-form-label">
-                  <span class="x-red">*</span>QQ2
-              </label>
-              <div class="layui-input-inline">
-                  <input type="text" id="qq" name="qq2" required="" lay-verify="qq2"
-                  autocomplete="off" class="layui-input" value="{$data.qq2}">
-              </div>
-          </div>
-          <div class="layui-form-item">
-              <label for="phone" class="layui-form-label">
-                  <span class="x-red">*</span>QQ3
-              </label>
-              <div class="layui-input-inline">
-                  <input type="text" id="qq" name="qq3" required="" lay-verify="qq3"
-                  autocomplete="off" class="layui-input" value="{$data.qq3}">
-              </div>
-          </div><div class="layui-form-item">
-              <label for="phone" class="layui-form-label">
-                  <span class="x-red">*</span>QQ4
-              </label>
-              <div class="layui-input-inline">
-                  <input type="text" id="qq" name="qq4" required="" lay-verify="qq4"
-                  autocomplete="off" class="layui-input" value="{$data.qq4}">
-              </div>
-          </div>
-          <div class="layui-form-item">
-              <label for="L_pass" class="layui-form-label">
-                  <span class="x-red">*</span>密　码
-              </label>
-              <div class="layui-input-inline">
-                  <input type="password" id="L_pass" name="pwd" required="" lay-verify="pass"
-                  autocomplete="off" class="layui-input">
-              </div>
-              <div class="layui-form-mid layui-word-aux">
-                  6到16个字符
-              </div>
-          </div>
-          <div class="layui-form-item">
-              <label for="L_repass" class="layui-form-label">
-                  <span class="x-red">*</span>确认密码
-              </label>
-              <div class="layui-input-inline">
-                  <input type="password" id="L_repass" required="" lay-verify="repass"
-                  autocomplete="off" class="layui-input">
-              </div>
-              {:token()}
           </div>
           <div class="layui-form-item">
               <label for="L_repass" class="layui-form-label">
               </label>
               <button  class="layui-btn" lay-filter="add" lay-submit="">
-                  更新
+                  新增
               </button>
           </div>
       </form>
     </div>
     <script>
+
         layui.use(['form','layer'], function(){
             $ = layui.jquery;
-          var form = layui.form
-          ,layer = layui.layer;
+            var form = layui.form
+            ,layer = layui.layer;
           //自定义验证规则
           form.verify({
               weixin: function(value){
@@ -134,43 +69,20 @@
                     return '微信号格式不正确！';
                 }
             }
-            // ,pass: [/(.+){6,12}$/, '密码必须6到12位']
-            ,repass: function(value){
-                if($('#L_pass').val()!=$('#L_repass').val()){
-                    return '两次密码不一致';
-                }
-            }
-            ,qq1 : function(value){
-                var reg = /^[1-9][0-9]{4,9}$/;
-                if (!reg.test(value)) {
-                    return 'QQ号格式不正确！';
-                }
-            }
-            ,qq2 : function(value){
-                var reg = /^[1-9][0-9]{4,9}$/;
-                if (!reg.test(value)) {
-                    return 'QQ号格式不正确！';
-                }
-            }
-            ,qq3 : function(value){
-                var reg = /^[1-9][0-9]{4,9}$/;
-                if (!reg.test(value)) {
-                    return 'QQ号格式不正确！';
-                }
-            }
-            ,qq4 : function(value){
-                var reg = /^[1-9][0-9]{4,9}$/;
-                if (!reg.test(value)) {
-                    return 'QQ号格式不正确！';
-                }
-            }
           });
           //监听提交
           form.on('submit(add)', function(data){
+            //   obj = document.getElementsByName('pri_id');
+            //   check_val = [];
+            //   for(k in obj){
+            //       if(obj[k].checked)
+            //           check_val.push(obj[k].value);
+            //   }
+            // console.log(check_val);
             //发异步，把数据提交给php
-            $.post("{:url('Admins/update')}",data.field,function(res){
+            $.post("{:url('Roles/add')}",data.field,function(res){
     			if(res.status == 1){
-                    layer.alert("更新成功", {icon: 6},function () {
+                    layer.alert("新增成功", {icon: 6},function () {
                         // 获得frame索引
                         var index = parent.layer.getFrameIndex(window.name);
                         //关闭当前frame
@@ -183,4 +95,37 @@
             return false;
           });
         });
+    // 为所有的复选框绑定一个点击事件
+    $(":checkbox").click(function(){
+        // console.log('123');
+    	// 先获取点击的这个level_id
+    	var tmp_level_id = level_id = $(this).attr("level_id");
+    	// 判断是选中还是取消
+    	if($(this).prop("checked"))
+    	{
+    		// 所有的子权限也选中
+    		$(this).nextAll(":checkbox").each(function(k,v){
+    			if($(v).attr("level_id") > level_id)
+    				$(v).prop("checked", "checked");
+    			else
+    				return false;
+    		});
+    		// 所有的上级权限也选中
+    		$(this).prevAll(":checkbox").each(function(k,v){
+    			if($(v).attr("level_id") < tmp_level_id)
+    			{
+    				$(v).prop("checked", "checked");
+    				tmp_level_id--; // 再找更上一级的
+    			}
+    		});
+    	}else{
+    		// 所有的子权限也取消
+    		$(this).nextAll(":checkbox").each(function(k,v){
+    			if($(v).attr("level_id") > level_id)
+    				$(v).removeAttr("checked");
+    			else
+    				return false;
+    		});
+    	}
+    });
     </script>

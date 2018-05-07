@@ -208,10 +208,16 @@ class Privilege extends Model
 		$btns = [];
 		foreach ($priData as $k => $v){
 			if($v['parent_id'] == 0){
-				foreach ($priData as $k1 => $v1){
+
+				foreach($priData as $k1 => $v1){
+
 					if($v1['parent_id'] == $v['id']){
-						$v['children'][] = $v1;
+
+						// $v[$][] = $v1;
+                        var_dump($v);die;
+
 					}
+
 				}
 				$btns[] = $v;
 			}

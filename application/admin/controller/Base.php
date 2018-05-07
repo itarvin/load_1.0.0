@@ -11,6 +11,11 @@ class Base extends Controller
 {
     // 初始化方法
     protected function initialize(){
+
+        if(!session('uid'))
+        {
+            $this->redirect(url('Login/login'));
+        }
         // 解密session, 对比权限
         $this->uid = json_decode(base64_decode(session('uid'),  true), true);
 
@@ -35,10 +40,9 @@ class Base extends Controller
             $this->redirect(url('Login/login'));
         }
         $this->name = session('u_name');
-        if( checksuperman($this->uid)){
-            $this->superman = 'yes';
-        }else {
-            $this->superman = 'no';
+        // 所有管理员都可以进入后台的首页
+        if(request()->controller() == 'Index'){
+            return TRUE;
         }
     }
 

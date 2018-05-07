@@ -9,7 +9,7 @@
                     <select name="parent_id" lay-filter="aihao">
                         <option value="0">顶级权限</option>
                         {volist name="list" id="vo"}
-                            <option value="{$vo.id}">{$vo.pri_name}</option>
+                            <option value="{$vo.id}">{:str_repeat('-', 8*$vo['level'])}{$vo.pri_name}</option>
                         {/volist}
                     </select>
                 </div>
@@ -27,7 +27,10 @@
                   <span class="x-red">*</span>模块名称
               </label>
               <div class="layui-input-inline">
-                  <input type="text" name="module_name" required="" lay-verify="required" autocomplete="off" class="layui-input">
+                  <input type="text" name="module_name" required="" lay-verify="required" autocomplete="off" class="layui-input" list="mudule">
+                  <datalist id="mudule">
+                      <option>admin</option>
+                  </datalist>
               </div>
           </div>
           <div class="layui-form-item">
@@ -35,7 +38,15 @@
                   <span class="x-red">*</span>控制器名称
               </label>
               <div class="layui-input-inline">
-                  <input type="text" name="controller_name" value="" autocomplete="off" class="layui-input">
+                  <input type="text" name="controller_name" value="" autocomplete="off" class="layui-input" list="controller">
+                  <datalist id="controller">
+                      <option>Admins</option>
+                      <option>Logs</option>
+                      <option>Members</option>
+                      <option>Privileges</option>
+                      <option>Roles</option>
+                      <option>Records</option>
+                  </datalist>
               </div>
           </div>
           <div class="layui-form-item">
@@ -43,7 +54,13 @@
                   <span class="x-red">*</span>方法名称
               </label>
               <div class="layui-input-inline">
-                  <input type="text" name="action_name" value="" autocomplete="off" class="layui-input">
+                  <input type="text" name="action_name" value="" autocomplete="off" class="layui-input" list='in'>
+                  <datalist id="in">
+                      <option>add</option>
+                      <option>edit</option>
+                      <option>index</option>
+                      <option>delete</option>
+                  </datalist>
               </div>
           </div>
           <div class="layui-form-item">
@@ -63,7 +80,7 @@
           //监听提交
           form.on('submit(add)', function(data){
             //发异步，把数据提交给php
-            $.post("{:url('Privileges/handle')}",data.field,function(res){
+            $.post("{:url('Privileges/add')}",data.field,function(res){
     			if(res.status == 1){
                     layer.alert("新增成功", {icon: 6},function () {
                         // 获得frame索引

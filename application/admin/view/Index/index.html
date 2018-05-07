@@ -24,20 +24,15 @@
     <div class="left-nav">
       <div id="side-nav">
         <ul id="nav">
+            {volist name="btns" id="vo"}
             <li>
                 <a href="javascript:;">
                     <i class="iconfont">&#xe6b8;</i>
-                    <cite>客户管理</cite>
+                    <cite>{$vo.pri_name}</cite>
                     <i class="iconfont nav_right">&#xe697;</i>
                 </a>
                 <ul class="sub-menu">
-                    <li>
-                        <a _href="{:url('Members/index')}">
-                            <i class="iconfont">&#xe6a7;</i>
-                            <cite>客户列表</cite>
-                        </a>
-
-                    </li >
+                    
                     <!-- 暂不开放当前功能 -->
                     <!-- <li>
                         <a _href="{:url('Member/recycle')}">
@@ -48,7 +43,7 @@
                 </ul>
             </li>
 
-            <li>
+            <!-- <li>
                 <a href="javascript:;">
                     <i class="iconfont">&#xe723;</i>
                     <cite>订单管理</cite>
@@ -63,7 +58,6 @@
                     </li >
                 </ul>
             </li>
-            {if $issuper == 'yes'}
             <li>
                 <a href="javascript:;">
                     <i class="iconfont">&#xe726;</i>
@@ -111,8 +105,7 @@
                         </a>
                     </li >
                 </ul>
-            </li>
-            {/if}
+            </li> -->
         </ul>
       </div>
     </div>

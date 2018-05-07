@@ -18,39 +18,36 @@ class Privileges extends Base
     {
         $model = new Privilege;
         $list = $model->getTree();
-        $this->assign('list',$list);
+        $count = $model->count();
+        $this->assign([
+            'list' => $list,
+            'count' => $count
+        ]);
         return $this->fetch('Privileges/index');
     }
 
 
     /**
     * 权限添加
+    * @return json
     */
     public function add()
     {
         $model = new Privilege;
         $list = $model->getTree();
-        $this->assign('list',$list);
-        return $this->fetch('Privileges/add');
-    }
-
-    /**
-    * 添加,更新数据执行方法
-    * @return json
-    */
-    public function handle()
-    {
         if(request()->isPost()){
             $input = Request::param();
-            $model = new Privilege;
             $result = $model->store($input);
             return buildReturn(['status' => $result['code'], 'info'=> $result['msg']]);
         }
+        $this->assign('list',$list);
+        return $this->fetch('Privileges/add');
     }
 
 
     /**
     * 权限修改
+    * @return json
     */
     public function edit()
     {
@@ -59,6 +56,11 @@ class Privileges extends Base
         $model = new Privilege;
         $list = $model->getTree();
         $data = $model->find($pid);
+        if(request()->isPost()){
+            $input = Request::param();
+            $result = $model->store($input);
+            return buildReturn(['status' => $result['code'], 'info'=> $result['msg']]);
+        }
         $this->assign([
             'data' => $data,
             'list' => $list
