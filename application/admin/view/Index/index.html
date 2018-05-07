@@ -28,84 +28,21 @@
             <li>
                 <a href="javascript:;">
                     <i class="iconfont">&#xe6b8;</i>
-                    <cite>{$vo.pri_name}</cite>
+                    <cite>{$vo['pri_name']}</cite>
                     <i class="iconfont nav_right">&#xe697;</i>
                 </a>
                 <ul class="sub-menu">
-                    
-                    <!-- 暂不开放当前功能 -->
-                    <!-- <li>
-                        <a _href="{:url('Member/recycle')}">
+                    {volist name="vo.children" id="v"}
+                    <li>
+                        <a _href="{:url($v['module_name'].'/'.$v['controller_name'].'/'.$v['action_name'])}">
                             <i class="iconfont">&#xe6a7;</i>
-                            <cite>我的回收站</cite>
+                            <cite>{$v.pri_name}</cite>
                         </a>
-                    </li> -->
+                    </li>
+                    {/volist}
                 </ul>
             </li>
-
-            <!-- <li>
-                <a href="javascript:;">
-                    <i class="iconfont">&#xe723;</i>
-                    <cite>订单管理</cite>
-                    <i class="iconfont nav_right">&#xe697;</i>
-                </a>
-                <ul class="sub-menu">
-                    <li>
-                        <a _href="{:url('Records/index')}">
-                            <i class="iconfont">&#xe6a7;</i>
-                            <cite>订单列表</cite>
-                        </a>
-                    </li >
-                </ul>
-            </li>
-            <li>
-                <a href="javascript:;">
-                    <i class="iconfont">&#xe726;</i>
-                    <cite>销售管理</cite>
-                    <i class="iconfont nav_right">&#xe697;</i>
-                </a>
-                <ul class="sub-menu">
-                    <li>
-                        <a _href="{:url('Admins/index')}">
-                            <i class="iconfont">&#xe6a7;</i>
-                            <cite>销售列表</cite>
-                        </a>
-                    </li >
-                    <li>
-                        <a _href="{:url('Roles/index')}">
-                            <i class="iconfont">&#xe6a7;</i>
-                            <cite>角色列表</cite>
-                        </a>
-                    </li >
-                    <li>
-                        <a _href="{:url('Admins/index')}">
-                            <i class="iconfont">&#xe6a7;</i>
-                            <cite>权限分类</cite>
-                        </a>
-                    </li >
-                    <li>
-                        <a _href="{:url('Privileges/index')}">
-                            <i class="iconfont">&#xe6a7;</i>
-                            <cite>权限列表</cite>
-                        </a>
-                    </li >
-                </ul>
-            </li>
-            <li>
-                <a href="javascript:;">
-                    <i class="iconfont">&#xe6ce;</i>
-                    <cite>系统统计</cite>
-                    <i class="iconfont nav_right">&#xe697;</i>
-                </a>
-                <ul class="sub-menu">
-                    <li>
-                        <a _href="{:url('Logs/index')}">
-                            <i class="iconfont">&#xe6a7;</i>
-                            <cite>日志列表</cite>
-                        </a>
-                    </li >
-                </ul>
-            </li> -->
+            {/volist}
         </ul>
       </div>
     </div>

@@ -5,9 +5,7 @@ namespace app\admin\controller;
  * @author  itarvin itarvin@163.com
  */
 use app\model\Admin;
-use app\model\Member;
 use app\model\Role;
-use app\model\Hitcount;
 use app\model\Adminrole;
 use think\facade\Request;
 use app\Util\ReturnCode;
@@ -21,7 +19,9 @@ class Admins extends Base
     public function index()
     {
         $user = new Admin;
+
         $result = $user->search(Request::param());
+
         $this->assign([
             'list'  => $result['list'],
             'count' => $result['count'],
@@ -38,13 +38,18 @@ class Admins extends Base
     public function add()
     {
         if( request()->isPost()){
+
             $user = new Admin;
+
             $result = $user->store(Request::param());
+
             return buildReturn(['status' => $result['code'],'info'=> $result['msg']]);
         }
         // 拿到角色表的数据
         $roleModel = new Role;
+
         $roleData = $roleModel->field('id,role_name')->select();
+
         $this->assign([
             'roleData'   => $roleData,
         ]);
@@ -74,10 +79,14 @@ class Admins extends Base
         $exist = explode(",", $roleId['role_id']);
 
         if(request()->isPost()){
+
             // 接收所有参数
             $data = Request::param();
+
             $data['uid'] = $this->uid;
+
             $result = $user->store($data);
+
             return buildReturn(['status' => $result['code'],'info'=> $result['msg']]);
         }
 
@@ -126,13 +135,18 @@ class Admins extends Base
     public function dimission()
     {
         $uid = input('uid');
+
         if( $uid == 1){
+
             return buildReturn(['status' => ReturnCode::AUTH_ERROR,'info'=> Tools::errorCode(ReturnCode::AUTH_ERROR)]);
         }else {
+
             $re = Admin::where('id', 'EQ', $uid)->update(array('isow' => '1'));
             if( $re){
+
                 return buildReturn(['status' => ReturnCode::SUCCESS,'info'=> Tools::errorCode(ReturnCode::SUCCESS)]);
             }else {
+
                 return buildReturn(['status' => ReturnCode::ERROR,'info'=> Tools::errorCode(ReturnCode::ERROR)]);
             }
         }
@@ -146,14 +160,18 @@ class Admins extends Base
     public function status()
     {
         $uid = Request::param('uid', '', 'trim');
+
         $user = new Admin;
+
         $chuqin = $user->field('chuqin')->find($uid);
+
         switch ($chuqin['chuqin']) {
             case '0':
                 $data['status'] = $user->where('id', $uid)->update(['chuqin' => '1']);
                 $data['chuqin'] = '1';
                 return json($data);
                 break;
+
             case '1':
                 $data['status'] = $user->where('id', $uid)->update(['chuqin' => '0']);
                 $data['chuqin'] = '0';
@@ -170,13 +188,16 @@ class Admins extends Base
     public function getHit()
     {
         // 接收时间传参
-        $date = input('date');
+        $date = Request::param('date', '', 'tirm');
         // 获取当前所有出勤销售
         $user = new Admin;
         $data = $user->getHitData($date);
+
         if( $data){
+
             return buildReturn(['status' => ReturnCode::SUCCESS,'info'=> Tools::errorCode(ReturnCode::SUCCESS), 'data' => $data]);
         }else{
+
             return buildReturn(['status' => ReturnCode::ERROR,'info'=> Tools::errorCode(ReturnCode::ERROR)]);
         }
     }

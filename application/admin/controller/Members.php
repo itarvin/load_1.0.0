@@ -21,12 +21,11 @@ class Members extends Base{
         $member = new Member;
         // 预定义type 数组
         $checktype = array('qq', 'phone', 'weixin');
+
         $where = [];
+
         $where[] = ['a.is_delete', 'EQ', '0'];
-        // check Admin
-        if($this->superman != 'yes'){
-            $where[] = ['a.uid', 'EQ', $this->uid];
-        }
+
         // 默认取出当天范围内的客户
         // $where[] = ['newtime', 'between', [date('Y-m-d', time()), date('Y-m-d H:i:s', time())]];
         if(request()->isPost())
@@ -65,7 +64,6 @@ class Members extends Base{
             'list' => $list,
             'count'=>$count,
             'uid'  => $this->uid,
-            'superman'  => $this->superman
         ]);
         return $this->fetch('Members/index');
     }
@@ -485,16 +483,7 @@ class Members extends Base{
         if($this->uid != 1 && $data['uid'] != $this->uid){
             $this->error('对不起，非法访问！');
         }
-        $this->assign('data', $data);
-        return $this->fetch('Members/edit');
-    }
 
-    /**
-     * 更新数据
-     * @return json
-     */
-    public function update()
-    {
         if(request()->isPost()){
             $member = new Member;
             // 接收所有参数
@@ -506,5 +495,8 @@ class Members extends Base{
             $result = $member->store($data);
             return buildReturn(['status' => $result['code'],'info'=> $result['msg']]);
         }
+
+        $this->assign('data', $data);
+        return $this->fetch('Members/edit');
     }
 }

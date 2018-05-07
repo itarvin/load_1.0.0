@@ -16,6 +16,66 @@ class  Login extends controller
      */
     public function login()
     {
+        if(request()->isPost()){
+            $user = new Admin;
+            $data = Request::param();
+
+            // 先验证验证码是否正确
+            if( !captcha_check($data['verify'])){
+                $this->error('验证码错误！', 'Login/login');
+            }
+
+            $rule = [
+                //管理员登陆字段验证
+                'users|管理员账号' => 'require',
+                'pwd|管理员密码' => 'require',
+            ];
+
+            // 数据验证
+            $validate = new Validate($rule);
+            $result   = $validate->check($data);
+
+            if( !$result){
+                $this->error($validate->getError(), 'Login/login');;
+            }
+
+            $preview = $user->where(array(
+                'users' => $data['users']
+            ))->find();
+
+            if( !$preview){
+                $this->error('当前用户不存在', 'Login/login');
+            }
+
+            $where_query = [
+                'users' => $data['users'],
+                'pwd' => $data['pwd']
+            ];
+
+            if( $user = $user->where($where_query)->find()) {
+
+                //注册session
+                $sid = base64_encode(json_encode($user->id));
+
+                session('uid', $sid);
+
+                session('u_name', $user->users);
+
+                $salt = md5($user->users.$user->pwd);
+
+                // 设置cookie 前缀为think_
+                Cookie::set('auth_'.md5($sid), $salt, ['expire'=> 3600 * 12 ]);
+
+                //更新最后请求IP及时间
+                $time = date('Y-m-d H:i:s', time());
+
+                $user->where($where_query)->update(['lasttime' => $time]);
+
+                return $this->success('登录成功', 'Index/index');
+            } else {
+                $this->error('登录失败:账号或密码错误', 'Login/login');
+            }
+        }
         return $this->fetch('Login/login');
     }
 
@@ -36,56 +96,6 @@ class  Login extends controller
         $captcha = new Captcha($config);
         return $captcha->entry();
     }
-
-    /**
-     * 处理数据登录
-     */
-    public function do_login()
-    {
-        $user = new Admin;
-        $data = input('post.');
-        // 先验证验证码是否正确
-        if( !captcha_check($data['verify'])){
-            $this->error('验证码错误！', 'Login/login');
-        }
-        $rule = [
-            //管理员登陆字段验证
-            'users|管理员账号' => 'require',
-            'pwd|管理员密码' => 'require',
-        ];
-        // 数据验证
-        $validate = new Validate($rule);
-        $result   = $validate->check($data);
-        if( !$result){
-            $this->error($validate->getError(), 'Login/login');;
-        }
-        $preview = $user->where(array(
-            'users' => $data['users']
-        ))->find();
-        if( !$preview){
-            $this->error('当前用户不存在', 'Login/login');
-        }
-        $where_query = array(
-            'users' => $data['users'],
-            'pwd' => $data['pwd'],
-        );
-        if( $user = $user->where($where_query)->find()) {
-            //注册session
-            $sid = base64_encode(json_encode($user->id));
-            session('uid', $sid);
-            session('u_name', $user->users);
-            $salt = md5($user->users.$user->pwd);
-            // 设置cookie 前缀为think_
-            Cookie::set('auth_'.md5($sid), $salt, ['expire'=> 3600 * 12 ]);
-            //更新最后请求IP及时间
-            $time = date('Y-m-d H:i:s', time());
-            $user->where($where_query)->update(['lasttime' => $time]);
-            return $this->success('登录成功', 'Index/index');
-        } else {
-            $this->error('登录失败:账号或密码错误', 'Login/login');
-        }
-    }
-
 
     /**
      * 退出

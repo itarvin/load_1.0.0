@@ -20,10 +20,6 @@ class Records extends Base
         $record = new Record;
         $uid = $this->uid;
         $where = [];
-        // 检测是否是超管
-        if($this->superman != 'yes'){
-            $where[] = ['a.uid', 'eq', $this->uid];
-        }
         // 默认取出当天范围内的客户
         $where[] = ['a.newtime', 'between', [date('Y-m-d', time()), date('Y-m-d H:i:s', time())]];
         // 处理查询

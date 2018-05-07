@@ -17,8 +17,11 @@ class Privileges extends Base
     public function index()
     {
         $model = new Privilege;
+
         $list = $model->getTree();
+
         $count = $model->count();
+
         $this->assign([
             'list' => $list,
             'count' => $count
@@ -34,12 +37,16 @@ class Privileges extends Base
     public function add()
     {
         $model = new Privilege;
+
         $list = $model->getTree();
+
         if(request()->isPost()){
-            $input = Request::param();
-            $result = $model->store($input);
+
+            $result = $model->store(Request::param());
+
             return buildReturn(['status' => $result['code'], 'info'=> $result['msg']]);
         }
+
         $this->assign('list',$list);
         return $this->fetch('Privileges/add');
     }
@@ -51,16 +58,19 @@ class Privileges extends Base
     */
     public function edit()
     {
-        // 过滤注入
-        $pid = Request::param('pid', '', 'strip_tags');
         $model = new Privilege;
+
         $list = $model->getTree();
-        $data = $model->find($pid);
+
+        $data = $model->find(Request::param('pid', '', 'strip_tags'));
+
         if(request()->isPost()){
-            $input = Request::param();
-            $result = $model->store($input);
+
+            $result = $model->store(Request::param());
+
             return buildReturn(['status' => $result['code'], 'info'=> $result['msg']]);
         }
+
         $this->assign([
             'data' => $data,
             'list' => $list
@@ -75,10 +85,11 @@ class Privileges extends Base
     public function delete()
     {
         if(request()->isPost()){
-            // 过滤注入
-            $id = Request::param('pid', '', 'strip_tags');
+
             $model = new Privilege;
-            $result = $model->del($id);
+
+            $result = $model->del(Request::param('pid', '', 'strip_tags'));
+
             return buildReturn(['status' => $result['code'], 'info'=> $result['msg']]);
         }
     }

@@ -7,6 +7,7 @@ namespace app\admin\controller;
  */
 use think\Controller;
 use app\model\Admin;
+use app\model\Privilege;
 class Base extends Controller
 {
     // 初始化方法
@@ -44,6 +45,11 @@ class Base extends Controller
         if(request()->controller() == 'Index'){
             return TRUE;
         }
+        $priModel = new Privilege;
+        
+        if(!$priModel->checkPri()){
+            $this->error('你想要的操作对象！程序员小哥哥办不到！(╯﹏╰)');
+        }
     }
 
 
@@ -53,9 +59,9 @@ class Base extends Controller
      */
     public function _empty($name)
     {
-        return json(array(
+        return json([
             'status' => '404',
             'info' => '你想要的操作对象！程序员小哥哥没找到！(╯﹏╰)'
-        ));
+        ]);
     }
 }

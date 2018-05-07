@@ -156,8 +156,6 @@ class Privilege extends Model
 	public function checkPri()
 	{
 		// 获取当前管理员正要访问的模型名称、控制器名称、方法名称
-		// tP中正带三个常量
-		//MODULE_NAME , CONTROLLER_NAME , ACTION_NAME
 		$adminId = json_decode(base64_decode(session('uid'),  true), true);
 		// 如果是超级管理员直接返回 TRUE
 		if(checksuperman($adminId))
@@ -168,12 +166,12 @@ class Privilege extends Model
 		$has = $arModel->alias('a')
         ->join('role_pri b', 'b.role_id = a.role_id')
         ->join('privilege c', 'c.id = b.pri_id')
-		->where(array(
-			'a.admin_id' => array('eq', $adminId),
-			'c.module_name' => array('eq', MODULE_NAME),
-			'c.controller_name' => array('eq', CONTROLLER_NAME),
-			'c.action_name' => array('eq', ACTION_NAME),
-		))->count();
+		->where([
+			['a.admin_id', 'eq', $adminId],
+			['c.module_name', 'eq', request()->module()],
+			['c.controller_name', 'eq', request()->controller()],
+			['c.action_name', 'eq', request()->action()],
+		])->count();
 		// 返回值，在继承Base中做rbac使用
 		return ($has > 0);
 	}
@@ -206,19 +204,31 @@ class Privilege extends Model
 		}
 		/*************** 从所有的权限中挑出前两级的 **********************/
 		$btns = [];
-		foreach ($priData as $k => $v){
-			if($v['parent_id'] == 0){
-
-				foreach($priData as $k1 => $v1){
-
-					if($v1['parent_id'] == $v['id']){
-
-						// $v[$][] = $v1;
-                        var_dump($v);die;
-
+        $ar = [];
+        foreach ($priData as $key => $value) {
+            $ar['id']                = $value['id'];
+            $ar['pri_name']          = $value['pri_name'];
+            $ar['module_name']       = $value['module_name'];
+            $ar['controller_name']   = $value['controller_name'];
+            $ar['action_name']       = $value['action_name'];
+            $ar['parent_id']         = $value['parent_id'];
+            $pd[] = $ar;
+        }
+		foreach ($pd as $k => $v){
+            /*判断循环的值得父级ID，存在，就继续向下挖递归，不存在该值，跳过这条数据*/
+			if($v['parent_id'] == 0)
+			{
+				// 再找这个顶的子级，再次开始循环整个数据
+				foreach ($priData as $k1 => $v1)
+				{
+					// 判定第二次循环的数组的父级ID是否为上一层的值ID
+					if($v1['parent_id'] == $v['id'])
+					{
+						// 存在，存二维数组
+						$v['children'][] = $v1;
 					}
-
 				}
+				// 存一维数组
 				$btns[] = $v;
 			}
 		}
