@@ -138,12 +138,8 @@ return [
     'exception_handle'       => '',
     // 定义上传文件目录
     'upload_path'            => '../public/uploads',
-    // 定义导入客户字段
-    'upload_field'           => array('username','phone','address','note','qq'),
     // 定义超级管理员id,
     'IS_SUPERMAN'           => array('1'),
-    // 定义导入最大处理数
-    'maxitem'                => 1000,
     //后台登录状态维持时间[目前只有登录和解锁会重置登录时间]
     'ONLINE_TIME'  => 7200,
 ];

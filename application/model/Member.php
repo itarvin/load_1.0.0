@@ -100,9 +100,6 @@ class Member extends Model
         $qv = isset($value['qq']) ? $value['qq'] : '';
         $pv = isset($value['phone']) ? $value['phone'] : '';
         $wv = isset($value['weixin']) ? $value['weixin'] : '';
-        // echo 'stert'.date('Y-m-d H:i:s',time());
-        // $result = $this->deepCheck($wv, $weixin, $id, $value);
-        // echo 'end'.date('Y-m-d H:i:s',time());die;
         if($result = $this->deepCheck($qv, $qq, $id, $value)){
             return $result;
         }else if($result = $this->deepCheck($pv, $phone, $id, $value)){
@@ -181,7 +178,7 @@ class Member extends Model
 
 
     /**
-     * 自定义搜索信息
+     * API自定义搜索信息
      * @param kid,uid
      * @return array
      */
@@ -218,6 +215,90 @@ class Member extends Model
          return $retult = [
              'data' => $list,
              'pages' => $pages
+         ];
+     }
+
+     // 未登录查询
+     public function publicSearch($value)
+     {
+         $where = [];
+         if($value && is_numeric($value)){
+             $where[] = ['a.phone|a.weixin|a.qq', 'eq', $value];
+             $result = $this->alias('a')
+             ->field('b.users,b.qq1')
+             ->join('admin b','a.uid = b.id')
+             ->where($where)->find();
+             if($result != null){
+                 return ['code' => ReturnCode::SUCCESS, 'msg' => Tools::errorCode(ReturnCode::SUCCESS), 'data' => $result];
+             }else {
+                 return ['code' => ReturnCode::NODATA, 'msg' => Tools::errorCode(ReturnCode::NODATA), 'data' => []];
+             }
+         }else {
+             return ['code' => ReturnCode::LACKOFPARAM, 'msg' => Tools::errorCode(ReturnCode::LACKOFPARAM),'data' => []];
+         }
+     }
+
+     /**
+      * 后台自定义搜索信息
+      * @param $data,$isPost
+      * @return array
+      */
+     public function adminSearch($data = '', $isPost = 'false', $uid, $isdelete = 'false')
+     {
+         // 预定义type 数组
+         $checktype = array('qq', 'phone', 'weixin');
+
+         $where = [];
+
+         // 默认取出当天范围内的客户
+         // $where[] = ['newtime', 'between', [date('Y-m-d', time()), date('Y-m-d H:i:s', time())]];
+         if($isPost  = 'true'){
+             $where = [];
+             // 接收参数
+             $start = isset($data['start']) ? $data['start'] : '';
+             $end = isset($data['end']) ? $data['end'] : '';
+             $type = isset($data['type']) ? $data['type'] : '';
+             $keyword = isset($data['keyword']) ? $data['keyword'] : '';
+
+             //check time
+             if ($start && $end) {
+                 $where[] = ['a.newtime', 'between', [$start, $end]];
+             }elseif($start){
+                 $where[] = ['a.newtime', 'GT', $start];
+             }elseif ($end) {
+                 $where[] = ['a.newtime', 'LT', $end];
+             }
+
+             // check type
+             if (!empty($keyword)) {
+                 if($type && in_array($type, $checktype)){
+                     $where[] = ['a.'.$type,  'EQ',  $keyword];
+                 }else{
+                     $where[] = ['a.qq|a.phone|a.weixin',  'EQ',  $keyword];
+                 }
+             }
+         }
+
+         if($isdelete == 'true'){
+
+             $where[] = ['a.is_delete', 'EQ', '1'];
+         }else{
+
+             $where[] = ['a.is_delete', 'EQ', '0'];
+         }
+
+         if(!checksuperman($uid)){
+             $where[] = ['a.uid', 'EQ', $uid];
+         }
+         $list = $this->alias('a')
+         ->field('a.*, b.users')
+         ->join('admin b', 'a.uid = b.id')
+         ->where($where)->order('id desc')->paginate();
+         $count = $list->total();
+
+         return $result = [
+             'list' => $list,
+             'count'=>$count,
          ];
      }
 }

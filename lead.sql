@@ -38,10 +38,11 @@ create table privilege
 	controller_name varchar(30) not null default '' comment '控制器名称',
 	action_name varchar(30) not null default '' comment '方法名称',
 	parent_id mediumint unsigned not null default '0' comment '上级权限Id',
+	ico varchar(50) not null comment '图标',
 	primary key (id)
 )engine=InnoDB default charset=utf8 comment '权限表';
 
-
+ALTER TABLE privilege add ico varchar(50) not null comment '图标';
 
 -- 管理员表已存在
 drop table if exists role_pri;
@@ -66,8 +67,8 @@ create table admin_role
 
 
 -- 系统配置表
-drop table if exists config;
-create table config
+drop table if exists setting;
+create table setting
 (
 	id mediumint unsigned not null auto_increment comment '配置id',
 	title varchar(50) not null comment '配置标题',

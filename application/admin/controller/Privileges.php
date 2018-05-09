@@ -17,7 +17,7 @@ class Privileges extends Base
     public function index()
     {
         $model = new Privilege;
-
+        
         $list = $model->getTree();
 
         $count = $model->count();

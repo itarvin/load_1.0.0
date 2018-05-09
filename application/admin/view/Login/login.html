@@ -21,7 +21,7 @@
         <div class="message">x-admin2.0-管理登录</div>
         <div id="darkbannerwrap"></div>
 
-        <form method="post" class="layui-form" method="post" action="{:url('Login/do_login')}">
+        <form method="post" class="layui-form" method="post" action="{:url('Login/login')}">
             <input name="users" placeholder="用户名"  type="text" lay-verify="required" class="layui-input" >
             <hr class="hr15">
             <input name="pwd" lay-verify="required" placeholder="密码"  type="password" class="layui-input">
@@ -35,16 +35,16 @@
     </div>
 
     <script>
-        $(function  () {
-			layui.use('form', function(){
-				var form = layui.form;
-				return false;
-			});
+	$(function  () {
+		layui.use('form', function(){
+			var form = layui.form;
+			return false;
 		});
-		function refreshVerify() {
-			var ts = Date.parse(new Date())/1000;
-			$('#verify_img').attr("src", "{:url('Login/verify')}?id="+ts);
-		}
+	});
+	function refreshVerify() {
+		var ts = Date.parse(new Date())/1000;
+		$('#verify_img').attr("src", "{:url('Login/verify')}?id="+ts);
+	}
     </script>
     <!-- 底部结束 -->
 </body>

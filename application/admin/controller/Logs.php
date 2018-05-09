@@ -23,8 +23,7 @@ class Logs extends Base
 
         $result = $log->search();
 
-        if(request()->isPost())
-        {
+        if(request()->isPost()){
             $result = $log->search(Request::param(), 'true');
         }
 
@@ -45,7 +44,7 @@ class Logs extends Base
     public function extractDetail()
     {
         if(request()->isPost()){
-            
+
             $log = new Log;
 
             $logid = Request::param('logid', '', 'trim');

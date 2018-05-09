@@ -37,6 +37,7 @@
             <th>登录名</th>
             <th>手　机</th>
             <th>微　信</th>
+            <th>角　色</th>
             <th><div class="layui-input-inline">
                 <select name="hitcount" onchange="changehit()" id="change">
                     <option value="" >点击数</option>
@@ -58,18 +59,12 @@
                 <td>{$vo.users}</td>
                 <td>{$vo.phone}</td>
                 <td>{$vo.weixin}</td>
+                <td>{$vo.role_name}</td>
                 <th><span id="hit_{$vo.id}" style="font-size:20px;color:green;"></span></th>
                 <td class="td-status">
                     <span class="layui-btn layui-btn-radius {if  $vo.chuqin == '0'}layui-btn-primary{else /}layui-btn-normal{/if}" onclick="changestatus({$vo.id})" id="stat_{$vo.id}">{if  $vo.chuqin == '0'}请假{else /}上班{/if}中</span>
                 </td>
                 <td class="td-manage">
-
-                  <a  href="{:url('Admins/custom')}"  title="员工客户">
-                      <button class="layui-btn layui-btn-sm layui-btn-primary">
-                          <i class="layui-icon">&#xe613;</i>
-                      </button>
-                  </a>
-
                   <a title="编辑"  onclick="x_admin_show('编辑','{:url('Admins/edit',array('id' => $vo.id))}')" href="javascript:;">
                       <button class="layui-btn layui-btn-sm layui-btn-primary">
                           <i class="layui-icon">编辑</i>
@@ -87,127 +82,112 @@
       </table>
     </div>
     <script>
-      layui.use('laydate', function(){
+    layui.use('laydate', function(){
         var laydate = layui.laydate;
-
-        //执行一个laydate实例
         laydate.render({
-          elem: '#start' //指定元素
+            elem: '#start' //指定元素
         });
-
-        //执行一个laydate实例
         laydate.render({
-          elem: '#end' //指定元素
+            elem: '#end' //指定元素
         });
-      });
-      /*用户-删除*/
-      function member_del(obj,id){
-          layer.confirm('确认要离职吗？',function(index){
-              //发异步删除数据
-              $.ajax({
-                  url:"{:url('Admins/dimission')}",
-                  type:'post',
-                  dataType:'json',
-                  data: {uid:id},
-                  success:function(msg){
-                      if(msg.status == 1){
-                          $(obj).parents("tr").remove();
-                          layer.msg('操作成功!',{icon:1,time:1000});
-                      }else if(msg.status == -14) {
-                          layer.msg('当前用户无法操作！',{icon:1,time:1000});
-                      }else {
-                          layer.msg('操作失败了!稍后再试~！',{icon:1,time:1000});
-                      }
-                  }
-              });
-
-          });
-      }
-      layui.use('form', function(){
-          var form = layui.form; //只有执行了这一步，部分表单元素才会自动修饰成功
+    });
+    /*用户-删除*/
+    function member_del(obj,id){
+        layer.confirm('确认要离职吗？',function(index){
+            //发异步删除数据
+            $.ajax({
+                url:"{:url('Admins/dimission')}",
+                type:'post',
+                dataType:'json',
+                data: {uid:id},
+                success:function(msg){
+                    if(msg.status == 1){
+                        $(obj).parents("tr").remove();
+                        layer.msg('操作成功!',{icon:1,time:1000});
+                    }else if(msg.status == -14) {
+                        layer.msg('当前用户无法操作！',{icon:1,time:1000});
+                    }else {
+                        layer.msg('操作失败了!稍后再试~！',{icon:1,time:1000});
+                    }
+                }
+            });
+        });
+    }
+    layui.use('form', function(){
+        var form = layui.form; //只有执行了这一步，部分表单元素才会自动修饰成功
 
           //……
 
           //但是，如果你的HTML是动态生成的，自动渲染就会失效
           // 因此你需要在相应的地方，执行下述方法来手动渲染，跟这类似的还有 element.init();
-          form.render();
-      });
-      layui.use(['layer', 'form', 'element'], function(){
-          var layer = layui.layer
-          ,form = layui.form
-          ,element = layui.element
-
-          //……
-          //你的代码都应该写在这里面
-      });
-
-
-
-      function loadhit()
-      {
-          var str=$('.x-right').text();
-          var num=str.replace(/[^0-9]/ig,"");
-          console.log(num);
-      }
-      function changestatus(userid)
-      {
-          var data = {
-              uid : userid
-          };
-          $.ajax({
-              url:"{:url('Admins/status')}",
-              type:'post',
-              dataType:'json',
-              data: data,
-              success:function(msg){
-                  var cow = '#stat_' + userid;
-                  console.log(cow);
-                  if(msg.status == '1')
-                  {
-                      switch (msg.chuqin) {
-                          case '0':
-                              $(cow).removeClass('layui-btn-normal');
-                              $(cow).addClass('layui-btn-primary');
-                              $(cow).text('请假中');
-                              break;
-                          case '1':
-                              $(cow).removeClass('layui-btn-primary');
-                              $(cow).addClass('layui-btn-normal');
-                              $(cow).text('上班中');
-                              break;
-                      }
-                      layer.msg('成功操作！', function(){
-                      });
-                  }else {
-                      layer.msg('失败了！稍后再试！', function(){
-                      });
-                  }
-              },
-          });
-      }
-      function changehit(){
-          var opt=$('#change').find("option:selected").val();
-          var data = {
-              date : opt
-          };
-          $.ajax({
-              url:"{:url('Admins/getHit')}",
-              type:'post',
-              dataType:'json',
-              data: data,
-              success:function(msg){
-                  if(msg.status == 1){
-                      $.each(msg.data,function(key,value) {
-                          var anchor='#hit_'+key;
-                          $(anchor).text(value);
-                      });
-                  }
-              }
-          });
-      }
-      function changelogo()
-      {
-          $('#button').addClass('layui-btn-danger');
-          $('#logo').html('&#xe63d;');
-      }
+        form.render();
+    });
+    layui.use(['layer', 'form', 'element'], function(){
+        var layer = layui.layer
+        ,form = layui.form
+        ,element = layui.element
+    });
+    function loadhit(){
+        var str=$('.x-right').text();
+        var num=str.replace(/[^0-9]/ig,"");
+        console.log(num);
+    }
+    function changestatus(userid){
+        var data = {
+            uid : userid
+        };
+        $.ajax({
+            url:"{:url('Admins/status')}",
+            type:'post',
+            dataType:'json',
+            data: data,
+            success:function(msg){
+                var cow = '#stat_' + userid;
+                if(msg.status == '1')
+                {
+                    switch (msg.chuqin) {
+                        case '0':
+                            $(cow).removeClass('layui-btn-normal');
+                            $(cow).addClass('layui-btn-primary');
+                            $(cow).text('请假中');
+                            break;
+                        case '1':
+                            $(cow).removeClass('layui-btn-primary');
+                            $(cow).addClass('layui-btn-normal');
+                            $(cow).text('上班中');
+                            break;
+                        }
+                        layer.msg('成功操作！', function(){
+                        });
+                    }else {
+                        layer.msg('失败了！稍后再试！', function(){
+                        });
+                    }
+                },
+            });
+        }
+        function changehit(){
+            var opt=$('#change').find("option:selected").val();
+            var data = {
+                date : opt
+            };
+            $.ajax({
+                url:"{:url('Admins/getHit')}",
+                type:'post',
+                dataType:'json',
+                data: data,
+                success:function(msg){
+                    if(msg.status == 1){
+                        $.each(msg.data,function(key,value) {
+                            var anchor='#hit_'+key;
+                            $(anchor).text(value);
+                        });
+                    }
+                }
+            });
+        }
+        function changelogo(){
+            $('#button').addClass('layui-btn-danger');
+            $('#logo').html('&#xe63d;');
+        }
     </script>

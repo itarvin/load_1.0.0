@@ -1,10 +1,9 @@
 {layout name="layout/layout" /}
     <div class="x-nav">
       <span class="layui-breadcrumb">
-        <a href="">首页</a>
+        <a href="{:url('Index/index')}">首页</a>
         <a href="{:url('Records/index')}">订单管理</a>
-        <a>
-          <cite>订单列表</cite></a>
+        <a><cite>订单列表</cite></a>
       </span>
       <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新">
         <i class="layui-icon" style="line-height:30px">ဂ</i></a>
@@ -67,56 +66,49 @@
       </div>
     </div>
     <script>
-      layui.use('laydate', function(){
+    layui.use('laydate', function(){
         var laydate = layui.laydate;
-
-        //执行一个laydate实例
         laydate.render({
-          elem: '#start' //指定元素
+            elem: '#start' //指定元素
         });
-
-        //执行一个laydate实例
         laydate.render({
-          elem: '#end' //指定元素
+            elem: '#end' //指定元素
         });
-      });
-      /*用户-删除*/
-      function member_del(obj,id){
-          layer.confirm('确认要删除吗？',function(index){
-              //发异步删除数据
-              $.ajax({
-                  url:"{:url('Records/delete')}",
-                  type:'post',
-                  dataType:'json',
-                  data: {deleid: id},
-                  success:function(msg){
-                      if(msg.status == 1)
-                      {
-                          $(obj).parents("tr").remove();
-                          layer.msg('已删除!',{icon:1,time:1000});
-                      }else {
-                          layer.msg(msg.error+'禁止操作！', {icon: 1});
-                      }
-                  },
-              });
-
-          });
-      }
-      // 默认填充当天的时间
-      window.onload=function()
-      {
-          gettime();
-      }
-      function gettime()
-      {
-          var myDate = new Date();//获取系统当前时间
-          var year = myDate.getFullYear(); //获取完整的年份(4位,1970-????)
-          var month = myDate.getMonth() + 1; //获取当前月份(0-11,0代表1月)
-          var day = myDate.getDate(); //获取当前日(1-31)
-          var now = year+'-'+month+'-'+day;
-          var hasvalue = $('#start').val();
-          if(!hasvalue){
-              $('#start').val(now);
-          }
-      }
+    });
+    /*订单-删除*/
+    function member_del(obj,id){
+        layer.confirm('确认要删除吗？',function(index){
+            //发异步删除数据
+            $.ajax({
+                url:"{:url('Records/delete')}",
+                type:'post',
+                dataType:'json',
+                data: {deleid: id},
+                success:function(msg){
+                    if(msg.status == 1){
+                        $(obj).parents("tr").remove();
+                        layer.msg('已删除!',{icon:1,time:1000});
+                    }else {
+                        layer.msg(msg.error+'禁止操作！', {icon: 1});
+                    }
+                },
+            });
+        });
+    }
+    // 默认填充当天的时间
+    window.onload=function(){
+        gettime();
+    }
+    function gettime()
+    {
+        var myDate = new Date();//获取系统当前时间
+        var year = myDate.getFullYear(); //获取完整的年份(4位,1970-????)
+        var month = myDate.getMonth() + 1; //获取当前月份(0-11,0代表1月)
+        var day = myDate.getDate(); //获取当前日(1-31)
+        var now = year+'-'+month+'-'+day;
+        var hasvalue = $('#start').val();
+        if(!hasvalue){
+            $('#start').val(now);
+        }
+    }
   </script>

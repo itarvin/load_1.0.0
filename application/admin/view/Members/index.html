@@ -1,10 +1,9 @@
 {layout name="layout/layout" /}
     <div class="x-nav">
       <span class="layui-breadcrumb">
-        <a href="">首页</a>
-        <a href="{:url('member/index')}">会员管理</a>
-        <a>
-          <cite>会员列表</cite></a>
+        <a href="{:url('Index/index')}">首页</a>
+        <a href="{:url('Members/index')}">会员管理</a>
+        <a><cite>会员列表</cite></a>
       </span>
       <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新">
         <i class="layui-icon" style="line-height:30px">ဂ</i></a>
@@ -31,75 +30,57 @@
       </div>
       <xblock>
           <!-- 暂不开放当前功能 -->
-        <!-- {if $superman != 'yes'}
         <button class="layui-btn layui-btn-danger" onclick="delAll()"><i class="layui-icon"></i>批量回收站</button>
-        {/if} -->
-        {if $superman != 'yes'}
         <button class="layui-btn" onclick="x_admin_show('添加用户','{:url('Members/add')}',600,400)"><i class="layui-icon"></i>添加</button>
-        {/if} 
         <span class="x-right" style="line-height:40px">共有数据：{$count} 条</span>
       </xblock>
       <table class="layui-table">
         <thead>
           <tr>
-             <!-- 暂不开放当前功能 -->
-            <!-- {if $superman != 'yes'}
             <th>
               <div class="layui-unselect header layui-form-checkbox" lay-skin="primary"><i class="layui-icon">&#xe605;</i></div>
             </th>
-            {/if} -->
             <th>ID</th>
             <th>用户名</th>
             <th>微信</th>
             <th>手机</th>
             <th>QQ</th>
-            {if $superman == 'yes'}
             <th>谁的客户</th>
-            {/if}
             <th>加入时间</th>
-            {if $superman != 'yes'}
             <th>操作</th>
-            {/if}
         </tr>
         </thead>
         <tbody>
         {volist name="list" id="vo"}
           <tr>
-              <!-- 暂不开放当前功能 -->
-            <!-- {if $superman != 'yes'}
             <td>
               <div class="layui-unselect layui-form-checkbox" lay-skin="primary" data-id='{$vo.id}'><i class="layui-icon">&#xe605;</i></div>
             </td>
-            {/if} -->
             <td>{$vo.id}</td>
             <td>{$vo.username}</td>
             <td>{$vo.weixin}</td>
             <td>{$vo.phone}</td>
             <td>{$vo.qq}</td>
-            {if $superman == 'yes'}
             <td>{$vo.users}</td>
-            {/if}
             <td>{$vo.newtime}</td>
-            {if $superman != 'yes'}
             <td class="td-manage">
                 <a title="编辑"  onclick="x_admin_show('编辑','{:url('Members/edit',array('id' => $vo.id))}')" href="javascript:;">
                     <button class="layui-btn layui-btn-sm layui-btn-primary">
                         <i class="layui-icon">编辑</i>
                     </button>
                 </a>
-                <a title="订单"  onclick="x_admin_show('添加订单','{:url('Records/addrecord',array('reid' => $vo.id))}',1000,600)" href="javascript:;">
+                <a title="订单"  onclick="x_admin_show('添加订单','{:url('Records/add',array('reid' => $vo.id))}',1000,600)" href="javascript:;">
                     <button class="layui-btn layui-btn-sm layui-btn-primary">
                         <i class="layui-icon">订单</i>
                     </button>
                 </a>
               <!-- 暂不开放当前功能 -->
-              <!-- <a title="删除" onclick="member_del(this,'{$vo.id}')" href="javascript:;">
+              <a title="删除" onclick="member_del(this,'{$vo.id}')" href="javascript:;">
                   <button class="layui-btn layui-btn-sm layui-btn-primary">
                       <i class="layui-icon">&#xe640;</i>
                   </button>
-              </a> -->
+              </a>
             </td>
-            {/if}
           </tr>
         {/volist}
         </tbody>
@@ -111,67 +92,59 @@
       </div>
     </div>
     <script>
-      layui.use('laydate', function(){
+    layui.use('laydate', function(){
         var laydate = layui.laydate;
-
-        //执行一个laydate实例
         laydate.render({
-          elem: '#start' //指定元素
+            elem: '#start' //指定元素
         });
-
-        //执行一个laydate实例
         laydate.render({
-          elem: '#end' //指定元素
+            elem: '#end' //指定元素
         });
-      });
-      /*用户-删除*/
-      function member_del(obj,id){
-          layer.confirm('确认要删除吗？',function(index){
-              //发异步删除数据
-              $.ajax({
-                  url:"{:url('Members/delete')}",
-                  type:'post',
-                  dataType:'json',
-                  data: {deleid: id},
-                  success:function(msg){
-                      if(msg.status == 1)
-                      {
-                          $(obj).parents("tr").remove();
-                          layer.msg('已删除!',{icon:1,time:1000});
-                      }else {
-                          layer.msg(msg.error+'禁止操作！', {icon: 1});
-                      }
-                  },
-              });
-          });
-      }
-
-      function delAll (argument) {
-          var data = tableCheck.getData();
-          layer.confirm('确认要回收吗？'+data,function(index){
-              //捉到所有被选中的，发异步进行删除
-              $.ajax({
-                  url:"{:url('Members/batchdelete')}",
-                  type:'post',
-                  dataType:'json',
-                  data: {deleid: data},
-                  success:function(msg){
-                      if(msg.status == 1)
-                      {
-                          layer.msg('回收'+msg.success+'条成功！请在您的回收站查看！', {icon: 1});
-                          $(".layui-form-checked").not('.header').parents('tr').remove();
-                      }else {
-                          layer.msg('客户列表存在'+msg.error+'个非您的客户！禁止操作！', {icon: 1});
-                      }
-                  },
-              });
-          });
-      }
-      function changelogo()
-      {
-          $('#button').addClass('layui-btn-danger');
-          $('#logo').html('&#xe63d;');
-      }
+    });
+    /*用户-删除*/
+    function member_del(obj,id){
+        layer.confirm('确认要删除吗？',function(index){
+            //发异步删除数据
+            $.ajax({
+                url:"{:url('Members/delete')}",
+                type:'post',
+                dataType:'json',
+                data: {kid: id},
+                success:function(msg){
+                    if(msg.status == 1){
+                        $(obj).parents("tr").remove();
+                        layer.msg('已删除!',{icon:1,time:1000});
+                    }else {
+                        layer.msg(msg.info, {icon: 1,time:1000});
+                    }
+                },
+            });
+        });
+    }
+    function delAll (argument) {
+        var data = tableCheck.getData();
+        layer.confirm('确认要回收吗？'+data,function(index){
+            //捉到所有被选中的，发异步进行删除
+            $.ajax({
+                url:"{:url('Members/batchdelete')}",
+                type:'post',
+                dataType:'json',
+                data: {deleid: data},
+                success:function(msg){
+                    if(msg.status == 1){
+                        layer.msg('回收'+msg.success+'条成功！请在您的回收站查看！', {icon: 1});
+                        $(".layui-form-checked").not('.header').parents('tr').remove();
+                    }else {
+                        layer.msg('客户列表存在'+msg.error+'个非您的客户！禁止操作！', {icon: 1});
+                    }
+                },
+            });
+        });
+    }
+    function changelogo(){
+        $('#button').addClass('layui-btn-danger');
+        $('#logo').html('&#xe63d;');
+    }
       // 默认填充当天的时间
       // window.onload=function()
       // {

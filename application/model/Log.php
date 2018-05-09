@@ -1,10 +1,10 @@
 <?php
 namespace app\model;
 use think\Model;
+use app\Util\Tools;
 class Log extends Model
 {
     protected $table='logs';
-
 
     public function search($data = '', $isSearch = 'false')
     {

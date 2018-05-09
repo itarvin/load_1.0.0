@@ -34,7 +34,7 @@
                   <td>
 					{volist name="priData" id="vo"}
 						{:str_repeat('-', 16*$vo['level'])}
-						<input level_id="{$vo['level']}" type="checkbox" id="che_{$vo.id}" name="pri_id[{$vo.id}]" value="{$vo['id']}" />
+						<input level_id="{$vo['level']}" type="checkbox" id="che_{$vo.id}" name="pri_id[{$vo.id}]" value="{$vo['id']}" lay-filter="encrypt"/>
 						<label for="che_{$vo.id}">{$vo['pri_name']}</label><br />
 					{/volist}
                 </td>
@@ -50,14 +50,13 @@
       </form>
     </div>
     <script>
-
-        layui.use(['form','layer'], function(){
-            $ = layui.jquery;
-            var form = layui.form
-            ,layer = layui.layer;
-          //自定义验证规则
-          form.verify({
-              weixin: function(value){
+    layui.use(['form','layer'], function(){
+        $ = layui.jquery;
+        var form = layui.form
+        ,layer = layui.layer;
+        //自定义验证规则
+        form.verify({
+            weixin: function(value){
                 var reg=/^[a-zA-Z\d_]{5,20}$/;
                 if(value.length < 6 || value.length > 20){
                     return '微信号必须6到20位';
@@ -66,16 +65,9 @@
                     return '微信号格式不正确！';
                 }
             }
-          });
-          //监听提交
-          form.on('submit(add)', function(data){
-            //   obj = document.getElementsByName('pri_id');
-            //   check_val = [];
-            //   for(k in obj){
-            //       if(obj[k].checked)
-            //           check_val.push(obj[k].value);
-            //   }
-            // console.log(check_val);
+        });
+        //监听提交
+        form.on('submit(add)', function(data){
             //发异步，把数据提交给php
             $.post("{:url('Roles/add')}",data.field,function(res){
     			if(res.status == 1){
@@ -90,39 +82,41 @@
     			}
             },'json');
             return false;
-          });
         });
-    // 为所有的复选框绑定一个点击事件
-    $(":checkbox").click(function(){
-        // console.log('123');
-    	// 先获取点击的这个level_id
-    	var tmp_level_id = level_id = $(this).attr("level_id");
-    	// 判断是选中还是取消
-    	if($(this).prop("checked"))
-    	{
-    		// 所有的子权限也选中
-    		$(this).nextAll(":checkbox").each(function(k,v){
-    			if($(v).attr("level_id") > level_id)
-    				$(v).prop("checked", "checked");
-    			else
-    				return false;
-    		});
-    		// 所有的上级权限也选中
-    		$(this).prevAll(":checkbox").each(function(k,v){
-    			if($(v).attr("level_id") < tmp_level_id)
-    			{
-    				$(v).prop("checked", "checked");
-    				tmp_level_id--; // 再找更上一级的
-    			}
-    		});
-    	}else{
-    		// 所有的子权限也取消
-    		$(this).nextAll(":checkbox").each(function(k,v){
-    			if($(v).attr("level_id") > level_id)
-    				$(v).removeAttr("checked");
-    			else
-    				return false;
-    		});
-    	}
-    });
+        // 为所有的复选框绑定一个点击事件
+        form.on('checkbox(encrypt)', function(data){
+            // 先获取点击的这个level_id
+            var tmp_level_id = level_id =  $(this).attr("level_id");
+            if (data.elem.checked) {
+                 // 所有的子权限也选中
+                 $(this).nextAll(":checkbox").each(function(k,v){
+                     if($(v).attr("level_id") > level_id){
+                         $(v).attr('checked', true);
+                         form.render();
+                     }else {
+                         return false;
+                     }
+                 });
+                 // 所有的上级权限也选中
+                 $(this).prevAll(":checkbox").each(function(k,v){
+                     if($(v).attr("level_id") < tmp_level_id)
+                     {
+                         $(v).attr('checked', true);
+                         form.render();
+                         tmp_level_id--; // 再找更上一级的
+                     }
+                 });
+             }else {
+                 // 所有的子权限也取消
+                 $(this).nextAll(":checkbox").each(function(k,v){
+                     if($(v).attr("level_id") > level_id){
+                         $(v).removeAttr('checked');
+                         form.render();
+                     }else {
+                         return false;
+                     }
+                 });
+             }
+         });
+     });
     </script>

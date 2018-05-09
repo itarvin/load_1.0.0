@@ -25,7 +25,7 @@
                   <span class="x-red">*</span>手　　机
               </label>
               <div class="layui-input-inline">
-                  <input type="text" id="phone" name="phone" 
+                  <input type="text" id="phone" name="phone"
                   autocomplete="off" class="layui-input" value="{$data.phone}">
               </div>
           </div>
@@ -72,16 +72,14 @@
       </form>
     </div>
     <script>
-        layui.use(['form','layer','laydate'], function(){
-            $ = layui.jquery;
-            var form = layui.form
-            ,laydate = layui.laydate
-            ,layer = layui.layer;
-
-            //日期
-             laydate.render({
-               elem: '#date'
-             });
+    layui.use(['form','layer','laydate'], function(){
+        $ = layui.jquery;
+        var form = layui.form
+        ,laydate = layui.laydate
+        ,layer = layui.layer;
+        laydate.render({
+            elem: '#date'
+        });
           //自定义验证规则
           // form.verify({
           //     weixin: function(value){
@@ -101,21 +99,19 @@
           //   }
           // });
           //监听提交
-          form.on('submit(add)', function(data){
+        form.on('submit(add)', function(data){
             //发异步，把数据提交给php
-            $.post("{:url('members/update')}",data.field,function(res){
-    			if(res.status == 1){
+            $.post("{:url('members/edit')}",data.field,function(res){
+                if(res.status == 1){
                     layer.alert("更新成功", {icon: 6},function () {
-                        // 获得frame索引
                         var index = parent.layer.getFrameIndex(window.name);
-                        //关闭当前frame
                         parent.layer.close(index);
                     });
                 }else{
-    				layer.msg(res.info, {time: 2000});
-    			}
+                    layer.msg(res.info, {time: 2000});
+                }
             },'json');
             return false;
-          });
         });
+    });
     </script>

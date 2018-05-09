@@ -14,6 +14,14 @@
                     </select>
                 </div>
             </div>
+            <div class="layui-form-item" id="icos">
+                <label for="pri_name" class="layui-form-label">
+                    <span class="x-red">*</span>定义图标
+                </label>
+                <div class="layui-input-inline">
+                    <input type="text" name="ico" autocomplete="off" class="layui-input" value="{$data['ico']}">
+                </div>
+            </div>
           <div class="layui-form-item">
               <label for="pri_name" class="layui-form-label">
                   <span class="x-red">*</span>权限名称
@@ -57,15 +65,15 @@
       </form>
     </div>
     <script>
-        layui.use(['form','layer'], function(){
-            $ = layui.jquery;
-            var form = layui.form
-            ,layer = layui.layer;
-          //监听提交
-          form.on('submit(edit)', function(data){
+    layui.use(['form','layer'], function(){
+        $ = layui.jquery;
+        var form = layui.form
+        ,layer = layui.layer;
+        //监听提交
+        form.on('submit(edit)', function(data){
             //发异步，把数据提交给php
             $.post("{:url('Privileges/edit')}",data.field,function(res){
-    			if(res.status == 1){
+                if(res.status == 1){
                     layer.alert("更新成功", {icon: 6},function () {
                         // 获得frame索引
                         var index = parent.layer.getFrameIndex(window.name);
@@ -77,6 +85,13 @@
     			}
             },'json');
             return false;
-          });
         });
+        form.on('select(aihao)', function(data){
+            if(data.value == 0){
+                $('#icos').show();
+            }else {
+                $('#icos').hide();
+            }
+        });
+    });
     </script>

@@ -15,7 +15,7 @@ class Admin extends Model
 
 
     protected $rule =   [
-        'users|用户名'     => 'min:2',
+        'users|用户名'     => 'min:2|unique:admin',
         'phone|手机号'     => 'length:11|number|/^1[3-8]{1}[0-9]{9}$/',
         'weixin|微信号'    => 'length:6,20|/^[a-zA-Z]{1}[-_a-zA-Z0-9]{5,19}+$/',
         'qq1|QQ1'          => 'number|length:6,10',
@@ -47,7 +47,7 @@ class Admin extends Model
         if(!$result) {
             return ['code' => ReturnCode::ERROR,'msg' => $validate->getError()];
         }
-        $data = Request::only(['id','users','qq1','qq2','qq3','qq4','pwd','weixin','status']);
+        $data = Request::only(['id','users','qq1','qq2','qq3','qq4','pwd','weixin','status','isow','gender']);
         $role_id = Request::only(['role_id']);
         if(isset($data['id'])){
             $preview = $this->where(array('users'=>$data['users']))->find();
@@ -97,16 +97,22 @@ class Admin extends Model
         $users = isset($data['users']) ? $data['users'] : '';
         //check time
         if ($start && $end) {
-            $where[] = ['newtime', 'between', [$start, $end]];
+            $where[] = ['a.newtime', 'between', [$start, $end]];
         }elseif( $start){
-            $where[] = ['newtime', 'GT', $start];
+            $where[] = ['a.newtime', 'GT', $start];
         }elseif ($end) {
-            $where[] = ['newtime', 'LT', $end];
+            $where[] = ['a.newtime', 'LT', $end];
         }
         if (!empty($users)) {
-            $where[] = ['users', 'LIKE', $users];
+            $where[] = ['a.users', 'LIKE', $users];
         }
-        $list = $this->where($where)->order('isow asc')->select();
+        $list = $this->alias('a')
+        ->field('a.users,a.isow,a.id,a.phone,a.weixin,a.chuqin,b.role_name')
+        ->join('admin_role c', 'c.admin_id = a.id')
+        ->join('role b', 'c.role_id = b.id')
+        ->order('a.isow asc')
+        ->where($where)
+        ->select();
         $count = $list->count();
         return $result = [
             'list' => $list,
@@ -126,7 +132,7 @@ class Admin extends Model
         $end  = isset($data['end ']) ? $data['end '] : '';
         $type = isset($data['type']) ? $data['type'] : '';
         $keyword = isset($data['keyword']) ? $data['keyword'] : '';
-        $uid  = isset($data['uid ']) ? $data['uid '] : '';
+        $uid  = isset($data['uid']) ? $data['uid'] : '';
         //check time
         if ($start && $end) {
             $where[] = ['newtime', 'between', [$start, $end]];
@@ -144,11 +150,13 @@ class Admin extends Model
             }
         }
         if($uid != ''){
-            $where[] = ['uid', 'EQ', $uid];
+            if(!checksuperman($uid)){
+                $where[] = ['uid', 'EQ', $uid];
+            }
         }
         $list = $member->where($where)->order('id desc')->paginate();
         $page = $list->render();
-        $count = $list->count();
+        $count = $list->total();
         return $result = [
             'list'  => $list,
             'count' => $count,

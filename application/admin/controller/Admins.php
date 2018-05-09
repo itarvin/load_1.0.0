@@ -12,6 +12,7 @@ use app\Util\ReturnCode;
 use app\Util\Tools;
 class Admins extends Base
 {
+
     /**
      * 主页
      * @return array
@@ -27,9 +28,9 @@ class Admins extends Base
             'count' => $result['count'],
             'uid'   => $this->uid
         ]);
+
         return $this->fetch('Admins/index');
     }
-
 
     /**
      * 新增
@@ -48,14 +49,13 @@ class Admins extends Base
         // 拿到角色表的数据
         $roleModel = new Role;
 
-        $roleData = $roleModel->field('id,role_name')->select();
+        $roleData = $roleModel->field('id,role_name')->where('role_status','0')->select();
 
         $this->assign([
             'roleData'   => $roleData,
         ]);
         return $this->fetch('Admins/add');
     }
-
 
     /**
      * 更新页
@@ -71,14 +71,13 @@ class Admins extends Base
         $data = $user->field('id, users, gender, isow, weixin, phone, qq1, qq2, qq3, qq4')->find($id);
         // 拿到角色表的数据
 
-        $roleData = $roleModel->field('id,role_name')->select();
-
+        $roleData = $roleModel->field('id,role_name')->where('role_status','0')->select();
         $roleId = $arModel->field('GROUP_CONCAT(role_id) role_id')
         ->where('admin_id', 'eq', $id)->find();
-
+        
         $exist = explode(",", $roleId['role_id']);
 
-        if(request()->isPost()){
+        if( request()->isPost()){
 
             // 接收所有参数
             $data = Request::param();
@@ -110,16 +109,17 @@ class Admins extends Base
 
         $users = $model->field('id, users')->order('id asc')->select();
 
-        $result = $model->custom();
+        $result = $model->custom(Request::param());
 
         if( request()->isPost()){
+
             $result = $model->custom(Request::param());
         }
 
         $this->assign([
             'list'  => $result['list'],
-            'count' =>$result['count'],
-            'page'  =>$result['page'],
+            'count' => $result['count'],
+            'page'  => $result['page'],
             'uid'   => $this->uid,
             'users' => $users
         ]);

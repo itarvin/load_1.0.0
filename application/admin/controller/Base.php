@@ -26,7 +26,7 @@ class Base extends Controller
 
             if( $auth){
 
-                $user = Admin::field('users, pwd')->find($this->uid);
+                $user = Admin::field('users,pwd')->find($this->uid);
 
                 if( md5($user['users'].$user['pwd']) != $auth){
 
@@ -46,7 +46,7 @@ class Base extends Controller
             return TRUE;
         }
         $priModel = new Privilege;
-        
+
         if(!$priModel->checkPri()){
             $this->error('你想要的操作对象！程序员小哥哥办不到！(╯﹏╰)');
         }

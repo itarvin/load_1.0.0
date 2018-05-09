@@ -10,12 +10,12 @@ namespace app\util;
 class ReturnCode {
 
     const SUCCESS = 1;
-    const ERROR = 0;
+    const ERROR = -2;
     const NODATA = -1;
     const AUTH_ERROR = -14;
     const UNKNOWN = -998;
     const EXCEPTION = -999;
-    const VERIFICATIONFAILURE = -2;
+    const VERIFICATIONFAILURE = -3;
     const ACCOUNTEXPIRED = -6;
     const OCCUPIED = -8;
     const LACKOFPARAM = -10;

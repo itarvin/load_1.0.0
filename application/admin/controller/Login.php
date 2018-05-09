@@ -9,6 +9,7 @@ use app\model\Admin;
 use think\facade\Cookie;
 use think\Validate;
 use think\captcha\Captcha;
+use think\facade\Request;
 class  Login extends controller
 {
     /**

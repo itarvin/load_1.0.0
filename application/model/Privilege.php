@@ -44,7 +44,8 @@ class Privilege extends Model
         $validate  = Validate::make($this->rule,$this->msg);
         $result = $validate->check($data);
         // 过滤post数组中的非数据表字段数据
-        $data = Request::only(['id','pri_name','module_name','controller_name','action_name','parent_id']);
+        $data = Request::only(['id','pri_name','module_name','controller_name','action_name','parent_id','ico']);
+        // var_dump($data);die;
         if(!$result) {
             return ['code' => ReturnCode::ERROR,'msg' => $validate->getError()];
         }
@@ -93,10 +94,10 @@ class Privilege extends Model
     private function _children($data, $parent_id=0, $isClear=TRUE)
     {
         // 定义空数组
-        static $ret = array();
+        static $ret = [];
         // 判定参数是否为真
         if($isClear)
-            $ret = array();
+            $ret = [];
         // 循环所有的数据
         foreach ($data as $k => $v)
         {
@@ -127,10 +128,10 @@ class Privilege extends Model
 	private function _reSort($data, $parent_id=0, $level=0, $isClear=TRUE)
 	{
 		// 定义一个静态空数组
-		static $ret = array();
+		static $ret = [];
 		// 判断参数是否存在值，若存在，给空数组
 		if($isClear)
-			$ret = array();
+			$ret = [];
 		// 循环输出所有数据的键值
 		foreach ($data as $k => $v)
 		{
@@ -185,6 +186,7 @@ class Privilege extends Model
 		/*************** 先取出当前管理员所拥有的所有的权限 ****************/
 		// 从存储的SESSION中获取当前管理员的ID
 		$adminId = json_decode(base64_decode(session('uid'),  true), true);
+
 		// 判断是否为超级管理员
 		if(checksuperman($adminId))
 		{
@@ -195,12 +197,10 @@ class Privilege extends Model
 			// 取出当前管理员所在角色 所拥有的权限
 			$arModel = new Adminrole;
 			$priData = $arModel->alias('a')
-			->field('DISTINCT c.id,c.pri_name,c.module_name,c.controller_name,c.action_name,c.parent_id')
+			->field('DISTINCT c.id,c.pri_name,c.module_name,c.controller_name,c.action_name,c.parent_id,c.ico')
             ->join('role_pri b', 'b.role_id = a.role_id')
             ->join('privilege c', 'c.id = b.pri_id')
-			->where(array(
-				'a.admin_id' => array('eq', $adminId),
-			))->select();
+			->where('a.admin_id', $adminId)->select();
 		}
 		/*************** 从所有的权限中挑出前两级的 **********************/
 		$btns = [];
@@ -212,6 +212,7 @@ class Privilege extends Model
             $ar['controller_name']   = $value['controller_name'];
             $ar['action_name']       = $value['action_name'];
             $ar['parent_id']         = $value['parent_id'];
+            $ar['ico']               = $value['ico'];
             $pd[] = $ar;
         }
 		foreach ($pd as $k => $v){

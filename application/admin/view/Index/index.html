@@ -1,33 +1,32 @@
 {layout name="layout/layout" /}
-    <!-- 顶部开始 -->
-    <div class="container">
-        <div class="logo"><a href="./index.html">X-admin v2.0</a></div>
-        <div class="left_open">
-            <i title="展开左侧栏" class="iconfont">&#xe699;</i>
-        </div>
-        <ul class="layui-nav right" lay-filter="">
-          <li class="layui-nav-item">
+<!-- 顶部开始 -->
+<div class="container">
+    <div class="logo"><a href="./index.html">客户系统</a></div>
+    <div class="left_open">
+        <i title="展开左侧栏" class="iconfont">&#xe699;</i>
+    </div>
+    <ul class="layui-nav right" lay-filter="">
+        <li class="layui-nav-item">
             <a href="javascript:;">{$name}</a>
             <dl class="layui-nav-child"> <!-- 二级菜单 -->
-              <dd><a onclick="x_admin_show('个人信息','{:url('admin/edit',array('id'=> $uid))}')">个人信息</a></dd>
-              <dd><a href="{:url('Login/login')}">切换帐号</a></dd>
-              <dd><a href="{:url('Login/logout')}">退出</a></dd>
+                <dd><a onclick="x_admin_show('个人信息','{:url('admin/edit',array('id'=> $uid))}')">个人信息</a></dd>
+                <dd><a href="{:url('Login/login')}">切换帐号</a></dd>
+                <dd><a href="{:url('Login/logout')}">退出</a></dd>
             </dl>
-          </li>
-          <li class="layui-nav-item to-index"><a href="/">前台首页</a></li>
-        </ul>
-
-    </div>
-    <!-- 顶部结束 -->
-    <!-- 中部开始 -->
-     <!-- 左侧菜单开始 -->
-    <div class="left-nav">
-      <div id="side-nav">
+        </li>
+        <li class="layui-nav-item to-index"><a href="/">前台首页</a></li>
+    </ul>
+</div>
+<!-- 顶部结束 -->
+<!-- 中部开始 -->
+<!-- 左侧菜单开始 -->
+<div class="left-nav">
+    <div id="side-nav">
         <ul id="nav">
             {volist name="btns" id="vo"}
             <li>
                 <a href="javascript:;">
-                    <i class="iconfont">&#xe6b8;</i>
+                    <i class="iconfont"><?php echo $vo['ico'];?></i>
                     <cite>{$vo['pri_name']}</cite>
                     <i class="iconfont nav_right">&#xe697;</i>
                 </a>
@@ -44,28 +43,27 @@
             </li>
             {/volist}
         </ul>
-      </div>
     </div>
-    <!-- <div class="x-slide_left"></div> -->
-    <!-- 左侧菜单结束 -->
-    <!-- 右侧主体开始 -->
-    <div class="page-content">
-        <div class="layui-tab tab" lay-filter="xbs_tab" lay-allowclose="false">
-          <ul class="layui-tab-title">
+</div>
+<!-- 左侧菜单结束 -->
+<!-- 右侧主体开始 -->
+<div class="page-content">
+    <div class="layui-tab tab" lay-filter="xbs_tab" lay-allowclose="false">
+        <ul class="layui-tab-title">
             <li>我的桌面</li>
-          </ul>
-          <div class="layui-tab-content">
+        </ul>
+        <div class="layui-tab-content">
             <div class="layui-tab-item layui-show">
                 <iframe src='{:url("Index/welcome")}' frameborder="0" scrolling="yes" class="x-iframe"></iframe>
             </div>
-          </div>
         </div>
     </div>
-    <div class="page-content-bg"></div>
-    <!-- 右侧主体结束 -->
-    <!-- 中部结束 -->
-    <!-- 底部开始 -->
-    <div class="footer">
-        <div class="copyright">Copyright ©2018 itarvin All Rights Reserved</div>
-    </div>
-    <!-- 底部结束 -->
+</div>
+<div class="page-content-bg"></div>
+<!-- 右侧主体结束 -->
+<!-- 中部结束 -->
+<!-- 底部开始 -->
+<div class="footer">
+    <div class="copyright">Copyright ©2018 itarvin All Rights Reserved</div>
+</div>
+<!-- 底部结束 -->

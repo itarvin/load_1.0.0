@@ -18,8 +18,11 @@ class Records extends Base
     public function index()
     {
         $record = new Record;
+
         $uid = $this->uid;
+
         $where = [];
+
         // 默认取出当天范围内的客户
         $where[] = ['a.newtime', 'between', [date('Y-m-d', time()), date('Y-m-d H:i:s', time())]];
         // 处理查询
@@ -66,7 +69,7 @@ class Records extends Base
      * 添加消费页
      * @return array
      */
-    public function addrecord()
+    public function add()
     {
         $khid = input('reid');
         // 先检测当前客户是否为当前销售
@@ -75,19 +78,7 @@ class Records extends Base
             $this->error('当前客户您无法操作！');
             exit;
         }
-        $check['users'] = $this->name;
-        $this->assign([
-            'data' => $check,
-            'khid' => $khid
-        ]);
-        return $this->fetch('Records/addrecord');
-    }
 
-    /**
-     * 处理添加订单数据
-     */
-    public function record()
-    {
         if(request()->isPost()){
             $input = Request::param();
             $lenght = count($input['product']);
@@ -112,6 +103,13 @@ class Records extends Base
                 $this->success('添加'.$re.'条订单成功！');
             }
         }
+
+        $check['users'] = $this->name;
+        $this->assign([
+            'data' => $check,
+            'khid' => $khid
+        ]);
+        return $this->fetch('Records/add');
     }
 
 

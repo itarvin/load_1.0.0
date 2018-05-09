@@ -1,7 +1,7 @@
 {layout name="layout/layout" /}
     <div class="x-nav">
       <span class="layui-breadcrumb">
-        <a href="">首页</a>
+        <a href="{:url('Index/index')}">首页</a>
         <a href="{:url('Records/index')}">订单管理</a>
         <a>
           <cite>订单列表</cite></a>
@@ -78,86 +78,66 @@
       </div>
     </div>
     <script>
-      layui.use(['laydate','form','layer'], function(){
+    layui.use(['laydate','form','layer'], function(){
         var form = layui.form
         ,laydate = layui.laydate
         ,layer = layui.layer;
-
-
-        //执行一个laydate实例
         laydate.render({
-          elem: '#start' //指定元素
+            elem: '#start' //指定元素
         });
-
-        //执行一个laydate实例
         laydate.render({
-          elem: '#end' //指定元素
+            elem: '#end' //指定元素
         });
-
-        // form.on('select(change)', function(data){
-        //     if(data.value == 10){
-        //         $('#keyword').show();
-        //     }else {
-        //         $('#keyword').hide();
-        //     }
-        // });
-      });
-      // 提取信息
-      function getinfo(id)
-      {
-          //发异步删除数据
-          $.ajax({
-              url:"{:url('Logs/extractDetail')}",
-              type:'post',
-              dataType:'json',
-              data: {logid: id},
-              success:function(msg){
-                  if(msg.status == 1)
-                  {
-                      var x = '#note_'+id;
-                      var text = $(x).text();
-                      var info = msg.data;
-                      html = '';
-                      html = "<table width='100%' border='1'><tr><th>操作IP</th><th>"+info['ip']+"</th></tr><tr><td>操作时间</td><td>"+info['newtime']+"</td></tr><tr><td>QQ</td><td>"+info['qq']+"</td></tr><tr><td>微信号</td><td>"+info['weixin']+"</td></tr><tr><td>手机号</td><td>"+info['phone']+"</td></tr><tr><td colspan='2'>备注</td></tr><tr><td colspan='2'>"+text+"</td></tr></table>";
-                      layer.open({
-                          type: 1
-                          ,title: false //不显示标题栏
-                          ,closeBtn: false
-                          ,area: ['300px', '360px']
-                          ,shade: 0.8
-                          ,id: 'itarvin' //设定一个id，防止重复弹出
-                          ,btn: ['关闭']
-                          ,btnAlign: 'c'
-                          ,moveType: 1 //拖拽模式，0或者1
-                          ,content: '<div style="padding: 40px; line-height: 22px; background-color: #393D49; color: #fff; font-weight: 300;word-wrap:break-word; text-align:center;">'+html+'</div>'
-                          ,success: function(layero){
-                          }
-                      });
-                  }
-              },
-          });
-
-
-      }
-      function changelogo()
-      {
-          $('#button').addClass('layui-btn-danger');
-          $('#logo').html('&#xe63d;');
-      }
-      window.onload=function()
-      {
-          gettime();
-      }
-      function gettime()
-      {
-          var myDate = new Date();//获取系统当前时间
-          var year = myDate.getFullYear(); //获取完整的年份(4位,1970-????)
-          var month = myDate.getMonth() + 1; //获取当前月份(0-11,0代表1月)
-          var day = myDate.getDate(); //获取当前日(1-31)
-          var now = year+'-'+month+'-'+day;
-          var hasvalue = $('#start').val();
-          if(!hasvalue){
-              $('#start').val(now);
-          }
-      }
+    });
+    // 提取信息
+    function getinfo(id){
+        //发异步删除数据
+        $.ajax({
+            url:"{:url('Logs/extractDetail')}",
+            type:'post',
+            dataType:'json',
+            data: {logid: id},
+            success:function(msg){
+                if(msg.status == 1){
+                    var x = '#note_'+id;
+                    var text = $(x).text();
+                    var info = msg.data;
+                    html = '';
+                    html = "<table width='100%' border='1'><tr><th>操作IP</th><th>"+info['ip']+"</th></tr><tr><td>操作时间</td><td>"+info['newtime']+"</td></tr><tr><td>QQ</td><td>"+info['qq']+"</td></tr><tr><td>微信号</td><td>"+info['weixin']+"</td></tr><tr><td>手机号</td><td>"+info['phone']+"</td></tr><tr><td colspan='2'>备注</td></tr><tr><td colspan='2'>"+text+"</td></tr></table>";
+                    layer.open({
+                        type: 1
+                        ,title: false //不显示标题栏
+                        ,closeBtn: false
+                        ,area: ['300px', '360px']
+                        ,shade: 0.8
+                        ,id: 'itarvin' //设定一个id，防止重复弹出
+                        ,btn: ['关闭']
+                        ,btnAlign: 'c'
+                        ,moveType: 1 //拖拽模式，0或者1
+                        ,content: '<div style="padding: 40px; line-height: 22px; background-color: #393D49; color: #fff; font-weight: 300;word-wrap:break-word; text-align:center;">'+html+'</div>'
+                        ,success: function(layero){
+                        }
+                    });
+                }
+            },
+        });
+    }
+    function changelogo(){
+        $('#button').addClass('layui-btn-danger');
+        $('#logo').html('&#xe63d;');
+    }
+    window.onload=function(){
+        gettime();
+    }
+    function gettime(){
+        var myDate = new Date();//获取系统当前时间
+        var year = myDate.getFullYear(); //获取完整的年份(4位,1970-????)
+        var month = myDate.getMonth() + 1; //获取当前月份(0-11,0代表1月)
+        var day = myDate.getDate(); //获取当前日(1-31)
+        var now = year+'-'+month+'-'+day;
+        var hasvalue = $('#start').val();
+        if(!hasvalue){
+            $('#start').val(now);
+        }
+    }
   </script>

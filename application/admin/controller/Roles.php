@@ -19,12 +19,14 @@ class Roles extends Base
     public function index()
     {
         $model = new Role;
+
         $result = $model->search();
+
         if(request()->isPost()){
-            $result = $model->store(Request::param());
+
+            $result = $model->search(Request::param());
         }
         $this->assign([
-            'pages' => $result['pages'],
             'data' => $result['data'],
             'count' => $result['count'],
         ]);
@@ -39,11 +41,15 @@ class Roles extends Base
     public function add()
     {
         $priModel = new Privilege;
+
         $priData = $priModel->getTree();
+
         if(request()->isPost()){
+
             $model = new Role;
-            $input = Request::param();
-            $result = $model->store($input);
+
+            $result = $model->store(Request::param());
+
             return buildReturn(['status' => $result['code'], 'info'=> $result['msg']]);
         }
         $this->assign([
@@ -61,19 +67,27 @@ class Roles extends Base
     public function edit()
     {
         $id = Request::param('rid', '', 'strip_tags');
+
         $model = new Role;
         $priModel = new Privilege;
+
         $priData = $priModel->getTree();
+
         $data = $model->find($id);
+
         // 取出当前角色已经拥有 的权限ID
         $rpModel = new Rolepri;
+
         $rpData = $rpModel->field('GROUP_CONCAT(pri_id) pri_id')
         ->where('role_id', $id)
         ->find();
+
         $exist = explode(",", $rpData['pri_id']);
+
         if(request()->isPost()){
-            $input = Request::param();
-            $result = $model->store($input);
+
+            $result = $model->store(Request::param());
+
             return buildReturn(['status' => $result['code'], 'info'=> $result['msg']]);
         }
         $this->assign([
@@ -94,42 +108,57 @@ class Roles extends Base
         if(request()->isPost()){
             // 过滤注入
             $id = Request::param('rid', '', 'strip_tags');
+
             $model = new Role;
+
             $status = $model->find($id);
+
             if(!$status){
+
                 return buildReturn(['status' => ReturnCode::ERROR,'info'=> Tools::errorCode(ReturnCode::ERROR)]);
             }
             $data = [];
             switch ($status['role_status']) {
+
                 case '1':
                     $data['role_status'] = 0;
                     if($model->where('id',$id)->update($data)){
+
                         return buildReturn(['status' => ReturnCode::SUCCESS,'info'=> Tools::errorCode(ReturnCode::SUCCESS)]);
                     }else {
+
                         return buildReturn(['status' => ReturnCode::ERROR,'info'=> Tools::errorCode(ReturnCode::ERROR)]);
                     }
                     break;
+
                 case '0':
                     $data['role_status'] = 1;
                     if($model->where('id',$id)->update($data)){
+
                         return buildReturn(['status' => ReturnCode::SUCCESS,'info'=> Tools::errorCode(ReturnCode::SUCCESS)]);
                     }else {
+
                         return buildReturn(['status' => ReturnCode::ERROR,'info'=> Tools::errorCode(ReturnCode::ERROR)]);
                     }
                     break;
             }
         }
     }
+
+
     /**
-    * 删除权限
+    * 删除角色
     */
     public function delete()
     {
         if(request()->isPost()){
             // 过滤注入
             $id = Request::param('rid', '', 'strip_tags');
+
             $model = new Role;
+            
             $result = $model->del($id);
+
             return buildReturn(['status' => $result['code'], 'info'=> $result['msg']]);
         }
     }

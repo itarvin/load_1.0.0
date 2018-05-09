@@ -1,35 +1,37 @@
 {layout name="layout/layout" /}
 <div class="x-nav">
     <span class="layui-breadcrumb">
-        <a href="">首页</a>
-        <a href="">演示</a>
-        <a>
-            <cite>导航元素</cite></a>
+        <a href="{:url('Index/index')}">首页</a>
+        <a href="{:url('Roles/index')}">角色管理</a>
+        <a><cite>角色列表</cite></a>
         </span>
         <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新">
             <i class="layui-icon" style="line-height:30px">ဂ</i></a>
         </div>
         <div class="x-body">
             <div class="layui-row">
-                <form class="layui-form layui-col-md12 x-so">
-                    <input type="text" name="role_name"  placeholder="请输入角色名称" autocomplete="off" class="layui-input">
+                <form class="layui-form layui-col-md12 x-so" action="{:url('Roles/index')}" method="post">
+                    <div class="layui-input-inline">
+                        <select name="role_status">
+                            <option value=''>所有状态</option>
+                            <option value='0' {if input('post.role_status') eq '0'}selected{/if}>已启用</option>
+                            <option value='1' {if input('post.role_status') eq '1'}selected{/if}>已停用</option>
+                        </select>
+                    </div>
+                    <input type="text" name="role_name"  placeholder="请输入角色名称" autocomplete="off" class="layui-input" value="{:input('post.role_name')}">
+
                     <button class="layui-btn"  lay-submit="" lay-filter="sreach"><i class="layui-icon">&#xe615;</i></button>
                 </form>
             </div>
             <xblock>
-                <button class="layui-btn layui-btn-danger" onclick="delAll()"><i class="layui-icon"></i>批量删除</button>
                 <button class="layui-btn" onclick="x_admin_show('添加角色','{:url('Roles/add')}')"><i class="layui-icon"></i>添加</button>
                 <span class="x-right" style="line-height:40px">共有数据：{$count} 条</span>
             </xblock>
             <table class="layui-table">
                 <thead>
                     <tr>
-                        <th>
-                            <div class="layui-unselect header layui-form-checkbox" lay-skin="primary"><i class="layui-icon">&#xe605;</i></div>
-                        </th>
                         <th>ID</th>
                         <th>角色名</th>
-                        <!-- <th>拥有权限规则</th> -->
                         <th>描述</th>
                         <th>状态</th>
                         <th>操作</th>
@@ -38,12 +40,9 @@
                         {volist name='data' id="vo"}
                         {if $vo.id neq null}
                         <tr>
-                            <td>
-                                <div class="layui-unselect layui-form-checkbox" lay-skin="primary" data-id='2'><i class="layui-icon">&#xe605;</i></div>
-                            </td>
                             <td>{$vo.id}</td>
                             <td>{$vo.role_name}</td>
-                            <!-- <td>{$vo.pri_name}</td> -->
+                            <td style="display:none;" id="pr_{$vo.id}">{$vo.pri_name}</td>
                             <td>{$vo.role_desc}</td>
                             <td class="td-status">
                                 {if $vo['role_status'] eq '0'}
@@ -54,19 +53,32 @@
                             <td class="td-manage">
                                 {if $vo['role_status'] eq '0'}
                                 <a onclick="member_stop(this,{$vo.id})" href="javascript:;"  title="停用">
+                                    <button class="layui-btn layui-btn-sm layui-btn-primary">
                                     <i class="layui-icon">&#xe601;</i>
+                                    </button>
                                 </a>
                                 {elseif $vo['role_status'] eq '1'/}
                                 <a onclick="member_stop(this,{$vo.id})" href="javascript:;"  title="启用">
+                                    <button class="layui-btn layui-btn-sm layui-btn-primary">
                                     <i class="layui-icon">&#xe62f;</i>
+                                    </button>
                                 </a>
                                 {/if}
 
                                 <a title="编辑"  onclick="x_admin_show('编辑','{:url('Roles/edit',array('rid' => $vo.id))}')" href="javascript:;">
+                                    <button class="layui-btn layui-btn-sm layui-btn-primary">
                                     <i class="layui-icon">&#xe642;</i>
+                                    </button>
                                 </a>
                                 <a title="删除" onclick="member_del(this,{$vo.id})" href="javascript:;">
+                                    <button class="layui-btn layui-btn-sm layui-btn-primary">
                                     <i class="layui-icon">&#xe640;</i>
+                                    </button>
+                                </a>
+                                <a title="权限详情" onclick="getinfo(this,{$vo.id})" href="javascript:;">
+                                    <button class="layui-btn layui-btn-sm layui-btn-primary">
+                                    <i class="layui-icon">详情</i>
+                                    </button>
                                 </a>
                             </td>
                         </tr>
@@ -74,11 +86,6 @@
                         {/volist}
                     </tbody>
                 </table>
-                <div class="page">
-                    <div>
-                        {$pages}
-                    </div>
-                </div>
             </div>
 <script>
 layui.use('laydate', function(){
@@ -144,12 +151,26 @@ function member_del(obj,id){
      });
  }
 
-function delAll (argument) {
-    var data = tableCheck.getData();
-    layer.confirm('确认要删除吗？'+data,function(index){
-        //捉到所有被选中的，发异步进行删除
-        layer.msg('删除成功', {icon: 1});
-        $(".layui-form-checked").not('.header').parents('tr').remove();
-    });
+ // 提取信息
+ function getinfo(obj,id)
+ {
+     var x = '#pr_'+id;
+     var text = $(x).text();
+     html = '';
+     html = "<table width='100%' border='1'><tr><td colspan='2'>权限详情列表</td></tr><tr><td colspan='2'>"+text+"</td></tr></table>";
+     layer.open({
+         type: 1
+         ,title: false //不显示标题栏
+         ,closeBtn: false
+         ,area: ['300px', '360px']
+         ,shade: 0.8
+         ,id: 'itarvin' //设定一个id，防止重复弹出
+         ,btn: ['关闭']
+         ,btnAlign: 'c'
+         ,moveType: 1 //拖拽模式，0或者1
+         ,content: '<div style="padding: 40px; line-height: 22px; background-color: #393D49; color: #fff; font-weight: 300;word-wrap:break-word; text-align:center;">'+html+'</div>'
+         ,success: function(layero){
+         }
+     });
  }
 </script>

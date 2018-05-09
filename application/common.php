@@ -9,8 +9,19 @@
 // | Author: 流年 <liu21st@gmail.com>
 // +----------------------------------------------------------------------
 use app\model\Log;
+use app\model\Setting;
 use app\Util\Tools;
 
+/**
+ * 获取配置项
+ * @return Boole
+ */
+function getconf($key){
+    if($key){
+        $result = Setting::field('content')->where('name',$key)->find();
+    }
+    return $result['content'] ? $result['content'] : "不是每一片云彩都有雨！";
+}
 
 /**
  * 检测是否当前用户是超管

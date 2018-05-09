@@ -26,7 +26,6 @@ class Role extends Model
         'role_desc.min:2'                          => '至少2个字符',
     ];
 
-
     /**
      * 新增，修改数据时的数据验证与处理
      * @param string $data    所有数据
@@ -85,32 +84,34 @@ class Role extends Model
      * @return array
      */
      public function search($data = ''){
+
          $where = [];
-         if($data != ''){
-             $role_status = isset($data['role_status']) ? $data['role_status'] : '';
-             $role_name = isset($data['role_name']) ? $data['role_name'] : '';
-             if($role_status != ''){
-                 $where[] = ['a.role_status', 'eq' ,$role_status];
-             }
-             if($role_name != ''){
-                 $where[] = ['a.role_name', 'LIKE' ,"%$role_name%"];
-             }
+         $role_status = isset($data['role_status']) ? $data['role_status'] : '';
+
+         $role_name = isset($data['role_name']) ? $data['role_name'] : '';
+
+         if($role_status != ''){
+             $where[] = ['a.role_status', 'eq' ,$role_status];
          }
+         if($role_name != ''){
+             $where[] = ['a.role_name', 'LIKE' ,"%$role_name%"];
+         }
+         // $list = $this->select();
          $list = $this->alias('a')
          ->field('a.*,GROUP_CONCAT(c.pri_name) pri_name')
          ->join('role_pri b','a.id = b.role_id')
          ->join('privilege c','b.pri_id = c.id')
-         ->where($where)->order('id desc')->paginate();
-         $pages = $list->render();
+         ->group('a.id')
+         ->where($where)->select();
+
+         // var_dump($list);die;
          $count = $list->count();
+
          return $retult = [
              'data' => $list,
-             'pages' => $pages,
              'count' => $count
          ];
      }
-
-
 
      // 预处理删除
      public function del($id){

@@ -18,7 +18,7 @@
               <select name="uid">
                   <option value="">所有销售</option>
                   {volist name="users" id="vo"}
-                      <option value="{$vo.id}" {if input('uid') == $vo.id}selected{/if}>{$vo.users}</option>
+                      <option value="{$vo.id}" {if input('post.uid') == $vo.id}selected{/if}>{$vo.users}</option>
                   {/volist}
               </select>
           </div>
@@ -59,7 +59,7 @@
             <td>{$vo.qq}</td>
             <td>{$vo.newtime}</td>
             <td class="td-manage">
-                <a title="订单"  onclick="x_admin_show('添加订单','{:url('Records/addrecord',array('reid' => $vo.id))}',1000,600)" href="javascript:;">
+                <a title="订单"  onclick="x_admin_show('添加订单','{:url('Records/add',array('reid' => $vo.id))}',1000,600)" href="javascript:;">
                     <button class="layui-btn layui-btn-sm layui-btn-primary">
                         <i class="layui-icon">&#xe63c;</i>
                     </button>
@@ -81,42 +81,38 @@
       </div>
     </div>
     <script>
-      layui.use('laydate', function(){
+    layui.use('laydate', function(){
         var laydate = layui.laydate;
-        //执行一个laydate实例
         laydate.render({
-          elem: '#start' //指定元素
+            elem: '#start' //指定元素
         });
-        //执行一个laydate实例
         laydate.render({
-          elem: '#end' //指定元素
+            elem: '#end' //指定元素
         });
-      });
-      /*用户-删除*/
-      function member_del(obj,id){
-          layer.confirm('确认要删除吗？',function(index){
-              //发异步删除数据
-              $.ajax({
-                  url:"{:url('Members/delete')}",
-                  type:'post',
-                  dataType:'json',
-                  data: {deleid: id},
-                  success:function(msg){
-                      if(msg.status == 1)
-                      {
-                          $(obj).parents("tr").remove();
-                          layer.msg('已删除!',{icon:1,time:1000});
-                      }else {
-                          layer.msg(msg.error+'禁止操作！', {icon: 1});
-                      }
-                  },
-              });
-
-          });
-      }
-      function changelogo()
-      {
-          $('#button').addClass('layui-btn-danger');
-          $('#logo').html('&#xe63d;');
-      }
+    });
+    /*用户-删除*/
+    function member_del(obj,id){
+        layer.confirm('确认要删除吗？',function(index){
+            //发异步删除数据
+            $.ajax({
+                url:"{:url('Members/delete')}",
+                type:'post',
+                dataType:'json',
+                data: {kid: id},
+                success:function(msg){
+                    if(msg.status == 1)
+                    {
+                        $(obj).parents("tr").remove();
+                        layer.msg('已删除!',{icon:1,time:1000});
+                    }else {
+                        layer.msg(msg.error+'禁止操作！', {icon: 1});
+                    }
+                },
+            });
+        });
+    }
+    function changelogo(){
+        $('#button').addClass('layui-btn-danger');
+        $('#logo').html('&#xe63d;');
+    }
   </script>

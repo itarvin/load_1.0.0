@@ -25,7 +25,7 @@ class Login extends Base
             $agent = Request::header('User-Agent');
             if(isset($input['verify']) && !captcha_check($input['verify'] ))
             {
-                return buildReturn(['status' => ReturnCode::SUCCESS, 'info' => '验证码错误！']);
+                return buildReturn(['status' => ReturnCode::ERROR, 'info' => '验证码错误！']);
             }
             $rule = [
                 //管理员登陆字段验证
@@ -144,9 +144,9 @@ class Login extends Base
     {
         $config = [
             // 验证码字体大小
-            'fontSize'    =>   20,
+            'fontSize'    =>   12,
             // 验证码位数
-            'length'      =>   4,
+            'length'      =>   3,
             // 关闭验证码杂点
             'useNoise'    =>   false,
         ];
