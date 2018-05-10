@@ -1,7 +1,7 @@
 <?php
 namespace app\admin\controller;
 /**
- * 网站配置表
+ * 应用场景：网站配置表
  * @author  itarvin itarvin@163.com
  */
 use app\model\Setting;
@@ -11,7 +11,7 @@ use app\Util\Tools;
 class Settings extends Base
 {
     /**
-     * 配置主页
+     * 应用场景：配置主页
      * @return array
      */
     public function index()
@@ -29,7 +29,7 @@ class Settings extends Base
 
 
     /**
-     * 配置添加
+     * 应用场景：配置添加
      * @return array
      */
     public function add()
@@ -47,7 +47,7 @@ class Settings extends Base
 
 
     /**
-     * 配置添加
+     * 应用场景：配置添加
      * @return array
      */
     public function edit()
@@ -69,7 +69,7 @@ class Settings extends Base
     }
 
     /**
-    * 删除配置
+    * 应用场景：删除配置
     * @return json
     */
     public function delete()
@@ -112,7 +112,7 @@ class Settings extends Base
                 $data[$k]['sort_num'] = $v;
             }
             foreach($data as $v){
-                
+
                 $model->where('id', $v['id'])->update($v);
             }
             return buildReturn(['status' =>ReturnCode::SUCCESS,'info' => Tools::errorCode(ReturnCode::SUCCESS)]);

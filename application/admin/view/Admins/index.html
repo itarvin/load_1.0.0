@@ -37,6 +37,7 @@
             <th>登录名</th>
             <th>手　机</th>
             <th>微　信</th>
+            <th>Q　Q</th>
             <th>角　色</th>
             <th><div class="layui-input-inline">
                 <select name="hitcount" onchange="changehit()" id="change">
@@ -57,8 +58,9 @@
               <tr {if $vo['isow'] == '1'} class="dimission" {/if}>
                 <td>{$vo.id}</td>
                 <td>{$vo.users}</td>
-                <td>{$vo.phone}</td>
+                <td><i class="iconfont">&#xe725;</i>{$vo.phone}</td>
                 <td>{$vo.weixin}</td>
+                <td><i class="iconfont">&#xe6f7;</i><a title="点击发起会话" style="color:green;" href="http://wpa.qq.com/msgrd?v=3&uin={$vo.qq1}&site=qq&menu=yes">{$vo.qq1}</a></td>
                 <td>{$vo.role_name}</td>
                 <th><span id="hit_{$vo.id}" style="font-size:20px;color:green;"></span></th>
                 <td class="td-status">

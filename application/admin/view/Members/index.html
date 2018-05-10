@@ -47,7 +47,9 @@
             <th>QQ</th>
             <th>谁的客户</th>
             <th>加入时间</th>
+            {if !checksuperman($uid)}
             <th>操作</th>
+            {/if}
         </tr>
         </thead>
         <tbody>
@@ -59,10 +61,11 @@
             <td>{$vo.id}</td>
             <td>{$vo.username}</td>
             <td>{$vo.weixin}</td>
-            <td>{$vo.phone}</td>
-            <td>{$vo.qq}</td>
+            <td><i class="iconfont">&#xe725;</i>{$vo.phone}</td>
+            <td><i class="iconfont">&#xe6f7;</i><a title="点击发起会话" style="color:green;" href="http://wpa.qq.com/msgrd?v=3&uin={$vo.qq}&site=qq&menu=yes">{$vo.qq}</a></td>
             <td>{$vo.users}</td>
             <td>{$vo.newtime}</td>
+            {if !checksuperman($uid)}
             <td class="td-manage">
                 <a title="编辑"  onclick="x_admin_show('编辑','{:url('Members/edit',array('id' => $vo.id))}')" href="javascript:;">
                     <button class="layui-btn layui-btn-sm layui-btn-primary">
@@ -81,6 +84,7 @@
                   </button>
               </a>
             </td>
+            {/if}
           </tr>
         {/volist}
         </tbody>

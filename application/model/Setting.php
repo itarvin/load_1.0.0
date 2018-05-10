@@ -27,7 +27,11 @@ class Setting extends Model
     ];
 
 
-
+    /**
+     * 应用场景：新增，修改数据时的数据验证与处理
+     * @param string $data    所有数据
+     * @return array
+     */
     public function store($data)
     {
         $validate  = Validate::make($this->rule,$this->message);
@@ -52,7 +56,8 @@ class Setting extends Model
     }
 
     /**
-     * 主页显示搜索
+     * 应用场景：主页显示搜索
+     * @return array
      */
     public function search(){
         $data = $this->order('sort_num  desc')->select();
@@ -86,8 +91,11 @@ class Setting extends Model
         ];
     }
 
-
-    // 预处理删除
+    /**
+     * 应用场景：预处理删除
+     * @param int $id 主键id
+     * @return array
+     */
     public function del($id){
         $result = $this->where('id',$id)->delete();
         if($result){

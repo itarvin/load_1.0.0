@@ -1,7 +1,7 @@
 <?php
 namespace app\admin\controller;
 /**
- * 角色类
+ * 应用场景：角色类
  * @author  itarvin itarvin@163.com
  */
 use app\model\Role;
@@ -13,7 +13,7 @@ use app\Util\Tools;
 class Roles extends Base
 {
     /**
-     * 角色主页
+     * 应用场景：角色主页
      * @return array
      */
     public function index()
@@ -35,7 +35,7 @@ class Roles extends Base
 
 
     /**
-     * 角色添加
+     * 应用场景：角色添加
      * @return array
      */
     public function add()
@@ -61,7 +61,7 @@ class Roles extends Base
 
 
     /**
-     * 角色更新
+     * 应用场景：角色更新
      * @return array
      */
     public function edit()
@@ -100,7 +100,7 @@ class Roles extends Base
 
 
     /**
-     * 修改角色状态
+     * 应用场景：修改角色状态
      * @return array
      */
     public function changeStatus()
@@ -156,7 +156,7 @@ class Roles extends Base
             $id = Request::param('rid', '', 'strip_tags');
 
             $model = new Role;
-            
+
             $result = $model->del($id);
 
             return buildReturn(['status' => $result['code'], 'info'=> $result['msg']]);

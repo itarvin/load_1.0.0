@@ -1,7 +1,7 @@
 <?php
 namespace app\admin\controller;
 /**
- * 订单记录类
+ * 应用场景：订单记录类
  * @author  itarvin itarvin@163.com
  */
 use app\model\Member;
@@ -12,61 +12,28 @@ use think\facade\Request;
 class Records extends Base
 {
     /**
-     * 主页
+     * 应用场景：主页
      * @return array
      */
     public function index()
     {
         $record = new Record;
-
-        $uid = $this->uid;
-
-        $where = [];
-
-        // 默认取出当天范围内的客户
-        $where[] = ['a.newtime', 'between', [date('Y-m-d', time()), date('Y-m-d H:i:s', time())]];
+        $result = $record->search('', 'false', $this->uid);
         // 处理查询
         if(request()->isPost()){
-            // 重新处理条件
-            $where = [];
-            // 检测是否是超管
-            if($this->superman != 'yes'){
-                $where[] = ['a.uid', 'eq', $this->uid];
-            }
-            $start = Request::param('start', '', 'trim');
-            $end = Request::param('end', '', 'trim');
-            $keyword = Request::param('keyword', '', 'trim');
-            //check time
-            if ($start && $end) {
-                $where[] = ['a.newtime', 'between', [$start, $end]];
-            }elseif($start){
-                $where[] = ['a.newtime', 'GT', $start];
-            }elseif ($end) {
-                $where[] = ['a.newtime', 'LT', $end];
-            }
-            //  check keyword
-            if (!empty($keyword)) {
-                $where[] = ['a.product|a.price',  'LIKE',  "%$keyword%"];
-            }
+            $result = $record->search(Request::param(), 'true', $this->uid);
         }
-        $list = $record->alias('a')
-        ->field('a.*, b.username, c.users')
-        ->join('member b', 'b.id = a.khid')
-        ->join('admin c', 'c.id = a.uid')
-        ->where($where)
-        ->order('id desc')->paginate();
-        $count = $list->total();
         $this->assign([
-            'list'  => $list,
-            'count' => $count,
-            'uid'   => $uid
+            'list'  => $result['list'],
+            'count' => $result['count'],
+            'uid'   => $this->uid
         ]);
         return $this->fetch('Records/index');
     }
 
 
     /**
-     * 添加消费页
+     * 应用场景：添加消费页
      * @return array
      */
     public function add()
@@ -114,7 +81,7 @@ class Records extends Base
 
 
     /**
-     * 删除订单
+     * 应用场景：删除订单
      * @return json
      */
     public function delete()
@@ -128,9 +95,10 @@ class Records extends Base
                 return buildReturn(['status' => ReturnCode::ERROR,'info'=> '当前订单您不能操作！']);
             }else {
                 writelog($id, Tools::logactKey('buy_delete'), $this->uid);
-                $re = $record->where('id', $id)->delete();
-                if($re){
+                if($record->where('id', $id)->delete()){
                     return buildReturn(['status' => ReturnCode::SUCCESS,'info'=> Tools::errorCode(ReturnCode::SUCCESS)]);
+                }else {
+                    return buildReturn(['status' => ReturnCode::ERROR,'info'=> Tools::errorCode(ReturnCode::ERROR)]);
                 }
             }
         }

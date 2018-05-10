@@ -55,8 +55,8 @@
             <td>{$vo.id}</td>
             <td>{$vo.username}</td>
             <td>{$vo.weixin}</td>
-            <td>{$vo.phone}</td>
-            <td>{$vo.qq}</td>
+            <td><i class="iconfont">&#xe725;</i>{$vo.phone}</td>
+            <td><i class="iconfont">&#xe6f7;</i><a title="点击发起会话" style="color:green;" href="http://wpa.qq.com/msgrd?v=3&uin={$vo.qq}&site=qq&menu=yes">{$vo.qq}</a></td>
             <td>{$vo.newtime}</td>
             <td class="td-manage">
                 <a title="订单"  onclick="x_admin_show('添加订单','{:url('Records/add',array('reid' => $vo.id))}',1000,600)" href="javascript:;">

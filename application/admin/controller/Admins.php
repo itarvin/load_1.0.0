@@ -1,7 +1,7 @@
 <?php
 namespace app\admin\controller;
 /**
- * 后台用户类
+ * 应用场景：后台用户类
  * @author  itarvin itarvin@163.com
  */
 use app\model\Admin;
@@ -14,7 +14,7 @@ class Admins extends Base
 {
 
     /**
-     * 主页
+     * 应用场景：主页
      * @return array
      */
     public function index()
@@ -33,7 +33,7 @@ class Admins extends Base
     }
 
     /**
-     * 新增
+     * 应用场景：新增
      * @return json
      */
     public function add()
@@ -58,7 +58,7 @@ class Admins extends Base
     }
 
     /**
-     * 更新页
+     * 应用场景：更新页
      */
     public function edit()
     {
@@ -74,7 +74,7 @@ class Admins extends Base
         $roleData = $roleModel->field('id,role_name')->where('role_status','0')->select();
         $roleId = $arModel->field('GROUP_CONCAT(role_id) role_id')
         ->where('admin_id', 'eq', $id)->find();
-        
+
         $exist = explode(",", $roleId['role_id']);
 
         if( request()->isPost()){
@@ -99,7 +99,7 @@ class Admins extends Base
 
 
     /**
-     * 销售的客户页
+     * 应用场景：销售的客户页
      * @return array
      */
     public function custom()
@@ -129,7 +129,7 @@ class Admins extends Base
 
 
     /**
-     * 离职
+     * 应用场景：离职
      * @return json
      */
     public function dimission()
@@ -154,7 +154,7 @@ class Admins extends Base
 
 
     /**
-     * 修改状态
+     * 应用场景：修改状态
      * @return json
      */
     public function status()
@@ -182,7 +182,7 @@ class Admins extends Base
 
 
     /**
-     * 获取点击数
+     * 应用场景：获取点击数
      * @return json
      */
     public function getHit()

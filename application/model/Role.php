@@ -27,7 +27,7 @@ class Role extends Model
     ];
 
     /**
-     * 新增，修改数据时的数据验证与处理
+     * 应用场景：新增，修改数据时的数据验证与处理
      * @param string $data    所有数据
      * @return array
      */
@@ -79,8 +79,8 @@ class Role extends Model
 
 
     /**
-     * 自定义搜索信息
-     * @param kid,uid
+     * 应用场景：自定义搜索信息
+     * @param array $data 提价的数据集
      * @return array
      */
      public function search($data = ''){
@@ -96,7 +96,7 @@ class Role extends Model
          if($role_name != ''){
              $where[] = ['a.role_name', 'LIKE' ,"%$role_name%"];
          }
-         // $list = $this->select();
+
          $list = $this->alias('a')
          ->field('a.*,GROUP_CONCAT(c.pri_name) pri_name')
          ->join('role_pri b','a.id = b.role_id')
@@ -104,7 +104,6 @@ class Role extends Model
          ->group('a.id')
          ->where($where)->select();
 
-         // var_dump($list);die;
          $count = $list->count();
 
          return $retult = [
@@ -113,7 +112,11 @@ class Role extends Model
          ];
      }
 
-     // 预处理删除
+     /**
+      * 应用场景：预处理删除
+      * @param int $id 主键id
+      * @return array
+      */
      public function del($id){
          // 删除角色携带的权限
          Rolepri::where('role_id', $id)->delete();

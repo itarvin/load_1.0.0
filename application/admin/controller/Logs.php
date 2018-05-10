@@ -1,7 +1,7 @@
 <?php
 namespace app\admin\controller;
 /**
- * 日志处理类
+ * 应用场景：日志处理类
  * @author  itarvin itarvin@163.com
  */
 use app\model\Log;
@@ -12,7 +12,7 @@ use app\Util\ReturnCode;
 class Logs extends Base
 {
     /**
-     * 主页显示
+     * 应用场景：主页显示
      */
     public function index()
     {
@@ -38,7 +38,7 @@ class Logs extends Base
 
 
     /**
-     * 提取详细信息
+     * 应用场景：提取详细信息
      * @return json
      */
     public function extractDetail()

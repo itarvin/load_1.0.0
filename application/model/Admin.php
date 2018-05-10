@@ -23,6 +23,7 @@ class Admin extends Model
         'qq3|QQ3'          => 'number|length:6,10',
         'qq4|QQ4'          => 'number|length:6,10',
     ];
+
     protected $message  =   [
         'users.min'                                 => '用户名最少2个字符',
         'phone.number'                              => '手机号必须是数字',
@@ -40,6 +41,11 @@ class Admin extends Model
         'weixin./^[a-zA-Z]{1}[-_a-zA-Z0-9]{5,19}+$/'=> '请输入正确的微信号',
     ];
 
+    /**
+     * 应用场景：新增，修改数据时的数据验证与处理
+     * @param string $data    所有数据
+     * @return array
+     */
     public function store($data)
     {
         $validate  = Validate::make($this->rule,$this->message);
@@ -47,35 +53,45 @@ class Admin extends Model
         if(!$result) {
             return ['code' => ReturnCode::ERROR,'msg' => $validate->getError()];
         }
-        $data = Request::only(['id','users','qq1','qq2','qq3','qq4','pwd','weixin','status','isow','gender']);
+        $data = Request::only(['id','users','qq1','qq2','qq3','qq4','pwd','weixin','status','isow','gender','qq1name','qq2name','qq3name','qq4name','wxname']);
+
         $role_id = Request::only(['role_id']);
+
         if(isset($data['id'])){
+
             $preview = $this->where(array('users'=>$data['users']))->find();
+
             if( $data['pwd'] != $preview['pwd'] && $data['pwd'] != ''){
+
     	        $data['pwd'] = $data['pwd'];
     	    }else{
     	    	unset($data['pwd']);
     	    }
             if($this->update($data)){
+
                 // 删除当前id所存在的权限
                 Adminrole::where('admin_id',$data['id'])->delete();
+
                 // 根据关联表的关系，还需对角色权限表进行赋值
-        		foreach ($role_id['role_id'] as $k => $v)
-        		{
+        		foreach ($role_id['role_id'] as $k => $v){
+
         			Adminrole::create([
         				'role_id' => $v,
         				'admin_id' => $data['id'],
         			]);
         		}
+
                 return ['code' => ReturnCode::SUCCESS,'msg' => Tools::errorCode(ReturnCode::SUCCESS)];
             }else {
+
                 return ['code' => ReturnCode::ERROR,'msg' => Tools::errorCode(ReturnCode::ERROR)];
             }
         }else{
             if($lastid = $this->insertGetId($data)){
+
                 // 根据关联表的关系，还需对角色权限表进行赋值
-        		foreach($role_id['role_id'] as $k => $v)
-        		{
+        		foreach($role_id['role_id'] as $k => $v){
+
         			Rolepri::create([
         				'role_id' => $v,
         				'admin_id' => $lastid
@@ -88,7 +104,53 @@ class Admin extends Model
         }
     }
 
+    /**
+     * 应用场景：api修改数据时的数据验证与处理
+     * @param string $data    所有数据
+     * @return array
+     */
+    public function apiStore($data)
+    {
+        $validate  = Validate::make($this->rule,$this->message);
+        $result = $validate->check($data);
+        if(!$result) {
+            return ['code' => ReturnCode::ERROR,'msg' => $validate->getError()];
+        }
+        $data = Request::only(['id','users','qq1','qq2','qq3','qq4','pwd','weixin','status','isow','gender','qq1name','qq2name','qq3name','qq4name','wxname','bg']);
 
+        $preview = $this->where(array('users'=>$data['users']))->find();
+        $pwd = isset($data['pwd']) ? $data['pwd'] : '';
+        if( $pwd != $preview['pwd'] && $pwd != ''){
+
+            $data['pwd'] = $data['pwd'];
+        }else if(isset($data['pwd'])){
+
+            unset($data['pwd']);
+        }
+
+        $bg = Tool::upload('bg', 'admin/Bg',$data['id']);
+
+        $qrcode = Tool::upload('qrcode', 'admin/Qrcode',$data['id']);
+
+        $data['bg'] = $bg['code'] == '1' ? $bg['msg'] : '';
+
+        if(!isset($data['id'])){
+            return ['code' => ReturnCode::LACKOFPARAM,'msg' => Tools::errorCode(ReturnCode::LACKOFPARAM)];
+        }
+        if($this->update($data)){
+
+            return ['code' => ReturnCode::SUCCESS,'msg' => Tools::errorCode(ReturnCode::SUCCESS)];
+        }else {
+
+            return ['code' => ReturnCode::ERROR,'msg' => Tools::errorCode(ReturnCode::ERROR)];
+        }
+    }
+
+    /**
+     * 应用场景：搜索
+     * @param array $data 提交数据集
+     * @return array
+     */
     public function search($data = '')
     {
         $where = [];
@@ -107,10 +169,11 @@ class Admin extends Model
             $where[] = ['a.users', 'LIKE', $users];
         }
         $list = $this->alias('a')
-        ->field('a.users,a.isow,a.id,a.phone,a.weixin,a.chuqin,b.role_name')
+        ->field('a.users,a.isow,a.id,a.phone,a.weixin,a.chuqin,a.qq1,GROUP_CONCAT(b.role_name) role_name')
         ->join('admin_role c', 'c.admin_id = a.id')
         ->join('role b', 'c.role_id = b.id')
         ->order('a.isow asc')
+        ->group('a.id')
         ->where($where)
         ->select();
         $count = $list->count();
@@ -120,8 +183,11 @@ class Admin extends Model
         ];
     }
 
-
-
+    /**
+     * 应用场景：客户页处理
+     * @param array $data 提交数据集
+     * @return array
+     */
     public function custom($data = '')
     {
         // 预定义type 数组
@@ -164,7 +230,11 @@ class Admin extends Model
         ];
     }
 
-
+    /**
+     * 应用场景：获取点击数据
+     * @param array $data 提交数据集
+     * @return array
+     */
     public function getHitData($date)
     {
         $userIds = $this->field('id')->where('chuqin', 'eq', '1')->select();

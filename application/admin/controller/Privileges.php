@@ -1,7 +1,7 @@
 <?php
 namespace app\admin\controller;
 /**
- * 后台权限类
+ * 应用场景：后台权限类
  * @author  itarvin itarvin@163.com
  */
 use app\model\Privilege;
@@ -11,13 +11,13 @@ use app\Util\Tools;
 class Privileges extends Base
 {
     /**
-     * 权限主页
+     * 应用场景：权限主页
      * @return array
      */
     public function index()
     {
         $model = new Privilege;
-        
+
         $list = $model->getTree();
 
         $count = $model->count();
@@ -30,8 +30,8 @@ class Privileges extends Base
     }
 
 
-    /**
-    * 权限添加
+   /**
+    * 应用场景：权限添加
     * @return json
     */
     public function add()
@@ -52,8 +52,8 @@ class Privileges extends Base
     }
 
 
-    /**
-    * 权限修改
+   /**
+    * 应用场景：权限修改
     * @return json
     */
     public function edit()
@@ -79,8 +79,8 @@ class Privileges extends Base
     }
 
 
-    /**
-    * 删除权限
+   /**
+    * 应用场景：删除权限
     */
     public function delete()
     {

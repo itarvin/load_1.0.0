@@ -28,7 +28,7 @@ class Member extends Model
     ];
 
     /**
-     * 新增，修改数据时的数据验证与处理，日志添加
+     * 应用场景：新增，修改数据时的数据验证与处理，日志添加
      * @param string $data    所有数据
      * @return array
      */
@@ -36,9 +36,9 @@ class Member extends Model
     {
         // 先检测当前数据是否存在其他行列
         $id = isset($data['id']) ? $data['id'] : '';
-        // echo 'stert'.date('Y-m-d H:i:s',time());
+
         $result = $this->checkValue($data, $id);
-        // echo 'end'.date('Y-m-d H:i:s',time());die;
+
         if($result){
             if($result['uid'] == $data['uid']){
                 $info = '已被你登记存在';
@@ -87,7 +87,7 @@ class Member extends Model
     }
 
     /**
-     * 检测是否QQ，phone，weixin其余列是否存在当前值
+     * 应用场景：检测是否QQ，phone，weixin其余列是否存在当前值
      * @param string $value    所有数据
      * @param int $id   更新数据时的id
      * @return array
@@ -110,7 +110,7 @@ class Member extends Model
     }
 
     /**
-     * 深度查询
+     * 应用场景：深度查询
      * @param string $value    精准字段
      * @param array $key       索引数组
      * @param id $id           更新id
@@ -154,7 +154,7 @@ class Member extends Model
 
 
     /**
-     * 自定义软删除
+     * 应用场景：自定义软删除
      * @param kid,uid
      * @return json
      */
@@ -178,7 +178,7 @@ class Member extends Model
 
 
     /**
-     * API自定义搜索信息
+     * 应用场景：API自定义搜索信息
      * @param kid,uid
      * @return array
      */
@@ -218,16 +218,22 @@ class Member extends Model
          ];
      }
 
-     // 未登录查询
+     /**
+      * 未登录查询
+      * @param string $value 关键字
+      * @return array
+      */
      public function publicSearch($value)
      {
          $where = [];
          if($value && is_numeric($value)){
+
              $where[] = ['a.phone|a.weixin|a.qq', 'eq', $value];
              $result = $this->alias('a')
              ->field('b.users,b.qq1')
              ->join('admin b','a.uid = b.id')
              ->where($where)->find();
+
              if($result != null){
                  return ['code' => ReturnCode::SUCCESS, 'msg' => Tools::errorCode(ReturnCode::SUCCESS), 'data' => $result];
              }else {
@@ -240,19 +246,21 @@ class Member extends Model
 
      /**
       * 后台自定义搜索信息
-      * @param $data,$isPost
+      * @param array $data 数据集
+      * @param Boolean $isPost 是否post提交
+      * @param int $uid 用户id标识
+      * @param Boolean $isdelete 是否删除
       * @return array
       */
      public function adminSearch($data = '', $isPost = 'false', $uid, $isdelete = 'false')
      {
          // 预定义type 数组
          $checktype = array('qq', 'phone', 'weixin');
-
          $where = [];
-
          // 默认取出当天范围内的客户
          // $where[] = ['newtime', 'between', [date('Y-m-d', time()), date('Y-m-d H:i:s', time())]];
          if($isPost  = 'true'){
+
              $where = [];
              // 接收参数
              $start = isset($data['start']) ? $data['start'] : '';

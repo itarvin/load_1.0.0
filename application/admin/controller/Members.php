@@ -1,7 +1,7 @@
 <?php
 namespace app\admin\controller;
 /**
- * 后台客户处理类
+ * 应用场景：后台客户处理类
  * @author  itarvin itarvin@163.com
  */
 use app\model\Member;
@@ -15,7 +15,7 @@ class Members extends Base
 {
 
     /**
-     * 主页显示
+     * 应用场景：主页显示
      * 获取当前管理员的客户会员
      */
     public function index()
@@ -35,14 +35,14 @@ class Members extends Base
     }
 
     /**
-     * 添加操作
+     * 应用场景：添加操作
      */
     public function add(){
         return $this->fetch('Members/add');
     }
 
     /**
-     * 修改静态页
+     * 应用场景：修改静态页
      */
     public function edit()
     {
@@ -51,7 +51,7 @@ class Members extends Base
         $consumer = new Member;
         $data = $consumer->find($id);
 
-        if($this->uid != 1 && $data['uid'] != $this->uid){
+        if($data['uid'] != $this->uid){
             $this->error('对不起，非法访问！');
         }
 
@@ -209,8 +209,6 @@ class Members extends Base
 
             $field = getconf('upload_field');
 
-            Cache::set('scv_field', $field);
-
             $data = Tools::fieldMapped($field);
 
             ini_set("max_execution_time",  "3600");
@@ -267,7 +265,7 @@ class Members extends Base
 
             $file = request()->file('file');
 
-            $fields = Cache::get('scv_field') ? Cache::get('scv_field') : getconf('upload_field');
+            $fields = explode(",", str_replace("，",",",getconf('upload_field')));
 
             $maxItem = getconf('maxItem');
 
@@ -328,10 +326,8 @@ class Members extends Base
                 $ph = [];
                 $wx = [];
                 // 根据字段拼接其键
-                foreach($file as $k => $v) {
-
+                foreach($file as $k => $v){
                     foreach($fields as $k1 => $v1) {
-
                         $data[$k][$v1] = $v[$k1] ? Tools::convertStrType($v[$k1], 'TOSBC') : '';
 
                         if($v1 == 'qq'){
@@ -465,7 +461,7 @@ class Members extends Base
 
             $filename = Cache::get('scv_'.$this->uid);
 
-            $fields = Cache::get('scv_field') ? Cache::get('scv_field') : getconf('upload_field');
+            $fields = explode(",", str_replace("，",",",getconf('upload_field')));
 
             $line = count(file($way.'/'.$filename));
 

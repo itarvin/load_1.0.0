@@ -6,6 +6,12 @@ class Log extends Model
 {
     protected $table='logs';
 
+    /**
+     * 应用场景：获取日志信息
+     * @param array $data 提交数据集
+     * @param Boolean $isSearch 是否搜索
+     * @return array
+     */
     public function search($data = '', $isSearch = 'false')
     {
         $where = [];

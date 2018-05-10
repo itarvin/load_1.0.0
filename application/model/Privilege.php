@@ -32,7 +32,7 @@ class Privilege extends Model
 
 
     /**
-     * 新增，修改数据时的数据验证与处理
+     * 应用场景：新增，修改数据时的数据验证与处理
      * @param string $data    所有数据
      * @return array
      */
@@ -45,7 +45,6 @@ class Privilege extends Model
         $result = $validate->check($data);
         // 过滤post数组中的非数据表字段数据
         $data = Request::only(['id','pri_name','module_name','controller_name','action_name','parent_id','ico']);
-        // var_dump($data);die;
         if(!$result) {
             return ['code' => ReturnCode::ERROR,'msg' => $validate->getError()];
         }
@@ -64,7 +63,11 @@ class Privilege extends Model
         }
     }
 
-    // 预处理删除
+    /**
+     * 应用场景：预处理删除
+     * @param int $id 主键id
+     * @return array
+     */
     public function del($id){
         $result = $this->getChildren($id);
         if($result){

@@ -7,14 +7,14 @@
     </div>
     <ul class="layui-nav right" lay-filter="">
         <li class="layui-nav-item">
-            <a href="javascript:;">{$name}</a>
+            <a href="javascript:;">{$role_name}[ {$name} ]</a>
             <dl class="layui-nav-child"> <!-- 二级菜单 -->
-                <dd><a onclick="x_admin_show('个人信息','{:url('admin/edit',array('id'=> $uid))}')">个人信息</a></dd>
+                <dd><a onclick="x_admin_show('个人信息','{:url('Admins/edit',array('id'=> $uid))}')">个人信息</a></dd>
                 <dd><a href="{:url('Login/login')}">切换帐号</a></dd>
                 <dd><a href="{:url('Login/logout')}">退出</a></dd>
             </dl>
         </li>
-        <li class="layui-nav-item to-index"><a href="/">前台首页</a></li>
+        <li class="layui-nav-item to-index"><a href="{:url('api/Index/index')}">前台首页</a></li>
     </ul>
 </div>
 <!-- 顶部结束 -->
@@ -54,7 +54,7 @@
         </ul>
         <div class="layui-tab-content">
             <div class="layui-tab-item layui-show">
-                <iframe src='{:url("Index/welcome")}' frameborder="0" scrolling="yes" class="x-iframe"></iframe>
+                <iframe src='{:url("admin/Index/welcome")}' frameborder="0" scrolling="yes" class="x-iframe"></iframe>
             </div>
         </div>
     </div>

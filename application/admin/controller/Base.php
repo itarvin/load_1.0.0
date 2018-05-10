@@ -1,7 +1,7 @@
 <?php
 namespace app\admin\controller;
 /**
- * app基类
+ * 应用场景：app基类
  * @since   2018/03/17 创建
  * @author  itarvin itarvin@163.com
  */
@@ -49,12 +49,13 @@ class Base extends Controller
 
         if(!$priModel->checkPri()){
             $this->error('你想要的操作对象！程序员小哥哥办不到！(╯﹏╰)');
+            exit;
         }
     }
 
 
     /**
-     * 空操作返回状态
+     * 应用场景：空操作返回状态
      * @return json
      */
     public function _empty($name)

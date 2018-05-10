@@ -53,7 +53,7 @@
             <td>{$vo.username}</td>
             <td>{$vo.weixin}</td>
             <td>{$vo.phone}</td>
-            <td>{$vo.qq}</td>
+            <td><i class="iconfont">&#xe6f7;</i><a title="点击发起会话" style="color:green;" href="http://wpa.qq.com/msgrd?v=3&uin={$vo.qq}&site=qq&menu=yes">{$vo.qq}</a></td>
             {if checksuperman($uid)}
             <td>{$vo.users}</td>
             {/if}

@@ -1,7 +1,7 @@
 <?php
 namespace app\admin\controller;
 /**
- * 后台登录类
+ * 应用场景：后台登录类
  * @author  itarvin itarvin@163.com
  */
 use think\Controller;
@@ -13,7 +13,7 @@ use think\facade\Request;
 class  Login extends controller
 {
     /**
-     * 登录静态页
+     * 应用场景：登录静态页
      */
     public function login()
     {
@@ -81,7 +81,7 @@ class  Login extends controller
     }
 
     /**
-     * 验证码输出
+     * 应用场景：验证码输出
      * @return img
      */
     public function verify()
@@ -99,7 +99,7 @@ class  Login extends controller
     }
 
     /**
-     * 退出
+     * 应用场景：退出
      */
     public function logout()
     {
@@ -110,7 +110,7 @@ class  Login extends controller
 
 
     /**
-     * 空操作返回状态
+     * 应用场景：空操作返回状态
      * @return json
      */
     public function _empty($name)

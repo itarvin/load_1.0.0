@@ -12,7 +12,11 @@ use think\Validate;
 use think\Controller;
 class Index extends Controller
 {
-    // 查询
+
+    /**
+     * 未登录查询
+     * @return json
+     */
     public function index()
     {
         if(request()->isPost()){

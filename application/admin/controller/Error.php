@@ -1,7 +1,7 @@
 <?php
 namespace app\admin\controller;
 /**
- * 空控制器
+ * 应用场景：空控制器
  * @author  itarvin itarvin@163.com
  * @return json
  */

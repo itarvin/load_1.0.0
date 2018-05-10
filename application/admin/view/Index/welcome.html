@@ -7,21 +7,47 @@
                     <thead>
                         <tr>
                             <th>统计</th>
-                            <th>资讯库</th>
-                            <th>图片库</th>
-                            <th>产品库</th>
-                            <th>用户</th>
-                            <th>管理员</th>
+                            <th>业绩</th>
+                            <th>订单</th>
+                            <th>客户</th>
+                            <th>销售</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
                             <td>总数</td>
-                            <td>92</td>
-                            <td>9</td>
-                            <td>0</td>
-                            <td>8</td>
-                            <td>20</td>
+                            <td><i class="iconfont">&#xe702;</i>{$all['mark']}</td>
+                            <td>{$all['record']}</td>
+                            <td>{$all['member']} [人]</td>
+                            <td>{$all['admin']} [人]</td>
+                        </tr>
+                        <tr>
+                            <td>今日</td>
+                            <td><i class="iconfont">&#xe702;</i>{$today['mark']}</td>
+                            <td>{$today['record']}</td>
+                            <td>{$today['member']} [人]</td>
+                            <td>{$today['admin']} [人]</td>
+                        </tr>
+                        <tr>
+                            <td>昨日</td>
+                            <td><i class="iconfont">&#xe702;</i>{$yesterday['mark']}</td>
+                            <td>{$yesterday['record']}</td>
+                            <td>{$yesterday['member']} [人]</td>
+                            <td>{$yesterday['admin']} [人]</td>
+                        </tr>
+                        <tr>
+                            <td>本周</td>
+                            <td><i class="iconfont">&#xe702;</i>{$week['mark']}</td>
+                            <td>{$week['record']}</td>
+                            <td>{$week['member']} [人]</td>
+                            <td>{$week['admin']} [人]</td>
+                        </tr>
+                        <tr>
+                            <td>本月</td>
+                            <td><i class="iconfont">&#xe702;</i>{$month['mark']}</td>
+                            <td>{$month['record']}</td>
+                            <td>{$month['member']} [人]</td>
+                            <td>{$month['admin']} [人]</td>
                         </tr>
                     </tbody>
                 </table>
@@ -34,7 +60,7 @@
                 <tbody>
                     <tr>
                         <th width="30%">服务器计算机名</th>
-                        <td><span id="lbServerName">{:php_uname()}</span></td>
+                        <td><span id="lbServerName">{:PHP_OS}</span></td>
                     </tr>
                     <tr>
                         <td>服务器IP地址</td>
@@ -46,7 +72,7 @@
                     </tr>
                     <tr>
                         <td>服务器操作系统 </td>
-                        <td>Microsoft Windows NT 5.2.3790 Service Pack 2</td>
+                        <td>{:php_uname()}</td>
                     </tr>
                     <tr>
                         <td>服务器的语言种类 </td>
@@ -61,7 +87,7 @@
                         <td>{$_SERVER['HTTP_USER_AGENT']}</td>
                     </tr>
                     <tr>
-                        <td>CPU </td>
+                        <td>服务器</td>
                         <td>{$_SERVER['SERVER_SOFTWARE']}</td>
                     </tr>
                     <tr>

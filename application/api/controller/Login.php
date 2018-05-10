@@ -129,8 +129,12 @@ class Login extends Base
     public function logout()
     {
         if($this->AuthPermission == '200'){
-            cookie('identity', null);
-            return buildReturn(['status' => ReturnCode::SUCCESS,'info'=>  Tools::errorCode(ReturnCode::SUCCESS)]);
+            if( request()->isPost()){
+                cookie('identity', null);
+                return buildReturn(['status' => ReturnCode::SUCCESS,'info'=>  Tools::errorCode(ReturnCode::SUCCESS)]);
+            }else {
+                return buildReturn(['status' => ReturnCode::LACKOFPARAM,'info'=>  Tools::errorCode(ReturnCode::LACKOFPARAM)]);
+            }
         }else {
             return $this->returnRes($this->AuthPermission, 'true');
         }
@@ -189,12 +193,5 @@ class Login extends Base
         // 拼装加密新字符串
         $token = $start.$uidStart.$uid.$uidEnd.$medium.$tokenEnd.$end;
         return $token;
-    }
-
-    // TEST
-    public function testmysql()
-    {
-        $list = Admin::select();
-        return json($list);
     }
 }

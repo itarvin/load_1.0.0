@@ -8,6 +8,40 @@
 namespace app\util;
 use app\model\Logact;
 class Tools {
+
+    /**
+    * 上传
+    * @return string
+    * @author iatrivn <iatrivn@163.com>
+    */
+    static public function upload($field = '', $upload_path, $filename)
+    {
+        // 上传配置
+        $config = [
+            'size' => 1024*1024*4,
+            'ext'  => 'jpg,gif,png,bmp,jpeg'
+        ];
+
+        $file = request()->file($field);
+        // 清除存在的文件
+        $existFile = ['jpg','gif','png','bmp','jpeg'];
+
+        if($file != null){
+            foreach($existFile as $k => $v){
+                $tmpFileName = $filename . $v;
+                unlink(config('upload_path') . $upload_path . '/'. $tmpFileName);
+            }
+
+            $info = $file->validate($config)->move(config('upload_path') . $upload_path,$filename);
+
+            if(!$info){
+                return json(['code' = '0','msg' => $file->getError()]);
+            }else {
+                return json(['code' = '1','msg' => $upload_path.'/'.$file->getSaveName()]);
+            }
+        }
+    }
+
      /**
      * 错误码对比
      * @return string

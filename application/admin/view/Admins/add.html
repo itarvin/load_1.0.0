@@ -5,10 +5,10 @@
                 <label for="phone" class="layui-form-label">
                     <span class="x-red">*</span>角　色
                 </label>
-                <div class="layui-input-inline">
+                <div class="layui-input-block">
                 {volist name="roleData" id="vo"}
 					<input type="checkbox" name="role_id[{$vo.id}]" value="{$vo.id}" id="role_{$vo.id}"/>
-					<label for="role_{$vo.id}">{$vo.role_name}　</label>
+					<label for="role_{$vo.id}">{$vo.role_name}</label>
                 {/volist}
                 </div>
             </div>
