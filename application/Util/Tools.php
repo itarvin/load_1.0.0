@@ -29,15 +29,17 @@ class Tools {
         if($file != null){
             foreach($existFile as $k => $v){
                 $tmpFileName = $filename . $v;
-                unlink(config('upload_path') . $upload_path . '/'. $tmpFileName);
+                if(file_exists(config('upload_path') . $upload_path . '/'. $tmpFileName)){
+                    unlink(config('upload_path') . $upload_path . '/'. $tmpFileName);
+                }
             }
 
             $info = $file->validate($config)->move(config('upload_path') . $upload_path,$filename);
 
             if(!$info){
-                return json(['code' = '0','msg' => $file->getError()]);
+                return ['code' => '0','msg' => $file->getError()];
             }else {
-                return json(['code' = '1','msg' => $upload_path.'/'.$file->getSaveName()]);
+                return ['code' => '1','msg' => $upload_path.'/'.$file->getSaveName()];
             }
         }
     }
@@ -233,5 +235,52 @@ class Tools {
     {
         $array = array('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z');
         return $array;
+    }
+
+
+    function htmldecode($str)
+    {
+        if(empty($str))
+            return;
+        if($str=="")
+            return $str;
+
+        //以下是过滤特殊字符串
+        $str = str_replace("&", " ", $str);
+        $str = str_replace(">", " ", $str);
+        $str = str_replace("<", " ", $str);
+        $str = str_replace("chr(32)", " ", $str);
+        $str = str_replace("chr(9)", " ", $str);
+        $str = str_replace("chr(34)", " ", $str);
+        $str = str_replace("\"", " ", $str);
+        $str = str_replace("chr(39)", " ", $str);
+        $str = str_replace("", " ", $str);
+        $str = str_replace("'", " ", $str);
+        $str = str_replace("select", " ", $str);
+        $str = str_replace("join", " ", $str);
+        $str = str_replace("union", " ", $str);
+        $str = str_replace("where", " ", $str);
+        $str = str_replace("insert", " ", $str);
+        $str = str_replace("delete", " ", $str);
+        $str = str_replace("update", " ", $str);
+        $str = str_replace("like", " ", $str);
+        $str = str_replace("drop", " ", $str);
+        $str = str_replace("create", " ", $str);
+        $str = str_replace("modify", " ", $str);
+        $str = str_replace("rename", " ", $str);
+        $str = str_replace("alter", " ", $str);
+        $str = str_replace("cas", " ", $str);
+        $str = str_replace("replace", " ", $str);
+        $str = str_replace("%", " ", $str);
+        $str = str_replace("or", " ", $str);
+        $str = str_replace("and", " ", $str);
+        $str = str_replace("!", " ", $str);
+        $str = str_replace("xor", " ", $str);
+        $str = str_replace("not", " ", $str);
+        $str = str_replace("user", " ", $str);
+        $str = str_replace("||", " ", $str);
+        $str = str_replace("<", " ", $str);
+        $str = str_replace(">", " ", $str);
+        return $str;
     }
 }

@@ -20,14 +20,17 @@ class Admins extends Base
     {
         if($this->AuthPermission == '200'){
             if( request()->isPost()){
+
                 $admin = new Admin;
                 $result = $admin->apiStore(Request::param());
+
                 return buildReturn(['status' => $result['code'],'info'=> $result['msg']]);
             }else {
 
                 return buildReturn(['status' => ReturnCode::LACKOFPARAM,'info'=>  Tools::errorCode(ReturnCode::LACKOFPARAM)]);
             }
         }else {
+            
             return $this->returnRes($this->AuthPermission, 'true');
         }
     }

@@ -49,8 +49,11 @@ class Admin extends Model
     public function store($data)
     {
         $validate  = Validate::make($this->rule,$this->message);
+
         $result = $validate->check($data);
+
         if(!$result) {
+
             return ['code' => ReturnCode::ERROR,'msg' => $validate->getError()];
         }
         $data = Request::only(['id','users','qq1','qq2','qq3','qq4','pwd','weixin','status','isow','gender','qq1name','qq2name','qq3name','qq4name','wxname']);
@@ -112,14 +115,19 @@ class Admin extends Model
     public function apiStore($data)
     {
         $validate  = Validate::make($this->rule,$this->message);
+
         $result = $validate->check($data);
+
         if(!$result) {
+
             return ['code' => ReturnCode::ERROR,'msg' => $validate->getError()];
         }
         $data = Request::only(['id','users','qq1','qq2','qq3','qq4','pwd','weixin','status','isow','gender','qq1name','qq2name','qq3name','qq4name','wxname','bg']);
 
         $preview = $this->where(array('users'=>$data['users']))->find();
+
         $pwd = isset($data['pwd']) ? $data['pwd'] : '';
+
         if( $pwd != $preview['pwd'] && $pwd != ''){
 
             $data['pwd'] = $data['pwd'];
@@ -128,13 +136,14 @@ class Admin extends Model
             unset($data['pwd']);
         }
 
-        $bg = Tool::upload('bg', 'admin/Bg',$data['id']);
+        $bg = Tools::upload('bg', '/admin/Bg',$data['id']);
 
-        $qrcode = Tool::upload('qrcode', 'admin/Qrcode',$data['id']);
+        $qrcode = Tools::upload('qrcode', '/admin/Qrcode',$data['id']);
 
         $data['bg'] = $bg['code'] == '1' ? $bg['msg'] : '';
 
         if(!isset($data['id'])){
+
             return ['code' => ReturnCode::LACKOFPARAM,'msg' => Tools::errorCode(ReturnCode::LACKOFPARAM)];
         }
         if($this->update($data)){
@@ -157,6 +166,7 @@ class Admin extends Model
         $start = isset($data['start']) ? $data['start'] : '';
         $end  = isset($data['end ']) ? $data['end '] : '';
         $users = isset($data['users']) ? $data['users'] : '';
+
         //check time
         if ($start && $end) {
             $where[] = ['a.newtime', 'between', [$start, $end]];
@@ -168,6 +178,7 @@ class Admin extends Model
         if (!empty($users)) {
             $where[] = ['a.users', 'LIKE', $users];
         }
+
         $list = $this->alias('a')
         ->field('a.users,a.isow,a.id,a.phone,a.weixin,a.chuqin,a.qq1,GROUP_CONCAT(b.role_name) role_name')
         ->join('admin_role c', 'c.admin_id = a.id')
@@ -176,7 +187,9 @@ class Admin extends Model
         ->group('a.id')
         ->where($where)
         ->select();
+
         $count = $list->count();
+
         return $result = [
             'list' => $list,
             'count'=> $count
@@ -194,11 +207,13 @@ class Admin extends Model
         $checktype = array('qq, phone, weixin');
         $member = new Member;
         $where = [];
+
         $start = isset($data['start']) ? $data['start'] : '';
         $end  = isset($data['end ']) ? $data['end '] : '';
         $type = isset($data['type']) ? $data['type'] : '';
         $keyword = isset($data['keyword']) ? $data['keyword'] : '';
         $uid  = isset($data['uid']) ? $data['uid'] : '';
+
         //check time
         if ($start && $end) {
             $where[] = ['newtime', 'between', [$start, $end]];
@@ -209,20 +224,27 @@ class Admin extends Model
         }
         // check type
         if (!empty($keyword)) {
+
             if( $type && in_array($type, $checktype)){
+
                 $where[] = [$type,  'EQ',  $keyword];
             }else{
+
                 $where[] = ['qq|phone|weixin',  'EQ',  $keyword];
             }
         }
         if($uid != ''){
+
             if(!checksuperman($uid)){
+
                 $where[] = ['uid', 'EQ', $uid];
             }
         }
         $list = $member->where($where)->order('id desc')->paginate();
+
         $page = $list->render();
         $count = $list->total();
+
         return $result = [
             'list'  => $list,
             'count' => $count,
@@ -238,40 +260,50 @@ class Admin extends Model
     public function getHitData($date)
     {
         $userIds = $this->field('id')->where('chuqin', 'eq', '1')->select();
+
         $where = [];
         $end = date('Y-m-d H:i:s', time());
+
         switch ($date) {
             case 'today':
                 $start = date('Y-m-d 0:0:0', time());
                 $where[] = ['date', 'between', [$start, $end]];
                 break;
+
             case 'week':
                 $start = date("Y-m-d", strtotime("-1 week"));
                 $where[] = ['date', 'between', [$start, $end]];
                 break;
+
             case 'halfmonth':
                 $start = date("Y-m-d", strtotime("-15 day"));
                 $where[] = ['date', 'between', [$start, $end]];
                 break;
+
             case 'month':
                 $start = date("Y-m-d", strtotime("-1 month"));
                 $where[] = ['date', 'between', [$start, $end]];
                 break;
+
             case 'threemonth':
                 $start = date("Y-m-d", strtotime("-3 month"));
                 $where[] = ['date', 'between', [$start, $end]];
                 break;
+                
             default:
                 $start = date('Y-m-d 0:0:0', time());
                 $where[] = ['date', 'between', [$start, $end]];
                 break;
             }
         foreach ($userIds as $k => $v) {
+
             $list[$v['id']] = Hitcount::field('pv')->where('uid', 'EQ', $v['id'])->where($where)->select();
         }
         foreach ($list as $key => $value) {
+
             $pv = 0;
             foreach($value as $k => $v){
+
                 $pv += $v['pv'];
             }
             $da[$key] = $pv;

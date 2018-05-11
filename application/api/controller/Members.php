@@ -23,13 +23,18 @@ class Members extends Base
     {
         if($this->AuthPermission == '200'){
             if( request()->isPost()){
+
                 $member = new Member;
+
                 $list = $member->search(Request::param(),$this->uid);
+
                 return buildReturn(['status' => ReturnCode::SUCCESS,'info'=>  Tools::errorCode(ReturnCode::SUCCESS),'data' => $list]);
             }else {
+
                 return buildReturn(['status' => ReturnCode::LACKOFPARAM,'info'=>  Tools::errorCode(ReturnCode::LACKOFPARAM)]);
             }
         }else {
+            
             return $this->returnRes($this->AuthPermission, 'true');
         }
     }
@@ -41,17 +46,25 @@ class Members extends Base
     public function add()
     {
         if($this->AuthPermission == '200'){
+
             if( request()->isPost()){
+
                 $member = new Member;
                 $data = Request::param();
+
                 $data['uid'] = $this->uid;
+
                 $data['newtime'] = date('Y-m-d H:i:s', time());
+
                 $result = $member->store($data);
+
                 return buildReturn(['status' => $result['code'],'info'=> $result['msg']]);
             }else {
+
                 return buildReturn(['status' => ReturnCode::LACKOFPARAM,'info'=>  Tools::errorCode(ReturnCode::LACKOFPARAM)]);
             }
         }else {
+
             return $this->returnRes($this->AuthPermission, 'true');
         }
     }
@@ -65,16 +78,21 @@ class Members extends Base
     {
         if($this->AuthPermission == '200'){
             if( request()->isPost()){
+
                 $member = new Member;
                 // 接收所有参数
                 $data = Request::param();
+
                 $data['uid'] = $this->uid;
                 $result = $member->store($data);
+
                 return buildReturn(['status' => $result['code'],'info'=> $result['msg']]);
             }else {
+
                 return buildReturn(['status' => ReturnCode::LACKOFPARAM,'info'=>  Tools::errorCode(ReturnCode::LACKOFPARAM)]);
             }
         }else {
+
             return $this->returnRes($this->AuthPermission, 'true');
         }
     }
@@ -88,20 +106,28 @@ class Members extends Base
     {
         if($this->AuthPermission == '200'){
             if( request()->isPost()){
+
                 $member = new Member;
                 $uid = Request::param('uid', '', 'strip_tags', 'trim');
+
                 $list = $member->field('id,username,sex,calendar,birthday,qq,phone,weixin,note,newtime,address,uid')->find($uid);
+
                 // 验证客户的操作者
                 if($list['uid'] == $this->uid){
+
                     unset($list['uid']);
+
                     return buildReturn(['status' => ReturnCode::SUCCESS,'info'=> Tools::errorCode(ReturnCode::SUCCESS), 'data' => $list]);
                 }else {
+
                     return buildReturn(['status' => ReturnCode::OCCUPIED,'info'=> Tools::errorCode(ReturnCode::OCCUPIED)]);
                 }
             }else {
+
                 return buildReturn(['status' => ReturnCode::LACKOFPARAM,'info'=>  Tools::errorCode(ReturnCode::LACKOFPARAM)]);
             }
         }else {
+
             return $this->returnRes($this->AuthPermission, 'true');
         }
     }
@@ -116,17 +142,20 @@ class Members extends Base
     {
         if($this->AuthPermission == '200'){
             if( request()->isPost()){
+
                 $member = new Member;
+
                 $kid = Request::param('kid', '', 'strip_tags', 'trim');
                 $result = $member->softDelete($kid, $this->uid);
+
                 return buildReturn(['status' => $result['code'],'info'=> $result['msg']]);
             }else {
+
                 return buildReturn(['status' => ReturnCode::LACKOFPARAM,'info'=>  Tools::errorCode(ReturnCode::LACKOFPARAM)]);
             }
         }else {
+
             return $this->returnRes($this->AuthPermission, 'true');
         }
     }
-
-
 }

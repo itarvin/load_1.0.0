@@ -39,16 +39,13 @@ class Records extends Base
     public function add()
     {
         $khid = input('reid');
-        // 先检测当前客户是否为当前销售
-        $check = Member::find($khid);
-        if($check['uid'] != $this->uid){
-            $this->error('当前客户您无法操作！');
-            exit;
-        }
 
         if(request()->isPost()){
+
             $input = Request::param();
+
             $lenght = count($input['product']);
+
             for($i = 0; $i < $lenght; $i++)
             {
                 $da['product'] = $input['product'][$i];
@@ -71,6 +68,12 @@ class Records extends Base
             }
         }
 
+        // 先检测当前客户是否为当前销售
+        $check = Member::find($khid);
+
+        if($check['uid'] != $this->uid){
+            $this->error('当前客户您无法操作！');
+        }
         $check['users'] = $this->name;
         $this->assign([
             'data' => $check,
@@ -87,17 +90,26 @@ class Records extends Base
     public function delete()
     {
         if(request()->isPost()){
+
             $id = input('post.deleid');
+
             $record = new Record;
+
             // 先判断当前是删除数据是否为当前用户的订单。
             $have = $record->where('id', $id)->find();
+
             if($have['uid']  != $this->uid){
+
                 return buildReturn(['status' => ReturnCode::ERROR,'info'=> '当前订单您不能操作！']);
             }else {
+
                 writelog($id, Tools::logactKey('buy_delete'), $this->uid);
+
                 if($record->where('id', $id)->delete()){
+
                     return buildReturn(['status' => ReturnCode::SUCCESS,'info'=> Tools::errorCode(ReturnCode::SUCCESS)]);
                 }else {
+
                     return buildReturn(['status' => ReturnCode::ERROR,'info'=> Tools::errorCode(ReturnCode::ERROR)]);
                 }
             }

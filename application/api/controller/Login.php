@@ -20,11 +20,13 @@ class Login extends Base
     public function login()
     {
         if(request()->isPost()){
+
             $input = Request::param();
             // 获取客户端设备
             $agent = Request::header('User-Agent');
-            if(isset($input['verify']) && !captcha_check($input['verify'] ))
-            {
+
+            if(isset($input['verify']) && !captcha_check($input['verify'] )){
+
                 return buildReturn(['status' => ReturnCode::ERROR, 'info' => '验证码错误！']);
             }
             $rule = [
@@ -32,7 +34,8 @@ class Login extends Base
                 'users|管理员账号' => 'require',
                 'pwd|管理员密码'   => 'require',
             ];
-            $user = new Admin;
+
+            $model = new Admin;
             $name = $input["users"];
             // 数据验证
             $validate = new Validate($rule);
@@ -41,17 +44,19 @@ class Login extends Base
                 return buildReturn(['status' => ReturnCode::VERIFICATIONFAILURE,'info'=> $validate->getError()]);
             }
 
-            $preview = $user->where(array(
+            $preview = $model->where(array(
                 'users'=> $name
             ))->find();
 
             if( !$preview){
 
                 $this->checkLogin($name);
+
                 return buildReturn(['status' => ReturnCode::AUTH_ERROR,'info'=>  Tools::errorCode(ReturnCode::AUTH_ERROR)]);
             }else if( $preview['status'] == 1){
 
                 $this->checkLogin($name);
+
                 return buildReturn(['status' => ReturnCode::LOCKACCOUNT,'info'=>  Tools::errorCode(ReturnCode::LOCKACCOUNT)]);
             }else {
 
@@ -59,7 +64,7 @@ class Login extends Base
                     'users' => $name,
                     'pwd'   => $input["pwd"]
                 ];
-                if( $user = $user->where($where_query)->find()) {
+                if( $user = $model->where($where_query)->find()) {
                     //更新最后请求IP及时间
                     $time = date('Y-m-d H:i:s', time());
                     // 加密账户密码
@@ -67,13 +72,15 @@ class Login extends Base
                     // 对数据二次加密
                     $token = $this->encryption($user->id, $agent, $salt);
                     // 更新时间
-                    $user->where($where_query)->update(['lasttime' => $time]);
+                    $model->where($where_query)->update(['lasttime' => $time]);
 
                     if( $input['online'] == 1){
                         // 标识存入cookie
                         Cookie::set('identity', $token, ['expire'=> 3600 * 12 * 30 ]);
+                        Cookie::set('uname', $user->users, ['expire'=> 3600 * 12 * 30 ]);
                     }else if( $input['online'] == 0) {
                         Cookie::set('identity', $token, ['expire'=> 3600 * 12]);
+                        Cookie::set('uname', $user->users, ['expire'=> 3600 * 12]);
                     }
 
                     // 返回状态
@@ -94,13 +101,17 @@ class Login extends Base
      * 检测登录信息，是否恶意
      * @return json
      */
-    private function checkLogin($name, $timestamp)
+    private function checkLogin($name, $timestamp = '')
     {
         $timestamp = $timestamp != '' ? $timestamp : time();
-        $attack = cache($name) != null ? cache($name) : [];
+
+        $attack = cache($name) != null ? cache($name) : [] ;
+
         array_push($attack, $timestamp);
+
         if( cache($name) != null){
-            if( count($attack) > 2){
+
+            if( count($attack) > 10){
                 // 锁当前用户
                 Admin::where('users', 'EQ', $name)->update(array('status' => 1));
                 cache($name,  NULL);
@@ -130,12 +141,16 @@ class Login extends Base
     {
         if($this->AuthPermission == '200'){
             if( request()->isPost()){
+
                 cookie('identity', null);
+
                 return buildReturn(['status' => ReturnCode::SUCCESS,'info'=>  Tools::errorCode(ReturnCode::SUCCESS)]);
             }else {
+
                 return buildReturn(['status' => ReturnCode::LACKOFPARAM,'info'=>  Tools::errorCode(ReturnCode::LACKOFPARAM)]);
             }
         }else {
+            
             return $this->returnRes($this->AuthPermission, 'true');
         }
     }

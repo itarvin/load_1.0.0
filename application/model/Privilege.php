@@ -40,24 +40,33 @@ class Privilege extends Model
     {
         // 先检测当前数据是否存在其他行列
         $id = isset($data['id']) ? $data['id'] : '';
+
         // 基础数据验证
         $validate  = Validate::make($this->rule,$this->msg);
         $result = $validate->check($data);
+
         // 过滤post数组中的非数据表字段数据
         $data = Request::only(['id','pri_name','module_name','controller_name','action_name','parent_id','ico']);
+
         if(!$result) {
+
             return ['code' => ReturnCode::ERROR,'msg' => $validate->getError()];
         }
         if($id != ''){
+
             if($this->update($data)){
+
                 return ['code' => ReturnCode::SUCCESS,'msg' => Tools::errorCode(ReturnCode::SUCCESS)];
             }else {
+
                 return ['code' => ReturnCode::ERROR,'msg' => Tools::errorCode(ReturnCode::ERROR)];
             }
         }else {
+
             if($lastid = $this->insertGetId($data)){
                 return ['code' => ReturnCode::SUCCESS,'msg' => Tools::errorCode(ReturnCode::SUCCESS)];
             }else {
+
                 return ['code' => ReturnCode::ERROR,'msg' => Tools::errorCode(ReturnCode::ERROR)];
             }
         }
@@ -68,15 +77,21 @@ class Privilege extends Model
      * @param int $id 主键id
      * @return array
      */
-    public function del($id){
+    public function del($id)
+    {
         $result = $this->getChildren($id);
+
         if($result){
+
             return ['code' => ReturnCode::ERROR,'msg' => '存在下级数据,静止操作！'];
         }else {
+
             // 这里要处理角色权限，暂留
             if($this->where('id',$id)->delete()){
+
                 return ['code' => ReturnCode::SUCCESS,'msg' => Tools::errorCode(ReturnCode::SUCCESS)];
             }else {
+
                 return ['code' => ReturnCode::ERROR,'msg' => Tools::errorCode(ReturnCode::ERROR)];
             }
         }
@@ -191,14 +206,16 @@ class Privilege extends Model
 		$adminId = json_decode(base64_decode(session('uid'),  true), true);
 
 		// 判断是否为超级管理员
-		if(checksuperman($adminId))
-		{
+		if(checksuperman($adminId)){
+
 			// 如果是，则吧所有的权限给超级管理员
 			$priData = $this->select();
 		}else{
+
             // 否则，根据所给的角色给相应的权限
 			// 取出当前管理员所在角色 所拥有的权限
 			$arModel = new Adminrole;
+
 			$priData = $arModel->alias('a')
 			->field('DISTINCT c.id,c.pri_name,c.module_name,c.controller_name,c.action_name,c.parent_id,c.ico')
             ->join('role_pri b', 'b.role_id = a.role_id')

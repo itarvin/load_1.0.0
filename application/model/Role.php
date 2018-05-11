@@ -35,22 +35,31 @@ class Role extends Model
     {
         // 先检测当前数据是否存在其他行列
         $id = isset($data['id']) ? $data['id'] : '';
+
         // 基础数据验证
         $validate  = Validate::make($this->rule,$this->msg);
+
         $result = $validate->check($data);
+
         // 过滤post数组中的非数据表字段数据
         $data = Request::only(['id','role_name','role_status','role_desc']);
+
         $priId = Request::only(['pri_id']);
+
         if(!$result) {
+
             return ['code' => ReturnCode::ERROR,'msg' => $validate->getError()];
         }
         if($id != ''){
+
             if($this->update($data)){
+
                 // 删除当前id所存在的权限
                 Rolepri::where('role_id',$data['id'])->delete();
+
                 // 根据关联表的关系，还需对角色权限表进行赋值
-        		foreach ($priId['pri_id'] as $k => $v)
-        		{
+        		foreach ($priId['pri_id'] as $k => $v){
+
         			Rolepri::create([
         				'pri_id' => $v,
         				'role_id' => $data['id'],
@@ -58,13 +67,15 @@ class Role extends Model
         		}
                 return ['code' => ReturnCode::SUCCESS,'msg' => Tools::errorCode(ReturnCode::SUCCESS)];
             }else {
+
                 return ['code' => ReturnCode::ERROR,'msg' => Tools::errorCode(ReturnCode::ERROR)];
             }
         }else {
+
             if($lastid = $this->insertGetId($data)){
+
                 // 根据关联表的关系，还需对角色权限表进行赋值
-        		foreach ($priId['pri_id'] as $k => $v)
-        		{
+        		foreach ($priId['pri_id'] as $k => $v){
         			Rolepri::create([
         				'pri_id' => $v,
         				'role_id' => $lastid,
@@ -72,6 +83,7 @@ class Role extends Model
         		}
                 return ['code' => ReturnCode::SUCCESS,'msg' => Tools::errorCode(ReturnCode::SUCCESS)];
             }else {
+
                 return ['code' => ReturnCode::ERROR,'msg' => Tools::errorCode(ReturnCode::ERROR)];
             }
         }
@@ -117,13 +129,17 @@ class Role extends Model
       * @param int $id 主键id
       * @return array
       */
-     public function del($id){
+     public function del($id)
+     {
          // 删除角色携带的权限
          Rolepri::where('role_id', $id)->delete();
          $result = $this->where('id',$id)->delete();
+
          if($result){
+
              return ['code' => ReturnCode::SUCCESS,'msg' => Tools::errorCode(ReturnCode::SUCCESS)];
          }else {
+             
              return ['code' => ReturnCode::ERROR,'msg' => Tools::errorCode(ReturnCode::ERROR)];
          }
      }

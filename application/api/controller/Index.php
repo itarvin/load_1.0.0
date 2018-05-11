@@ -20,10 +20,14 @@ class Index extends Controller
     public function index()
     {
         if(request()->isPost()){
+
             $member = new Member;
+
             $result = $member->publicSearch(Request::param('value','','trim'));
+
             return buildReturn(['status' => $result['code'],'info'=>  $result['msg'],'data' => $result['data']]);
         }else {
+            
             return buildReturn(['status' => ReturnCode::LACKOFPARAM,'info'=>  Tools::errorCode(ReturnCode::LACKOFPARAM)]);
         }
     }

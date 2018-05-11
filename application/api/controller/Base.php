@@ -16,9 +16,11 @@ class Base extends Controller
     /**
      * 初始化方法
      */
-    protected function initialize(){
+    protected function initialize()
+    {
         // 校验是否存在当前cookie
         if( Cookie::has('identity')){
+
             $token = Cookie::get('identity');
             // 获取客户端设备
             $agent = Request::header('User-Agent');
@@ -26,22 +28,30 @@ class Base extends Controller
             $result = $this->analysisCode($token);
             // 解析token验证
             $key = json_decode(base64_decode($result['token'], true), true);
+
             $uid = json_decode(base64_decode($result['uid']));
+
             $preview = Admin::field('users, pwd')->find($uid);
+
             $this->uid = $uid;
             // 验证是否当前用户设备与提交的用户设备一致.
             if( $key['agent'] == $agent && md5($preview['users'].$preview['pwd']) == $key['salt']){
+
                 $this->AuthPermission = '200';
             }else{
+
                 if( md5($preview['users'].$preview['pwd']) == $key['salt']){
+
                     $this->AuthPermission = '300';
                     cookie('identity', null);
                 }else {
+
                     $this->AuthPermission = '400';
                     cookie('identity', null);
                 }
             }
         }else {
+
             $this->AuthPermission = '400';
         }
     }
@@ -56,8 +66,10 @@ class Base extends Controller
     {
         if( $isCheck == 'true'){
             if( $AuthPermission == "400"){
+
                 return buildReturn(['status' =>ReturnCode::ACCOUNTEXPIRED,'info' => "请您先登录账户！"]);
             }else if( $AuthPermission == "300"){
+
                 return buildReturn(['status' =>ReturnCode::AUTH_ERROR,'info' => Tools::errorCode(ReturnCode::AUTH_ERROR)]);
             }
         }

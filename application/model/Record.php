@@ -24,6 +24,7 @@ class Record extends Model
             $start = isset($data['start']) ? $data['start'] : '';
             $end = isset($data['end']) ? $data['end'] : '';
             $keyword = isset($data['keyword']) ? $data['keyword'] : '';
+
             //check time
             if ($start && $end) {
                 $where[] = ['a.newtime', 'between', [$start, $end]];
@@ -32,6 +33,7 @@ class Record extends Model
             }elseif ($end) {
                 $where[] = ['a.newtime', 'LT', $end];
             }
+
             //  check keyword
             if (!empty($keyword)) {
                 $where[] = ['a.product|a.price',  'LIKE',  "%$keyword%"];
@@ -41,13 +43,16 @@ class Record extends Model
         if(!checksuperman($uid)){
             $where[] = ['a.uid', 'eq', $uid];
         }
+
         $list = $this->alias('a')
         ->field('a.*, b.username, c.users')
         ->join('member b', 'b.id = a.khid')
         ->join('admin c', 'c.id = a.uid')
         ->where($where)
         ->order('id desc')->paginate();
+
         $count = $list->total();
+        
         return $result = [
             'list'  => $list,
             'count' => $count,
