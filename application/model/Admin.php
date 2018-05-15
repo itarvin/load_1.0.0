@@ -56,7 +56,7 @@ class Admin extends Model
 
             return ['code' => ReturnCode::ERROR,'msg' => $validate->getError()];
         }
-        $data = Request::only(['id','users','qq1','qq2','qq3','qq4','pwd','weixin','status','isow','gender','qq1name','qq2name','qq3name','qq4name','wxname']);
+        $data = Request::only(['id','users','qq1','qq2','qq3','qq4','pwd','weixin','status','isow','gender','qq1name','qq2name','qq3name','qq4name','wxname','phone']);
 
         $role_id = Request::only(['role_id']);
 
@@ -70,7 +70,18 @@ class Admin extends Model
     	    }else{
     	    	unset($data['pwd']);
     	    }
+
+            $bg = Tools::upload('bg', '/admin/Bg',$data['id']);
+            if($bg['code'] == 1){
+                $data['bg'] = $bg['msg'];
+            }else {
+                unset($data['bg']);
+            }
+
+            $qrcode = Tools::upload('qrcode', '/admin/Qrcode',$data['id']);
+
             if($this->update($data)){
+
 
                 // 删除当前id所存在的权限
                 Adminrole::where('admin_id',$data['id'])->delete();
@@ -90,12 +101,19 @@ class Admin extends Model
                 return ['code' => ReturnCode::ERROR,'msg' => Tools::errorCode(ReturnCode::ERROR)];
             }
         }else{
+            $data['newtime'] = date('Y-m-d H:i:s',time());
             if($lastid = $this->insertGetId($data)){
 
+                $bg = Tools::upload('bg', '/admin/Bg',$lastid);
+                $this->where('id', $lastid)->data(['bg' => $bg['msg']])->update();
+
+                $qrcode = Tools::upload('qrcode', '/admin/Qrcode',$lastid);
+
                 // 根据关联表的关系，还需对角色权限表进行赋值
+
         		foreach($role_id['role_id'] as $k => $v){
 
-        			Rolepri::create([
+        			Adminrole::create([
         				'role_id' => $v,
         				'admin_id' => $lastid
         			]);
@@ -122,9 +140,9 @@ class Admin extends Model
 
             return ['code' => ReturnCode::ERROR,'msg' => $validate->getError()];
         }
-        $data = Request::only(['id','users','qq1','qq2','qq3','qq4','pwd','weixin','status','isow','gender','qq1name','qq2name','qq3name','qq4name','wxname','bg']);
+        $data = Request::only(['id','users','qq1','qq2','qq3','qq4','pwd','weixin','status','isow','gender','qq1name','qq2name','qq3name','qq4name','wxname','bg','description','sex','phone','qrcode']);
 
-        $preview = $this->where(array('users'=>$data['users']))->find();
+        $preview = $this->where('users',$data['users'])->find();
 
         $pwd = isset($data['pwd']) ? $data['pwd'] : '';
 
@@ -137,10 +155,12 @@ class Admin extends Model
         }
 
         $bg = Tools::upload('bg', '/admin/Bg',$data['id']);
+        var_dump($bg);
 
         $qrcode = Tools::upload('qrcode', '/admin/Qrcode',$data['id']);
 
         $data['bg'] = $bg['code'] == '1' ? $bg['msg'] : '';
+        // $data['bg'] = $bg['code'] == '1' ? $bg['msg'] : '';
 
         if(!isset($data['id'])){
 
@@ -187,6 +207,7 @@ class Admin extends Model
         ->group('a.id')
         ->where($where)
         ->select();
+        // var_dump($list);die;
 
         $count = $list->count();
 
@@ -289,7 +310,7 @@ class Admin extends Model
                 $start = date("Y-m-d", strtotime("-3 month"));
                 $where[] = ['date', 'between', [$start, $end]];
                 break;
-                
+
             default:
                 $start = date('Y-m-d 0:0:0', time());
                 $where[] = ['date', 'between', [$start, $end]];

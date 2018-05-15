@@ -44,7 +44,13 @@ class Admins extends Base
 
             $result = $user->store(Request::param());
 
-            return buildReturn(['status' => $result['code'],'info'=> $result['msg']]);
+            if($result['code'] == 1){
+                $this->success($result['msg']);
+            }else {
+                $this->error($result['msg']);
+            }
+
+            // return buildReturn(['status' => $result['code'],'info'=> $result['msg']]);
         }
         // 拿到角色表的数据
         $roleModel = new Role;
@@ -68,7 +74,7 @@ class Admins extends Base
         $roleModel = new Role;
         $arModel = new Adminrole;
 
-        $data = $user->field('id, users, gender, isow, weixin, phone, qq1, qq2, qq3, qq4')->find($id);
+        $data = $user->field('id, users, gender, isow, weixin, phone, qq1, qq2, qq3, qq4, bg')->find($id);
         // 拿到角色表的数据
 
         $roleData = $roleModel->field('id,role_name')->where('role_status','0')->select();
@@ -77,16 +83,24 @@ class Admins extends Base
 
         $exist = explode(",", $roleId['role_id']);
 
+        // 拼接二维码路径
+        $data['qrcode'] = Tools::getQrcode($id);
+
         if( request()->isPost()){
 
             // 接收所有参数
-            $data = Request::param();
+            $input = Request::param();
 
-            $data['uid'] = $this->uid;
+            $input['uid'] = $this->uid;
 
-            $result = $user->store($data);
+            $result = $user->store($input);
 
-            return buildReturn(['status' => $result['code'],'info'=> $result['msg']]);
+            if($result['code'] == 1){
+                $this->success($result['msg']);
+            }else {
+                $this->error($result['msg']);
+            }
+            // return buildReturn(['status' => $result['code'],'info'=> $result['msg']]);
         }
 
         $this->assign([

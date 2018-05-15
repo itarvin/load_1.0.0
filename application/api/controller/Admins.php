@@ -22,6 +22,7 @@ class Admins extends Base
             if( request()->isPost()){
 
                 $admin = new Admin;
+                var_dump(Request::param());
                 $result = $admin->apiStore(Request::param());
 
                 return buildReturn(['status' => $result['code'],'info'=> $result['msg']]);
@@ -30,7 +31,7 @@ class Admins extends Base
                 return buildReturn(['status' => ReturnCode::LACKOFPARAM,'info'=>  Tools::errorCode(ReturnCode::LACKOFPARAM)]);
             }
         }else {
-            
+
             return $this->returnRes($this->AuthPermission, 'true');
         }
     }
@@ -48,9 +49,7 @@ class Admins extends Base
             if( request()->isPost()){
                 $admin = new Admin;
 
-                $uid = Request::param("uid","",'strip_tags','trim');
-
-                $list = $admin->field('id,users,phone,qq1,qq2,qq3,qq4,description,qq1name,qq2name,qq3name,qq4name,weixin,wxname')->find($uid);
+                $list = $admin->field('id,users,phone,qq1,qq2,qq3,qq4,description,qq1name,qq2name,qq3name,qq4name,weixin,wxname')->find($this->uid);
                 if($list){
 
                     return buildReturn(['status' => ReturnCode::SUCCESS,'info'=> Tools::errorCode(ReturnCode::SUCCESS), 'data' => $list]);

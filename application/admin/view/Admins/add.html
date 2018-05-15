@@ -1,6 +1,6 @@
 {layout name="layout/layout" /}
     <div class="x-body">
-        <form class="layui-form">
+        <form class="layui-form" enctype="multipart/form-data" action="{:url('Admins/add')}" method="post">
             <div class="layui-form-item">
                 <label for="phone" class="layui-form-label">
                     <span class="x-red">*</span>角　色
@@ -39,6 +39,22 @@
               <div class="layui-input-inline">
                   <input type="radio" name="isow" value="1" title="离职" >
                   <input type="radio" name="isow" value="0" title="在职" checked>
+              </div>
+          </div>
+          <div class="layui-form-item">
+              <label for="phone" class="layui-form-label">
+                  <span class="x-red">*</span>头  像
+              </label>
+              <div class="layui-input-inline">
+                  <input type="file"  name="bg">
+              </div>
+          </div>
+          <div class="layui-form-item">
+              <label for="phone" class="layui-form-label">
+                  <span class="x-red">*</span>二维码
+              </label>
+              <div class="layui-input-inline">
+                  <input type="file"  name="qrcode">
               </div>
           </div>
           <div class="layui-form-item">
@@ -175,21 +191,23 @@
                 }
             }
         });
-        form.on('submit(add)', function(data){
-            //发异步，把数据提交给php
-            $.post("{:url('Admins/add')}",data.field,function(res){
-    			if(res.status == 1){
-                    layer.alert("新增成功", {icon: 6},function () {
-                        // 获得frame索引
-                        var index = parent.layer.getFrameIndex(window.name);
-                        //关闭当前frame
-                        parent.layer.close(index);
-                    });
-                }else{
-    				layer.msg(res.info, {time: 2000});
-    			}
-            },'json');
-            return false;
-        });
+        // 如若单纯提交数据可选中当前ajax，文件选用表单提交
+        // form.on('submit(add)', function(data){
+        //     console.log(data);
+        //     //发异步，把数据提交给php
+        //     $.post("{:url('Admins/add')}",data.field,function(res){
+    	// 		if(res.status == 1){
+        //             layer.alert("新增成功", {icon: 6},function () {
+        //                 // 获得frame索引
+        //                 var index = parent.layer.getFrameIndex(window.name);
+        //                 //关闭当前frame
+        //                 parent.layer.close(index);
+        //             });
+        //         }else{
+    	// 			layer.msg(res.info, {time: 2000});
+    	// 		}
+        //     },'json');
+        //     return false;
+        // });
     });
     </script>

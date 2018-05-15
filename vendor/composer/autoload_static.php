@@ -20,6 +20,10 @@ class ComposerStaticInitdf7c780b02c5d92a9ffa7fdf0b30bd63
         array (
             'app\\' => 4,
         ),
+        'O' => 
+        array (
+            'Overtrue\\ChineseCalendar\\' => 25,
+        ),
     );
 
     public static $prefixDirsPsr4 = array (
@@ -34,6 +38,10 @@ class ComposerStaticInitdf7c780b02c5d92a9ffa7fdf0b30bd63
         'app\\' => 
         array (
             0 => __DIR__ . '/../..' . '/application',
+        ),
+        'Overtrue\\ChineseCalendar\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/overtrue/chinese-calendar/src',
         ),
     );
 

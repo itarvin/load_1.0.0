@@ -9,4 +9,5 @@ return array(
     'think\\composer\\' => array($vendorDir . '/topthink/think-installer/src'),
     'think\\captcha\\' => array($vendorDir . '/topthink/think-captcha/src'),
     'app\\' => array($baseDir . '/application'),
+    'Overtrue\\ChineseCalendar\\' => array($vendorDir . '/overtrue/chinese-calendar/src'),
 );

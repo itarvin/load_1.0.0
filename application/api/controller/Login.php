@@ -25,7 +25,13 @@ class Login extends Base
             // 获取客户端设备
             $agent = Request::header('User-Agent');
 
-            if(isset($input['verify']) && !captcha_check($input['verify'] )){
+            // if(isset($input['verify']) && !captcha_check($input['verify'] )){
+            //
+            //     return buildReturn(['status' => ReturnCode::ERROR, 'info' => '验证码错误！']);
+            // }
+
+            // 数字运算验证码
+            if(isset($input['verify']) && !checkcode($input['verify'] )){
 
                 return buildReturn(['status' => ReturnCode::ERROR, 'info' => '验证码错误！']);
             }
@@ -74,13 +80,15 @@ class Login extends Base
                     // 更新时间
                     $model->where($where_query)->update(['lasttime' => $time]);
 
+                    $clientInfo = base64_encode(json_encode(['uname' => $user->users, 'bg' => $user->bg]));
+
                     if( $input['online'] == 1){
                         // 标识存入cookie
                         Cookie::set('identity', $token, ['expire'=> 3600 * 12 * 30 ]);
-                        Cookie::set('uname', $user->users, ['expire'=> 3600 * 12 * 30 ]);
+                        Cookie::set('client', $clientInfo, ['expire'=> 3600 * 12 * 30 ]);
                     }else if( $input['online'] == 0) {
                         Cookie::set('identity', $token, ['expire'=> 3600 * 12]);
-                        Cookie::set('uname', $user->users, ['expire'=> 3600 * 12]);
+                        Cookie::set('client', $clientInfo, ['expire'=> 3600 * 12]);
                     }
 
                     // 返回状态
@@ -150,7 +158,7 @@ class Login extends Base
                 return buildReturn(['status' => ReturnCode::LACKOFPARAM,'info'=>  Tools::errorCode(ReturnCode::LACKOFPARAM)]);
             }
         }else {
-            
+
             return $this->returnRes($this->AuthPermission, 'true');
         }
     }
@@ -161,16 +169,17 @@ class Login extends Base
      */
     public function verify()
     {
-        $config = [
-            // 验证码字体大小
-            'fontSize'    =>   12,
-            // 验证码位数
-            'length'      =>   3,
-            // 关闭验证码杂点
-            'useNoise'    =>   false,
-        ];
-        $captcha = new Captcha($config);
-        return $captcha->entry();
+        // $config = [
+        //     // 验证码字体大小
+        //     'fontSize'    =>   12,
+        //     // 验证码位数
+        //     'length'      =>   3,
+        //     // 关闭验证码杂点
+        //     'useNoise'    =>   false,
+        // ];
+        // $captcha = new Captcha($config);
+        // return $captcha->entry();
+        makecode();
     }
 
 

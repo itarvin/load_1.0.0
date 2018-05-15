@@ -12,6 +12,36 @@ use app\model\Log;
 use app\model\Setting;
 use app\Util\Tools;
 
+/*****************客户端调用验证码***********************/
+// 生成验证码
+function makecode()
+{
+    require_once '../thinkphp/library/think/code.php';
+    $num1 = rand(1,20);
+    $num2 = rand(1,20);
+    $code = VerifyCode::get($num1,$num2);
+    return $code;
+}
+// 验证验证码
+function checkcode($code)
+{
+    require_once '../thinkphp/library/think/code.php';
+    $re = VerifyCode::check($code);
+    return $re;
+}
+
+/**
+ * 应用场景：获取配置项
+ * @return string
+ */
+function showImage($path, $width, $height)
+{
+    $upPath = config('show_path');
+
+    return "<img src=".$upPath.$path." width=".$width." height =".$height.">";
+}
+
+
 /**
  * 应用场景：获取配置项
  * @return string

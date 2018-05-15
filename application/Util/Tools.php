@@ -10,6 +10,28 @@ use app\model\Logact;
 class Tools {
 
     /**
+    * 获取二维码
+    * @return string
+    * @author iatrivn <iatrivn@163.com>
+    */
+    static public function getQrcode($key)
+    {
+        $existFile = ['jpg','gif','png','bmp','jpeg'];
+        $path = [];
+        foreach($existFile as $k => $v){
+
+            $qrPath = "./uploads/admin/Qrcode/".$key.".".$v;
+
+            if(file_exists($qrPath)){
+
+                $path[] = "/admin/Qrcode/".$key.".".$v;
+            }
+        }
+        return isset($path[0]) ? $path[0] : '';
+    }
+
+
+    /**
     * 上传
     * @return string
     * @author iatrivn <iatrivn@163.com>
@@ -23,6 +45,7 @@ class Tools {
         ];
 
         $file = request()->file($field);
+
         // 清除存在的文件
         $existFile = ['jpg','gif','png','bmp','jpeg'];
 
@@ -39,7 +62,7 @@ class Tools {
             if(!$info){
                 return ['code' => '0','msg' => $file->getError()];
             }else {
-                return ['code' => '1','msg' => $upload_path.'/'.$file->getSaveName()];
+                return ['code' => '1','msg' => $upload_path.'/'.$info->getSaveName()];
             }
         }
     }
@@ -235,52 +258,5 @@ class Tools {
     {
         $array = array('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z');
         return $array;
-    }
-
-
-    function htmldecode($str)
-    {
-        if(empty($str))
-            return;
-        if($str=="")
-            return $str;
-
-        //以下是过滤特殊字符串
-        $str = str_replace("&", " ", $str);
-        $str = str_replace(">", " ", $str);
-        $str = str_replace("<", " ", $str);
-        $str = str_replace("chr(32)", " ", $str);
-        $str = str_replace("chr(9)", " ", $str);
-        $str = str_replace("chr(34)", " ", $str);
-        $str = str_replace("\"", " ", $str);
-        $str = str_replace("chr(39)", " ", $str);
-        $str = str_replace("", " ", $str);
-        $str = str_replace("'", " ", $str);
-        $str = str_replace("select", " ", $str);
-        $str = str_replace("join", " ", $str);
-        $str = str_replace("union", " ", $str);
-        $str = str_replace("where", " ", $str);
-        $str = str_replace("insert", " ", $str);
-        $str = str_replace("delete", " ", $str);
-        $str = str_replace("update", " ", $str);
-        $str = str_replace("like", " ", $str);
-        $str = str_replace("drop", " ", $str);
-        $str = str_replace("create", " ", $str);
-        $str = str_replace("modify", " ", $str);
-        $str = str_replace("rename", " ", $str);
-        $str = str_replace("alter", " ", $str);
-        $str = str_replace("cas", " ", $str);
-        $str = str_replace("replace", " ", $str);
-        $str = str_replace("%", " ", $str);
-        $str = str_replace("or", " ", $str);
-        $str = str_replace("and", " ", $str);
-        $str = str_replace("!", " ", $str);
-        $str = str_replace("xor", " ", $str);
-        $str = str_replace("not", " ", $str);
-        $str = str_replace("user", " ", $str);
-        $str = str_replace("||", " ", $str);
-        $str = str_replace("<", " ", $str);
-        $str = str_replace(">", " ", $str);
-        return $str;
     }
 }
