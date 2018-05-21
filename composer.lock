@@ -4,8 +4,55 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "89e591e67eef938baa16efce9957af51",
+    "content-hash": "472bb007557ee85711005cd94f102000",
     "packages": [
+        {
+            "name": "overtrue/chinese-calendar",
+            "version": "0.0.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/overtrue/chinese-calendar.git",
+                "reference": "ca24062ec974a1c121c1685eb6e6337c6d40817d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/overtrue/chinese-calendar/zipball/ca24062ec974a1c121c1685eb6e6337c6d40817d",
+                "reference": "ca24062ec974a1c121c1685eb6e6337c6d40817d",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.5.9"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^6.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Overtrue\\ChineseCalendar\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "overtrue",
+                    "email": "anzhengchao@gmail.com"
+                }
+            ],
+            "description": "中国农历转换与查询工具",
+            "keywords": [
+                "Chinese",
+                "calendar",
+                "lunar",
+                "lunar2solar",
+                "solar",
+                "solar2lunar"
+            ],
+            "time": "2018-03-25T04:55:14+00:00"
+        },
         {
             "name": "phpoffice/phpexcel",
             "version": "1.8.1",

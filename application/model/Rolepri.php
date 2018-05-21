@@ -3,5 +3,5 @@ namespace app\model;
 use think\Model;
 class Rolepri extends Model
 {
-    protected $table='role_pri';
+    protected $name='role_pri';
 }

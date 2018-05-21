@@ -1,7 +1,7 @@
 <?php
 namespace app\model;
 use think\Model;
-use think\Validate;
+use think\validate\ValidateRule;
 use app\Util\ReturnCode;
 use app\Util\Tools;
 use app\model\Admin;
@@ -67,7 +67,7 @@ class Member extends Model
             return ['code' => ReturnCode::ERROR, 'msg' => 'QQ, 微信，电话不能同时为空！'];
         }
         // 基础数据验证
-        $validate  = Validate::make($this->rule,$this->msg);
+        $validate  = ValidateRule::make($this->rule,$this->msg);
         $result = $validate->check($data);
 
         if(!$result) {
@@ -279,7 +279,7 @@ class Member extends Model
 
              $result = $this->alias('a')
              ->field('b.users,b.qq1')
-             ->join('admin b','a.uid = b.id')
+             ->leftJoin(['admin'=>'b'],'a.uid = b.id')
              ->where($where)->find();
 
              if($result != null){
@@ -348,7 +348,7 @@ class Member extends Model
          }
          $list = $this->alias('a')
          ->field('a.*, b.users')
-         ->join('admin b', 'a.uid = b.id')
+         ->leftJoin(['admin'=>'b'], 'a.uid = b.id')
          ->where($where)->order('id desc')->paginate();
          $count = $list->total();
 
@@ -444,7 +444,7 @@ class Member extends Model
                  $error = Cache::get('scv_'.$uid.'_'.$filename) ? Cache::get('scv_'.$uid.'_'.$filename) : [];
 
                  foreach($have as $k => $v){
-                     
+
                      array_push($error, $data[$v]);
 
                      unset($data[$v]);

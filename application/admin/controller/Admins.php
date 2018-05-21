@@ -12,7 +12,6 @@ use app\Util\ReturnCode;
 use app\Util\Tools;
 class Admins extends Base
 {
-
     /**
      * 应用场景：主页
      * @return array

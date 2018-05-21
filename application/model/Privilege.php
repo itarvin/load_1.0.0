@@ -10,7 +10,7 @@ class Privilege extends Model
 {
     //主键
     protected $pk = 'id';
-    protected $table='privilege';
+    protected $name='privilege';
 
     protected $rule = [
         'parent_id|上级ID'          => 'require|number',
@@ -181,16 +181,24 @@ class Privilege extends Model
 			return TRUE;
 		// 实例化模型
 		$arModel = new Adminrole;
-		// 连贯操作并且联表查询数据
-		$has = $arModel->alias('a')
-        ->join('role_pri b', 'b.role_id = a.role_id')
-        ->join('privilege c', 'c.id = b.pri_id')
-		->where([
-			['a.admin_id', 'eq', $adminId],
-			['c.module_name', 'eq', request()->module()],
-			['c.controller_name', 'eq', request()->controller()],
-			['c.action_name', 'eq', request()->action()],
-		])->count();
+        $isHasChk = $arModel->alias('a')
+        ->leftJoin('role_pri b', 'b.role_id = a.role_id')
+        ->leftJoin('role c', 'b.role_id = c.id')
+        ->where('a.admin_id',$adminId)->find();
+        if($isHasChk['role_status'] == 1){
+            $has = 0;
+        }else {
+    		// 连贯操作并且联表查询数据
+    		$has = $arModel->alias('a')
+            ->leftJoin('role_pri b', 'b.role_id = a.role_id')
+            ->leftJoin('privilege c', 'c.id = b.pri_id')
+    		->where([
+    			['a.admin_id', 'eq', $adminId],
+    			['c.module_name', 'eq', request()->module()],
+    			['c.controller_name', 'eq', request()->controller()],
+    			['c.action_name', 'eq', request()->action()],
+    		])->count();
+        }
 		// 返回值，在继承Base中做rbac使用
 		return ($has > 0);
 	}
@@ -215,16 +223,24 @@ class Privilege extends Model
             // 否则，根据所给的角色给相应的权限
 			// 取出当前管理员所在角色 所拥有的权限
 			$arModel = new Adminrole;
-
-			$priData = $arModel->alias('a')
-			->field('DISTINCT c.id,c.pri_name,c.module_name,c.controller_name,c.action_name,c.parent_id,c.ico')
-            ->join('role_pri b', 'b.role_id = a.role_id')
-            ->join('privilege c', 'c.id = b.pri_id')
-			->where('a.admin_id', $adminId)->select();
+            $ischeck = $arModel->alias('a')
+            ->leftJoin('role_pri b', 'b.role_id = a.role_id')
+            ->leftJoin('role c', 'b.role_id = c.id')
+            ->where('a.admin_id',$adminId)->find();
+            if($ischeck['role_status'] == 1){
+                $priData = [];
+            }else {
+                $priData = $arModel->alias('a')
+    			->field('DISTINCT c.id,c.pri_name,c.module_name,c.controller_name,c.action_name,c.parent_id,c.ico')
+                ->leftJoin('role_pri b', 'b.role_id = a.role_id')
+                ->leftJoin('privilege c', 'c.id = b.pri_id')
+    			->where('a.admin_id', $adminId)->select();
+            }
 		}
 		/*************** 从所有的权限中挑出前两级的 **********************/
 		$btns = [];
         $ar = [];
+        $pd = [];
         foreach ($priData as $key => $value) {
             $ar['id']                = $value['id'];
             $ar['pri_name']          = $value['pri_name'];

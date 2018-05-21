@@ -1,7 +1,7 @@
 <?php
 namespace app\model;
 use think\Model;
-use think\Validate;
+use think\validate\ValidateRule;
 use app\Util\ReturnCode;
 use app\Util\Tools;
 use think\facade\Request;
@@ -11,8 +11,8 @@ class Admin extends Model
 {
     //主键
     protected $pk = 'id';
-    protected $table='admin';
 
+    protected $table='admin';
 
     protected $rule =   [
         'users|用户名'     => 'min:2|unique:admin',
@@ -48,7 +48,7 @@ class Admin extends Model
      */
     public function store($data)
     {
-        $validate  = Validate::make($this->rule,$this->message);
+        $validate  = ValidateRule::make($this->rule,$this->message);
 
         $result = $validate->check($data);
 
@@ -85,15 +85,17 @@ class Admin extends Model
 
                 // 删除当前id所存在的权限
                 Adminrole::where('admin_id',$data['id'])->delete();
+                if(!empty($role_id)) {
+                    // 根据关联表的关系，还需对角色权限表进行赋值
 
-                // 根据关联表的关系，还需对角色权限表进行赋值
-        		foreach ($role_id['role_id'] as $k => $v){
+            		foreach ($role_id['role_id'] as $k => $v){
 
-        			Adminrole::create([
-        				'role_id' => $v,
-        				'admin_id' => $data['id'],
-        			]);
-        		}
+            			Adminrole::create([
+            				'role_id' => $v,
+            				'admin_id' => $data['id'],
+            			]);
+            		}
+                }
 
                 return ['code' => ReturnCode::SUCCESS,'msg' => Tools::errorCode(ReturnCode::SUCCESS)];
             }else {
@@ -108,16 +110,18 @@ class Admin extends Model
                 $this->where('id', $lastid)->data(['bg' => $bg['msg']])->update();
 
                 $qrcode = Tools::upload('qrcode', '/admin/Qrcode',$lastid);
+                if(!empty($role_id)){
+                    // 根据关联表的关系，还需对角色权限表进行赋值
 
-                // 根据关联表的关系，还需对角色权限表进行赋值
+            		foreach($role_id['role_id'] as $k => $v){
 
-        		foreach($role_id['role_id'] as $k => $v){
+            			Adminrole::create([
+            				'role_id' => $v,
+            				'admin_id' => $lastid
+            			]);
+            		}
+                }
 
-        			Adminrole::create([
-        				'role_id' => $v,
-        				'admin_id' => $lastid
-        			]);
-        		}
                 return ['code' => ReturnCode::SUCCESS,'msg' => Tools::errorCode(ReturnCode::SUCCESS)];
             }else {
                 return ['code' => ReturnCode::ERROR,'msg' => Tools::errorCode(ReturnCode::ERROR)];
@@ -155,7 +159,6 @@ class Admin extends Model
         }
 
         $bg = Tools::upload('bg', '/admin/Bg',$data['id']);
-        var_dump($bg);
 
         $qrcode = Tools::upload('qrcode', '/admin/Qrcode',$data['id']);
 
@@ -201,13 +204,12 @@ class Admin extends Model
 
         $list = $this->alias('a')
         ->field('a.users,a.isow,a.id,a.phone,a.weixin,a.chuqin,a.qq1,GROUP_CONCAT(b.role_name) role_name')
-        ->join('admin_role c', 'c.admin_id = a.id')
-        ->join('role b', 'c.role_id = b.id')
+        ->leftJoin('admin_role c', 'c.admin_id = a.id')
+        ->leftJoin('role b', 'c.role_id = b.id')
         ->order('a.isow asc')
         ->group('a.id')
         ->where($where)
         ->select();
-        // var_dump($list);die;
 
         $count = $list->count();
 

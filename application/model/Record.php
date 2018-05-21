@@ -46,13 +46,13 @@ class Record extends Model
 
         $list = $this->alias('a')
         ->field('a.*, b.username, c.users')
-        ->join('member b', 'b.id = a.khid')
-        ->join('admin c', 'c.id = a.uid')
+        ->leftJoin(['member'=>'b'], 'b.id = a.khid')
+        ->leftJoin(['admin'=>'c'], 'c.id = a.uid')
         ->where($where)
         ->order('id desc')->paginate();
 
         $count = $list->total();
-        
+
         return $result = [
             'list'  => $list,
             'count' => $count,

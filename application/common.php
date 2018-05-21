@@ -8,9 +8,7 @@
 // +----------------------------------------------------------------------
 // | Author: 流年 <liu21st@gmail.com>
 // +----------------------------------------------------------------------
-use app\model\Log;
 use app\model\Setting;
-use app\Util\Tools;
 
 /*****************客户端调用验证码***********************/
 // 生成验证码
@@ -153,7 +151,7 @@ function writelog($data, $act, $uid, $edits = '')
         // 新增消费
         case '2':
             $note = [];
-            $kh = Db::name('member')->where('id',$data['khid'])->find();
+            $kh = Db::table('member')->where('id',$data['khid'])->find();
             $note = json_encode([
                 'username'=> $kh['username'],
                 'product'=> $data['product'],
@@ -166,8 +164,8 @@ function writelog($data, $act, $uid, $edits = '')
             break;
         // 删除消费
         case '4':
-            $info = Db::name('record')->field('price,product,khid')->find($data);
-            $kh = Db::name('member')->field('qq,username,weixin,phone')->find($info['khid']);
+            $info = Db::table('record')->field('price,product,khid')->find($data);
+            $kh = Db::table('member')->field('qq,username,weixin,phone')->find($info['khid']);
             $note = json_encode([
                 'username' => $kh['username'],
                 'product'=> $info['product'],
@@ -180,9 +178,9 @@ function writelog($data, $act, $uid, $edits = '')
         // 3:删除客户;5:更新客户；1：新增客户
         default:
             if($act == 3 || $act == 5 || $act == 1){
-                $kh = Db::name('member')->where('id',$data)->find();
+                $kh = Db::table('member')->where('id',$data)->find();
                 if($act == 3){
-                    $price = Db::name('record')->field('price')->where('khid','EQ',$data)->select();
+                    $price = Db::table('record')->field('price')->where('khid','EQ',$data)->select();
                     $sum = 0;
                     foreach($price as $k => $v){
                         $sum += $v['price'];
@@ -228,7 +226,7 @@ function writelog($data, $act, $uid, $edits = '')
         $da['uid'] = $uid;
         $da['note'] = $note;
         $da['ip'] = $_SERVER['REMOTE_ADDR'];
-        Db::name('logs')->insert($da);
+        Db::table('logs')->insert($da);
     }
 }
 

@@ -10,7 +10,7 @@ class Role extends Model
 {
     //主键
     protected $pk = 'id';
-    protected $table='role';
+    protected $name='role';
 
 
     protected $rule = [
@@ -40,10 +40,8 @@ class Role extends Model
         $validate  = Validate::make($this->rule,$this->msg);
 
         $result = $validate->check($data);
-
         // 过滤post数组中的非数据表字段数据
         $data = Request::only(['id','role_name','role_status','role_desc']);
-
         $priId = Request::only(['pri_id']);
 
         if(!$result) {
@@ -111,8 +109,8 @@ class Role extends Model
 
          $list = $this->alias('a')
          ->field('a.*,GROUP_CONCAT(c.pri_name) pri_name')
-         ->join('role_pri b','a.id = b.role_id')
-         ->join('privilege c','b.pri_id = c.id')
+         ->leftJoin('crm_role_pri b','a.id = b.role_id')
+         ->leftJoin('crm_privilege c','b.pri_id = c.id')
          ->group('a.id')
          ->where($where)->select();
 
@@ -139,7 +137,7 @@ class Role extends Model
 
              return ['code' => ReturnCode::SUCCESS,'msg' => Tools::errorCode(ReturnCode::SUCCESS)];
          }else {
-             
+
              return ['code' => ReturnCode::ERROR,'msg' => Tools::errorCode(ReturnCode::ERROR)];
          }
      }

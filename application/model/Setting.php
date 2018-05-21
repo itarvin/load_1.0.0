@@ -9,7 +9,7 @@ class Setting extends Model
 {
     //主键
     protected $pk = 'id';
-    protected $table='setting';
+    protected $name='setting';
 
     protected $rule =   [
         'title|配置标题'          => 'min:2|unique:setting',
@@ -119,7 +119,7 @@ class Setting extends Model
 
             return ['code' => ReturnCode::SUCCESS,'msg' => Tools::errorCode(ReturnCode::SUCCESS)];
         }else {
-            
+
             return ['code' => ReturnCode::ERROR,'msg' => Tools::errorCode(ReturnCode::ERROR)];
         }
     }

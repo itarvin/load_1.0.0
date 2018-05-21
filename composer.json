@@ -19,7 +19,8 @@
         "php": ">=5.6.0",
         "topthink/framework": "5.1.*",
         "topthink/think-captcha": "^2.0",
-        "phpoffice/phpexcel": "^1.8"
+        "phpoffice/phpexcel": "^1.8",
+        "overtrue/chinese-calendar": "^0.0.5"
     },
     "autoload": {
         "psr-4": {

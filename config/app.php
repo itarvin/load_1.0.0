@@ -138,6 +138,8 @@ return [
     'exception_handle'       => '',
     // 定义上传文件目录
     'upload_path'            => '../public/uploads',
+    // 显示图片目录
+    'show_path'            => '/uploads',
     // 定义超级管理员id,
     'IS_SUPERMAN'           => array('1'),
     //后台登录状态维持时间[目前只有登录和解锁会重置登录时间]

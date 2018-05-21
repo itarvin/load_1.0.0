@@ -71,8 +71,8 @@ class Log extends Model
         // 提取对应数据
         $list = $this->alias('a')
         ->field('a.*, b.users, c.act_name')
-        ->join('admin b', 'a.uid = b.id')
-        ->join(['logs_act'=>'c'], 'a.act = c.id')
+        ->leftJoin(['admin' => 'b'], 'a.uid = b.id')
+        ->leftJoin(['logs_act'=>'c'], 'a.act = c.id')
         ->where($where)->whereOr($map)->order('id desc')->paginate();
 
         // 是否提交了关键字
