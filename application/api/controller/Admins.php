@@ -22,7 +22,7 @@ class Admins extends Base
             if( request()->isPost()){
 
                 $admin = new Admin;
-                var_dump(Request::param());
+                
                 $result = $admin->apiStore(Request::param());
 
                 return buildReturn(['status' => $result['code'],'info'=> $result['msg']]);

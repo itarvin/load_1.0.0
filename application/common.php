@@ -12,21 +12,21 @@ use app\model\Setting;
 
 /*****************客户端调用验证码***********************/
 // 生成验证码
-function makecode()
-{
-    require_once '../thinkphp/library/think/code.php';
-    $num1 = rand(1,20);
-    $num2 = rand(1,20);
-    $code = VerifyCode::get($num1,$num2);
-    return $code;
-}
-// 验证验证码
-function checkcode($code)
-{
-    require_once '../thinkphp/library/think/code.php';
-    $re = VerifyCode::check($code);
-    return $re;
-}
+// function makecode()
+// {
+//     require_once '../thinkphp/library/think/code.php';
+//     $num1 = rand(1,20);
+//     $num2 = rand(1,20);
+//     $code = VerifyCode::get($num1,$num2,'itarvin');
+//     return $code;
+// }
+// // 验证验证码
+// function checkcode($code)
+// {
+//     require_once '../thinkphp/library/think/code.php';
+//     $re = VerifyCode::check($code,'itarvin');
+//     return $re;
+// }
 
 /**
  * 应用场景：获取配置项
@@ -191,6 +191,7 @@ function writelog($data, $act, $uid, $edits = '')
                         'birthday'=> $kh['birthday'],
                     ]);
                 }else if($act == 5){
+                    // var_dump($kh);
                     $jsons = [];
                     foreach ($kh as $key => $output) {
                         foreach ($edits as $key2 => $input) {

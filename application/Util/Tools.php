@@ -86,8 +86,6 @@ class Tools {
             ReturnCode::OCCUPIED             => '非您的客户！',
             ReturnCode::LACKOFPARAM          => '缺少合法参数',
             ReturnCode::LOCKACCOUNT          => '账户异常，已被冻结！请联系管理员释放',
-
-
     	);
     	return $code ? $errorInfo[$code] : '未知错误';
     }

@@ -34,6 +34,7 @@ class Base extends Controller
             $preview = Admin::field('users, pwd')->find($uid);
 
             $this->uid = $uid;
+            // var_dump($this->uid);
             // 验证是否当前用户设备与提交的用户设备一致.
             if( $key['agent'] == $agent && md5($preview['users'].$preview['pwd']) == $key['salt']){
 

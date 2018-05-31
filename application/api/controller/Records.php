@@ -16,8 +16,8 @@ class Records extends Base
      * @param page(post)
      * @return json
      */
-    // public function add()
-    // {
-    //
-    // }
+    public function add()
+    {
+
+    }
 }

@@ -16,7 +16,7 @@ class Logs extends Base
      */
     public function index()
     {
-        // Debug::remark('begin');
+
         $log = new Log;
 
         $acts = Logact::field('id, act_name')->select();

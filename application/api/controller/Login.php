@@ -25,16 +25,16 @@ class Login extends Base
             // 获取客户端设备
             $agent = Request::header('User-Agent');
 
-            // if(isset($input['verify']) && !captcha_check($input['verify'] )){
-            //
-            //     return buildReturn(['status' => ReturnCode::ERROR, 'info' => '验证码错误！']);
-            // }
-
-            // 数字运算验证码
-            if(isset($input['verify']) && !checkcode($input['verify'] )){
+            if(isset($input['verify']) && !captcha_check($input['verify'] )){
 
                 return buildReturn(['status' => ReturnCode::ERROR, 'info' => '验证码错误！']);
             }
+
+            // 数字运算验证码
+            // if(isset($input['verify']) && !checkcode($input['verify'] )){
+            //
+            //     return buildReturn(['status' => ReturnCode::ERROR, 'info' => '验证码错误！']);
+            // }
             $rule = [
                 //管理员登陆字段验证
                 'users|管理员账号' => 'require',
@@ -80,19 +80,18 @@ class Login extends Base
                     // 更新时间
                     $model->where($where_query)->update(['lasttime' => $time]);
 
-                    $clientInfo = base64_encode(json_encode(['uname' => $user->users, 'bg' => $user->bg]));
-
-                    if( $input['online'] == 1){
+                    if( isset($input['online']) && $input['online'] == 1){
                         // 标识存入cookie
                         Cookie::set('identity', $token, ['expire'=> 3600 * 12 * 30 ]);
-                        Cookie::set('client', $clientInfo, ['expire'=> 3600 * 12 * 30 ]);
-                    }else if( $input['online'] == 0) {
+                    }else{
                         Cookie::set('identity', $token, ['expire'=> 3600 * 12]);
-                        Cookie::set('client', $clientInfo, ['expire'=> 3600 * 12]);
                     }
 
+                    $reUser['users'] = $user['users'];
+                    $reUser['bg'] = "/public/uploads".$user['bg'];
+                    $reUser['clientid'] = $user['id'];
                     // 返回状态
-                    return buildReturn(['status' => ReturnCode::SUCCESS,'info'=>  Tools::errorCode(ReturnCode::SUCCESS)]);
+                    return buildReturn(['status' => ReturnCode::SUCCESS,'info'=>  Tools::errorCode(ReturnCode::SUCCESS),'data' => $reUser]);
                 } else {
 
                     $this->checkLogin($name);
@@ -169,17 +168,17 @@ class Login extends Base
      */
     public function verify()
     {
-        // $config = [
-        //     // 验证码字体大小
-        //     'fontSize'    =>   12,
-        //     // 验证码位数
-        //     'length'      =>   3,
-        //     // 关闭验证码杂点
-        //     'useNoise'    =>   false,
-        // ];
-        // $captcha = new Captcha($config);
-        // return $captcha->entry();
-        makecode();
+        $config = [
+            // 验证码字体大小
+            'fontSize'    =>   16,
+            // 验证码位数
+            'length'      =>   3,
+            // 关闭验证码杂点
+            'useNoise'    =>   false,
+        ];
+        $captcha = new Captcha($config);
+        return $captcha->entry();
+        // makecode();
     }
 
 

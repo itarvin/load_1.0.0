@@ -136,7 +136,7 @@ class Admin extends Model
      */
     public function apiStore($data)
     {
-        $validate  = Validate::make($this->rule,$this->message);
+        $validate  = ValidateRule::make($this->rule,$this->message);
 
         $result = $validate->check($data);
 

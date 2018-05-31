@@ -15,26 +15,53 @@ class Members extends Base
 {
 
     /**
+     * 指定类型查询
+     * @param page(post)
+     * @return json
+     */
+    public function search()
+    {
+        if($this->AuthPermission == '200'){
+
+            if( request()->isPost()){
+
+                $member = new Member;
+
+                $result = $member->loginSearch(Request::param(),$this->uid);
+
+                return buildReturn(['status' => $result['code'],'info'=>  $result['msg'],'data' => $result['data']]);
+            }else {
+
+                return buildReturn(['status' => ReturnCode::LACKOFPARAM,'info'=>  Tools::errorCode(ReturnCode::LACKOFPARAM)]);
+            }
+        }else {
+
+            return $this->returnRes($this->AuthPermission, 'true');
+        }
+    }
+
+    /**
      * 分页数据接口
      * @param page(post)
      * @return json
      */
     public function index()
     {
+
         if($this->AuthPermission == '200'){
-            if( request()->isPost()){
+            if( request()->isGet()){
 
                 $member = new Member;
 
                 $list = $member->search(Request::param(),$this->uid);
 
-                return buildReturn(['status' => ReturnCode::SUCCESS,'info'=>  Tools::errorCode(ReturnCode::SUCCESS),'data' => $list]);
+                return json(['code' => 0,'msg' => "", 'count' => $list['count'],'data' => $list['data']]);
             }else {
 
                 return buildReturn(['status' => ReturnCode::LACKOFPARAM,'info'=>  Tools::errorCode(ReturnCode::LACKOFPARAM)]);
             }
         }else {
-            
+
             return $this->returnRes($this->AuthPermission, 'true');
         }
     }
@@ -149,6 +176,37 @@ class Members extends Base
                 $result = $member->softDelete($kid, $this->uid);
 
                 return buildReturn(['status' => $result['code'],'info'=> $result['msg']]);
+            }else {
+
+                return buildReturn(['status' => ReturnCode::LACKOFPARAM,'info'=>  Tools::errorCode(ReturnCode::LACKOFPARAM)]);
+            }
+        }else {
+
+            return $this->returnRes($this->AuthPermission, 'true');
+        }
+    }
+
+    /**
+     * 获取客户信息
+     * @param kid
+     * @return json
+     */
+    public function getMemeber()
+    {
+        if($this->AuthPermission == '200'){
+            if( request()->isPost()){
+
+                $khid = Request::param('khid', '', 'strip_tags', 'trim');
+                $check = Member::field('id,username,uid')->find($khid);
+
+                if($check['uid'] == $this->uid){
+
+                    return buildReturn(['status' => ReturnCode::SUCCESS,'info'=> Tools::errorCode(ReturnCode::SUCCESS),'data' => $check]);
+                }else {
+
+                    return buildReturn(['status' => ReturnCode::ERROR,'info'=> Tools::errorCode(ReturnCode::ERROR)]);
+                }
+
             }else {
 
                 return buildReturn(['status' => ReturnCode::LACKOFPARAM,'info'=>  Tools::errorCode(ReturnCode::LACKOFPARAM)]);

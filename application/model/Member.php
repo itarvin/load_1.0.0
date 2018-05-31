@@ -37,23 +37,24 @@ class Member extends Model
     {
         // 先检测当前数据是否存在其他行列
         $id = isset($data['id']) ? $data['id'] : '';
+        if($id != ''){
+            $result = $this->checkValue($data, $id);
+            if($result){
 
-        $result = $this->checkValue($data, $id);
+                if($result['uid'] == $data['uid']){
 
-        if($result){
+                    $info = '已被你登记存在';
+                    return ['code' => ReturnCode::ERROR, 'msg' => $info];
+                }else{
 
-            if($result['uid'] == $data['uid']){
-
-                $info = '已被你登记存在';
-                return ['code' => ReturnCode::ERROR, 'msg' => $info];
-            }else{
-
-                $info = '已被'.$result['user'].'登记存在';
-                return ['code' => ReturnCode::ERROR, 'msg' => $info];
+                    $info = '已被'.$result['user'].'登记存在';
+                    return ['code' => ReturnCode::ERROR, 'msg' => $info];
+                }
             }
         }
+
         // 检测修改是否为所有者
-        if(isset($data['id'])){
+        if(isset($id) && $id != ''){
 
             $exist = $this->where('id','EQ',$data['id'])->find();
 
@@ -75,7 +76,7 @@ class Member extends Model
             return ['code' => ReturnCode::ERROR,'msg' => $validate->getError()];
         }
         // 数据处理
-        if(isset($data['id'])){
+        if(isset($id) && $id != ''){
 
             // ------日志处理 ---start
             writelog($data['id'], Tools::logactKey('cus_change'), $data['uid'],$data);
@@ -88,8 +89,9 @@ class Member extends Model
                 return ['code' => ReturnCode::ERROR,'msg' => Tools::errorCode(ReturnCode::ERROR)];
             }
         }else{
-            if($lastid = $this->insertGetId($data)){
+            unset($data['id']);
 
+            if($lastid = $this->insertGetId($data)){
                 // ------日志处理 ---start
                 writelog($lastid, Tools::logactKey('cus_insert'), $data['uid']);
                 // -------------------end
@@ -221,6 +223,9 @@ class Member extends Model
      */
      public function search($data,$uid)
      {
+         $page = isset($data['page']) ? $data['page'] : 1;
+         $limit = isset($data['limit']) ? $data['limit'] : 10;
+
          $where = [];
          $where[] = ['uid', 'EQ', $uid];
          $where[] = ['is_delete', 'EQ', 0];
@@ -255,13 +260,14 @@ class Member extends Model
                  $where[] = ['note', 'LIKE', $note];
              }
          }
-         $list = $this->field('id,username,sex,calendar,birthday,qq,phone,weixin,note,newtime,address')->where($where)->order('id desc')->paginate();
+         // $list = $this->field('id,username,sex,calendar,birthday,qq,phone,weixin,note,newtime,address')->where($where)->order('id desc')->paginate('100');
+         $list = $this->field('id,username,sex,calendar,birthday,qq,phone,weixin,note,newtime,address')->where($where)->order('id desc')->page($page, $limit)->select();
+         $count = $this->where($where)->count();
 
-         $pages = $list->render();
-
+         // $pages = $list->render();
          return $retult = [
              'data' => $list,
-             'pages' => $pages
+             'count' => $count
          ];
      }
 
@@ -284,6 +290,47 @@ class Member extends Model
 
              if($result != null){
                  return ['code' => ReturnCode::SUCCESS, 'msg' => Tools::errorCode(ReturnCode::SUCCESS), 'data' => $result];
+             }else {
+                 return ['code' => ReturnCode::NODATA, 'msg' => Tools::errorCode(ReturnCode::NODATA), 'data' => []];
+             }
+         }else {
+             return ['code' => ReturnCode::LACKOFPARAM, 'msg' => Tools::errorCode(ReturnCode::LACKOFPARAM),'data' => []];
+         }
+     }
+
+     /**
+      * 客户端登录查询
+      * @param string $value 关键字
+      * @return array
+      */
+     public function loginSearch($value,$uid)
+     {
+         $where = [];
+         if(isset($value['type']) && isset($value['value']) && $value['value'] != '' && is_numeric($value['value'])){
+             if($value['type'] != '0'){
+                 $where[] = ['a.'.$value['type'], 'eq', $value['value']];
+             }else {
+                 $where[] = ['a.qq|a.phone|a.weixin', 'eq', $value['value']];
+             }
+
+             $result = $this->alias('a')
+             ->field('b.users,b.qq1,a.id,a.username,a.weixin,a.note,a.phone,a.qq,a.sex,a.uid,a.newtime,a.address,a.age')
+             ->leftJoin(['admin'=>'b'],'a.uid = b.id')
+             ->where($where)->find();
+
+             if($result != null){
+
+                 if($result['uid'] != $uid){
+
+                     $data['users'] = $result['users'];
+                     $data['qq1'] = $result['qq1'];
+                     $data['newtime'] = $result['newtime'];
+                 }else {
+
+                     $data = $result;
+                 }
+
+                 return ['code' => ReturnCode::SUCCESS, 'msg' => Tools::errorCode(ReturnCode::SUCCESS), 'data' => $data];
              }else {
                  return ['code' => ReturnCode::NODATA, 'msg' => Tools::errorCode(ReturnCode::NODATA), 'data' => []];
              }
