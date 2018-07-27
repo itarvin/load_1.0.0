@@ -1,0 +1,216 @@
+{layout name="layout/layout" /}
+    <div class="x-body">
+        <form class="layui-form" action="{:url('admin/edit')}" enctype="multipart/form-data" method="post">
+            <div class="layui-form-item">
+                <label for="phone" class="layui-form-label">
+                    <span class="x-red">*</span>角　色
+                </label>
+                <div class="layui-input-block">
+                {volist name="roleData" id="vo"}
+
+					<input type="checkbox" name="role_id[{$vo.id}]" value="{$vo.id}" id="role_{$vo.id}" {if in_array($vo.id,$roleId)}checked=""{/if}}/>
+					<label for="role_{$vo.id}">{$vo.role_name}　</label>
+
+                {/volist}
+                </div>
+            </div>
+          <div class="layui-form-item">
+              <label for="username" class="layui-form-label">
+                  <span class="x-red">*</span>登录名
+              </label>
+              <div class="layui-input-inline">
+                  <input type="text" id="username" name="users" required="" lay-verify="required" autocomplete="off" class="layui-input" value="{$data.users}">
+                  <input type="hidden" name="id" value="{$data.id}">
+              </div>
+              <div class="layui-form-mid layui-word-aux">
+                  <span class="x-red">*</span>将会成为您唯一的登入名
+              </div>
+          </div>
+          <div class="layui-form-item">
+              <label for="phone" class="layui-form-label">
+                  <span class="x-red">*</span>性　别
+              </label>
+              <div class="layui-input-inline">
+                  <input type="radio" name="gender" value="0" title="男" {if $data['gender'] == '0'}checked=''{/if}>
+                  <input type="radio" name="gender" value="1" title="女" {if $data['gender'] == '1'}checked=''{/if}>
+              </div>
+          </div>
+          <div class="layui-form-item">
+              <label for="phone" class="layui-form-label">
+                  <span class="x-red">*</span>状  态
+              </label>
+              <div class="layui-input-inline">
+                  <input type="radio" name="isow" value="1" title="离职" {if $data['isow'] == '1'}checked=''{/if}>
+                  <input type="radio" name="isow" value="0" title="在职" {if $data['isow'] == '0'}checked=''{/if}>
+              </div>
+          </div>
+          <div class="layui-form-item">
+              <label for="phone" class="layui-form-label">
+                  <span class="x-red">*</span>头  像
+              </label>
+              <div class="layui-input-inline">
+                  <input type="file"  name="bg">
+              </div>
+              <div class="layui-form-mid layui-word-aux">
+                  {:showImage($data['bg'], '50' , '50')}
+              </div>
+          </div>
+
+          <div class="layui-form-item">
+              <label for="phone" class="layui-form-label">
+                  <span class="x-red">*</span>二维码
+              </label>
+              <div class="layui-input-inline">
+                  <input type="file"  name="qrcode">
+              </div>
+              <div class="layui-form-mid layui-word-aux">
+                  {:showImage($data['qrcode'], '50' , '50')}
+              </div>
+          </div>
+          <div class="layui-form-item">
+              <label for="phone" class="layui-form-label">
+                  <span class="x-red">*</span>手　机
+              </label>
+              <div class="layui-input-inline">
+                  <input type="text" id="phone" name="phone" required="" lay-verify="phone" autocomplete="off" class="layui-input" value="{$data.phone}">
+              </div>
+          </div>
+          <div class="layui-form-item">
+              <label for="phone" class="layui-form-label">
+                  <span class="x-red">*</span>微信号
+              </label>
+              <div class="layui-input-inline">
+                  <input type="text" id="weixin" name="weixin" required="" lay-verify="weixin"
+                  autocomplete="off" class="layui-input" value="{$data.weixin}">
+              </div>
+              <div class="layui-form-mid layui-word-aux">
+                  <span class="x-red">*</span>
+              </div>
+          </div>
+          <div class="layui-form-item">
+              <label for="phone" class="layui-form-label">
+                  <span class="x-red">*</span>QQ1
+              </label>
+              <div class="layui-input-inline">
+                  <input type="text"  name="qq1" required="" lay-verify="qq1"
+                  autocomplete="off" class="layui-input" value="{$data.qq1}">
+              </div>
+          </div>
+          <div class="layui-form-item">
+              <label for="phone" class="layui-form-label">
+                  <span class="x-red">*</span>QQ2
+              </label>
+              <div class="layui-input-inline">
+                  <input type="text" id="qq" name="qq2" required="" lay-verify="qq2"
+                  autocomplete="off" class="layui-input" value="{$data.qq2}">
+              </div>
+          </div>
+          <div class="layui-form-item">
+              <label for="phone" class="layui-form-label">
+                  <span class="x-red">*</span>QQ3
+              </label>
+              <div class="layui-input-inline">
+                  <input type="text" id="qq" name="qq3" required="" lay-verify="qq3"
+                  autocomplete="off" class="layui-input" value="{$data.qq3}">
+              </div>
+          </div><div class="layui-form-item">
+              <label for="phone" class="layui-form-label">
+                  <span class="x-red">*</span>QQ4
+              </label>
+              <div class="layui-input-inline">
+                  <input type="text" id="qq" name="qq4" required="" lay-verify="qq4"
+                  autocomplete="off" class="layui-input" value="{$data.qq4}">
+              </div>
+          </div>
+          <div class="layui-form-item">
+              <label for="L_pass" class="layui-form-label">
+                  <span class="x-red">*</span>密　码
+              </label>
+              <div class="layui-input-inline">
+                  <input type="password" id="L_pass" name="pwd" autocomplete="off" class="layui-input">
+              </div>
+          </div>
+          <div class="layui-form-item">
+              <label for="L_repass" class="layui-form-label">
+                  <span class="x-red">*</span>确认密码
+              </label>
+              <div class="layui-input-inline">
+                  <input type="password" id="L_repass" autocomplete="off" class="layui-input">
+              </div>
+              {:token()}
+          </div>
+          <div class="layui-form-item">
+              <label for="L_repass" class="layui-form-label">
+              </label>
+              <button  class="layui-btn" lay-filter="add" lay-submit="">
+                  更新
+              </button>
+          </div>
+      </form>
+    </div>
+    <script>
+    layui.use(['form','layer'], function(){
+        $ = layui.jquery;
+        var form = layui.form
+        ,layer = layui.layer;
+        //自定义验证规则
+        form.verify({
+            weixin: function(value){
+                var reg=/^[a-zA-Z\d_]{5,20}$/;
+                if(value.length < 6 || value.length > 20){
+                    return '微信号必须6到20位';
+                }
+                if (!reg.test(value)) {
+                    return '微信号格式不正确！';
+                }
+            }
+            // ,pass: [/(.+){6,12}$/, '密码必须6到12位']
+            ,repass: function(value){
+                if($('#L_pass').val()!=$('#L_repass').val()){
+                    return '两次密码不一致';
+                }
+            }
+            ,qq1 : function(value){
+                var reg = /^[1-9][0-9]{4,9}$/;
+                if (!reg.test(value)) {
+                    return 'QQ号格式不正确！';
+                }
+            }
+            ,qq2 : function(value){
+                var reg = /^[1-9][0-9]{4,9}$/;
+                if (!reg.test(value)) {
+                    return 'QQ号格式不正确！';
+                }
+            }
+            ,qq3 : function(value){
+                var reg = /^[1-9][0-9]{4,9}$/;
+                if (!reg.test(value)) {
+                    return 'QQ号格式不正确！';
+                }
+            }
+            ,qq4 : function(value){
+                var reg = /^[1-9][0-9]{4,9}$/;
+                if (!reg.test(value)) {
+                    return 'QQ号格式不正确！';
+                }
+            }
+        });
+        //监听提交
+        // form.on('submit(add)', function(data){
+        //     //发异步，把数据提交给php
+        //     $.post("{:url('admin/edit')}",data.field,function(res){
+    	// 		if(res.status == 1){
+        //             layer.alert("更新成功", {icon: 6},function () {
+        //                 // 获得frame索引
+        //                 var index = parent.layer.getFrameIndex(window.name);
+        //                 //关闭当前frame
+        //                 parent.layer.close(index);
+        //             });
+        //         }else{
+    	// 			layer.msg(res.info, {time: 2000});
+    	// 		}
+        //     },'json');
+        //     return false;
+        // });
+    });
+    </script>

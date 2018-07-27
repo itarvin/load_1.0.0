@@ -12,7 +12,6 @@ class Role extends Model
     protected $pk = 'id';
     protected $name='role';
 
-
     protected $rule = [
         'role_name|角色名称'         => 'require|min:2|unique:role',
         'role_status|角色状态'       => 'require|number',
@@ -35,29 +34,21 @@ class Role extends Model
     {
         // 先检测当前数据是否存在其他行列
         $id = isset($data['id']) ? $data['id'] : '';
-
         // 基础数据验证
         $validate  = Validate::make($this->rule,$this->msg);
-
         $result = $validate->check($data);
         // 过滤post数组中的非数据表字段数据
         $data = Request::only(['id','role_name','role_status','role_desc']);
         $priId = Request::only(['pri_id']);
-
         if(!$result) {
-
             return ['code' => ReturnCode::ERROR,'msg' => $validate->getError()];
         }
         if($id != ''){
-
             if($this->update($data)){
-
                 // 删除当前id所存在的权限
                 Rolepri::where('role_id',$data['id'])->delete();
-
                 // 根据关联表的关系，还需对角色权限表进行赋值
         		foreach ($priId['pri_id'] as $k => $v){
-
         			Rolepri::create([
         				'pri_id' => $v,
         				'role_id' => $data['id'],
@@ -65,13 +56,10 @@ class Role extends Model
         		}
                 return ['code' => ReturnCode::SUCCESS,'msg' => Tools::errorCode(ReturnCode::SUCCESS)];
             }else {
-
                 return ['code' => ReturnCode::ERROR,'msg' => Tools::errorCode(ReturnCode::ERROR)];
             }
         }else {
-
             if($lastid = $this->insertGetId($data)){
-
                 // 根据关联表的关系，还需对角色权限表进行赋值
         		foreach ($priId['pri_id'] as $k => $v){
         			Rolepri::create([
@@ -81,7 +69,6 @@ class Role extends Model
         		}
                 return ['code' => ReturnCode::SUCCESS,'msg' => Tools::errorCode(ReturnCode::SUCCESS)];
             }else {
-
                 return ['code' => ReturnCode::ERROR,'msg' => Tools::errorCode(ReturnCode::ERROR)];
             }
         }
@@ -93,29 +80,24 @@ class Role extends Model
      * @param array $data 提价的数据集
      * @return array
      */
-     public function search($data = ''){
-
+     public function search($data = '')
+     {
          $where = [];
          $role_status = isset($data['role_status']) ? $data['role_status'] : '';
-
          $role_name = isset($data['role_name']) ? $data['role_name'] : '';
-
          if($role_status != ''){
              $where[] = ['a.role_status', 'eq' ,$role_status];
          }
          if($role_name != ''){
              $where[] = ['a.role_name', 'LIKE' ,"%$role_name%"];
          }
-
          $list = $this->alias('a')
          ->field('a.*,GROUP_CONCAT(c.pri_name) pri_name')
          ->leftJoin('crm_role_pri b','a.id = b.role_id')
          ->leftJoin('crm_privilege c','b.pri_id = c.id')
          ->group('a.id')
          ->where($where)->select();
-
          $count = $list->count();
-
          return $retult = [
              'data' => $list,
              'count' => $count
@@ -132,12 +114,9 @@ class Role extends Model
          // 删除角色携带的权限
          Rolepri::where('role_id', $id)->delete();
          $result = $this->where('id',$id)->delete();
-
          if($result){
-
              return ['code' => ReturnCode::SUCCESS,'msg' => Tools::errorCode(ReturnCode::SUCCESS)];
          }else {
-
              return ['code' => ReturnCode::ERROR,'msg' => Tools::errorCode(ReturnCode::ERROR)];
          }
      }

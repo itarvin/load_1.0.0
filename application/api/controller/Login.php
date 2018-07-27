@@ -59,7 +59,7 @@ class Login extends Base
                 $this->checkLogin($name);
 
                 return buildReturn(['status' => ReturnCode::AUTH_ERROR,'info'=>  Tools::errorCode(ReturnCode::AUTH_ERROR)]);
-            }else if( $preview['status'] == 1){
+            }else if( $preview['isow'] == 1){
 
                 $this->checkLogin($name);
 

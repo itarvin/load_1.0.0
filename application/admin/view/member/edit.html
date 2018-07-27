@@ -1,0 +1,117 @@
+{layout name="layout/layout" /}
+    <div class="x-body">
+        <form class="layui-form">
+          <div class="layui-form-item">
+              <label for="username" class="layui-form-label">
+                  <span class="x-red">*</span>客户名称
+              </label>
+              <div class="layui-input-inline">
+                  <input type="text" id="username" name="username" required="" lay-verify="required" autocomplete="off" class="layui-input" value="{$data.username}">
+                  <input type="hidden" name="id" value="{$data.id}">
+                  <input type="hidden" name="uid" value="{$data.uid}">
+              </div>
+          </div>
+          <div class="layui-form-item">
+              <label for="phone" class="layui-form-label">
+                  <span class="x-red">*</span>性　　别
+              </label>
+              <div class="layui-input-inline">
+                  <input type="radio" name="sex" value="男" title="男" {if $data['sex'] == '男'}che生日ed=''{/if}>
+                  <input type="radio" name="sex" value="女" title="女" {if $data['sex'] == '女'}checked=''{/if}>
+              </div>
+          </div>
+          <div class="layui-form-item">
+              <label for="phone" class="layui-form-label">
+                  <span class="x-red">*</span>手　　机
+              </label>
+              <div class="layui-input-inline">
+                  <input type="text" id="phone" name="phone"
+                  autocomplete="off" class="layui-input" value="{$data.phone}">
+              </div>
+          </div>
+          <div class="layui-form-item">
+              <label for="phone" class="layui-form-label">
+                  <span class="x-red">*</span>微 信 号
+              </label>
+              <div class="layui-input-inline">
+                  <input type="text" id="weixin" name="weixin" lay-verify="weixin"
+                  autocomplete="off" class="layui-input" value="{$data.weixin}">
+              </div>
+          </div>
+          <div class="layui-form-item">
+              <label for="phone" class="layui-form-label">
+                  <span class="x-red">*</span>Q　　Q
+              </label>
+              <div class="layui-input-inline">
+                  <input type="text"  name="qq" lay-verify="qq"
+                  autocomplete="off" class="layui-input" value="{$data.qq}">
+              </div>
+          </div>
+          <div class="layui-form-item">
+              <label for="phone" class="layui-form-label">
+                  <span class="x-red">*</span>生　　日
+              </label>
+              <div class="layui-input-inline">
+                  <input type="text"  name="birthday" required="" autocomplete="off" class="layui-input" value="{$data.birthday}" id="date">
+              </div>
+          </div>
+          <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">备　　注</label>
+            <div class="layui-input-block">
+              <textarea placeholder="请输入内容" class="layui-textarea" name="note">{$data['note']}</textarea>
+            </div>
+          </div>
+          {:token()}
+          <div class="layui-form-item">
+              <label for="L_repass" class="layui-form-label">
+              </label>
+              <button  class="layui-btn" lay-filter="add" lay-submit="">
+                  更新
+              </button>
+          </div>
+      </form>
+    </div>
+    <script>
+    layui.use(['form','layer','laydate'], function(){
+        $ = layui.jquery;
+        var form = layui.form
+        ,laydate = layui.laydate
+        ,layer = layui.layer;
+        laydate.render({
+            elem: '#date'
+        });
+          //自定义验证规则
+          // form.verify({
+          //     weixin: function(value){
+          //       var reg=/^[a-zA-Z\d_]{5,20}$/;
+          //       if(value.length < 6 || value.length > 20){
+          //           return '微信号必须6到20位';
+          //       }
+          //       if (!reg.test(value)) {
+          //           return '微信号格式不正确！';
+          //       }
+          //   }
+          //   ,qq : function(value){
+          //       var reg = /^[1-9][0-9]{4,9}$/;
+          //       if (!reg.test(value)) {
+          //           return 'QQ号格式不正确！';
+          //       }
+          //   }
+          // });
+          //监听提交
+        form.on('submit(add)', function(data){
+            //发异步，把数据提交给php
+            $.post("{:url('member/edit')}",data.field,function(res){
+                if(res.status == 1){
+                    layer.alert("更新成功", {icon: 6},function () {
+                        var index = parent.layer.getFrameIndex(window.name);
+                        parent.layer.close(index);
+                    });
+                }else{
+                    layer.msg(res.info, {time: 2000});
+                }
+            },'json');
+            return false;
+        });
+    });
+    </script>

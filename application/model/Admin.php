@@ -49,79 +49,57 @@ class Admin extends Model
     public function store($data)
     {
         $validate  = ValidateRule::make($this->rule,$this->message);
-
         $result = $validate->check($data);
-
         if(!$result) {
-
             return ['code' => ReturnCode::ERROR,'msg' => $validate->getError()];
         }
-        $data = Request::only(['id','users','qq1','qq2','qq3','qq4','pwd','weixin','status','isow','gender','qq1name','qq2name','qq3name','qq4name','wxname','phone']);
-
+        $data = Request::only(['id','users','qq1','qq2','qq3','qq4','pwd','weixin','isow','gender','qq1name','qq2name','qq3name','qq4name','wxname','phone']);
         $role_id = Request::only(['role_id']);
-
         if(isset($data['id'])){
-
             $preview = $this->where(array('users'=>$data['users']))->find();
-
             if( $data['pwd'] != $preview['pwd'] && $data['pwd'] != ''){
-
     	        $data['pwd'] = $data['pwd'];
     	    }else{
     	    	unset($data['pwd']);
     	    }
-
             $bg = Tools::upload('bg', '/admin/Bg',$data['id']);
             if($bg['code'] == 1){
                 $data['bg'] = $bg['msg'];
             }else {
                 unset($data['bg']);
             }
-
             $qrcode = Tools::upload('qrcode', '/admin/Qrcode',$data['id']);
-
             if($this->update($data)){
-
-
                 // 删除当前id所存在的权限
                 Adminrole::where('admin_id',$data['id'])->delete();
                 if(!empty($role_id)) {
                     // 根据关联表的关系，还需对角色权限表进行赋值
-
             		foreach ($role_id['role_id'] as $k => $v){
-
             			Adminrole::create([
             				'role_id' => $v,
             				'admin_id' => $data['id'],
             			]);
             		}
                 }
-
                 return ['code' => ReturnCode::SUCCESS,'msg' => Tools::errorCode(ReturnCode::SUCCESS)];
             }else {
-
                 return ['code' => ReturnCode::ERROR,'msg' => Tools::errorCode(ReturnCode::ERROR)];
             }
         }else{
             $data['newtime'] = date('Y-m-d H:i:s',time());
             if($lastid = $this->insertGetId($data)){
-
                 $bg = Tools::upload('bg', '/admin/Bg',$lastid);
                 $this->where('id', $lastid)->data(['bg' => $bg['msg']])->update();
-
                 $qrcode = Tools::upload('qrcode', '/admin/Qrcode',$lastid);
                 if(!empty($role_id)){
                     // 根据关联表的关系，还需对角色权限表进行赋值
-
             		foreach($role_id['role_id'] as $k => $v){
-
             			Adminrole::create([
             				'role_id' => $v,
             				'admin_id' => $lastid
             			]);
             		}
                 }
-
                 return ['code' => ReturnCode::SUCCESS,'msg' => Tools::errorCode(ReturnCode::SUCCESS)];
             }else {
                 return ['code' => ReturnCode::ERROR,'msg' => Tools::errorCode(ReturnCode::ERROR)];
@@ -137,43 +115,28 @@ class Admin extends Model
     public function apiStore($data)
     {
         $validate  = ValidateRule::make($this->rule,$this->message);
-
         $result = $validate->check($data);
-
         if(!$result) {
-
             return ['code' => ReturnCode::ERROR,'msg' => $validate->getError()];
         }
         $data = Request::only(['id','users','qq1','qq2','qq3','qq4','pwd','weixin','status','isow','gender','qq1name','qq2name','qq3name','qq4name','wxname','bg','description','sex','phone','qrcode']);
-
         $preview = $this->where('users',$data['users'])->find();
-
         $pwd = isset($data['pwd']) ? $data['pwd'] : '';
-
         if( $pwd != $preview['pwd'] && $pwd != ''){
-
             $data['pwd'] = $data['pwd'];
         }else if(isset($data['pwd'])){
-
             unset($data['pwd']);
         }
-
         $bg = Tools::upload('bg', '/admin/Bg',$data['id']);
-
         $qrcode = Tools::upload('qrcode', '/admin/Qrcode',$data['id']);
-
         $data['bg'] = $bg['code'] == '1' ? $bg['msg'] : '';
         // $data['bg'] = $bg['code'] == '1' ? $bg['msg'] : '';
-
         if(!isset($data['id'])){
-
             return ['code' => ReturnCode::LACKOFPARAM,'msg' => Tools::errorCode(ReturnCode::LACKOFPARAM)];
         }
         if($this->update($data)){
-
             return ['code' => ReturnCode::SUCCESS,'msg' => Tools::errorCode(ReturnCode::SUCCESS)];
         }else {
-
             return ['code' => ReturnCode::ERROR,'msg' => Tools::errorCode(ReturnCode::ERROR)];
         }
     }
@@ -210,9 +173,7 @@ class Admin extends Model
         ->group('a.id')
         ->where($where)
         ->select();
-
         $count = $list->count();
-
         return $result = [
             'list' => $list,
             'count'=> $count
@@ -247,27 +208,20 @@ class Admin extends Model
         }
         // check type
         if (!empty($keyword)) {
-
             if( $type && in_array($type, $checktype)){
-
                 $where[] = [$type,  'EQ',  $keyword];
             }else{
-
                 $where[] = ['qq|phone|weixin',  'EQ',  $keyword];
             }
         }
         if($uid != ''){
-
             if(!checksuperman($uid)){
-
                 $where[] = ['uid', 'EQ', $uid];
             }
         }
         $list = $member->where($where)->order('id desc')->paginate();
-
         $page = $list->render();
         $count = $list->total();
-
         return $result = [
             'list'  => $list,
             'count' => $count,
@@ -283,10 +237,8 @@ class Admin extends Model
     public function getHitData($date)
     {
         $userIds = $this->field('id')->where('chuqin', 'eq', '1')->select();
-
         $where = [];
         $end = date('Y-m-d H:i:s', time());
-
         switch ($date) {
             case 'today':
                 $start = date('Y-m-d 0:0:0', time());
@@ -319,14 +271,11 @@ class Admin extends Model
                 break;
             }
         foreach ($userIds as $k => $v) {
-
             $list[$v['id']] = Hitcount::field('pv')->where('uid', 'EQ', $v['id'])->where($where)->select();
         }
         foreach ($list as $key => $value) {
-
             $pv = 0;
             foreach($value as $k => $v){
-
                 $pv += $v['pv'];
             }
             $da[$key] = $pv;

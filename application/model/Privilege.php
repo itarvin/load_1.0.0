@@ -29,8 +29,6 @@ class Privilege extends Model
         'action_name.alphaDash'                     => '方法名称为字母和数字，下划线_及破折号-',
     ];
 
-
-
     /**
      * 应用场景：新增，修改数据时的数据验证与处理
      * @param string $data    所有数据
@@ -40,33 +38,24 @@ class Privilege extends Model
     {
         // 先检测当前数据是否存在其他行列
         $id = isset($data['id']) ? $data['id'] : '';
-
         // 基础数据验证
         $validate  = Validate::make($this->rule,$this->msg);
         $result = $validate->check($data);
-
         // 过滤post数组中的非数据表字段数据
         $data = Request::only(['id','pri_name','module_name','controller_name','action_name','parent_id','ico']);
-
         if(!$result) {
-
             return ['code' => ReturnCode::ERROR,'msg' => $validate->getError()];
         }
         if($id != ''){
-
             if($this->update($data)){
-
                 return ['code' => ReturnCode::SUCCESS,'msg' => Tools::errorCode(ReturnCode::SUCCESS)];
             }else {
-
                 return ['code' => ReturnCode::ERROR,'msg' => Tools::errorCode(ReturnCode::ERROR)];
             }
         }else {
-
             if($lastid = $this->insertGetId($data)){
                 return ['code' => ReturnCode::SUCCESS,'msg' => Tools::errorCode(ReturnCode::SUCCESS)];
             }else {
-
                 return ['code' => ReturnCode::ERROR,'msg' => Tools::errorCode(ReturnCode::ERROR)];
             }
         }
@@ -80,24 +69,17 @@ class Privilege extends Model
     public function del($id)
     {
         $result = $this->getChildren($id);
-
         if($result){
-
             return ['code' => ReturnCode::ERROR,'msg' => '存在下级数据,静止操作！'];
         }else {
-
             // 这里要处理角色权限，暂留
             if($this->where('id',$id)->delete()){
-
                 return ['code' => ReturnCode::SUCCESS,'msg' => Tools::errorCode(ReturnCode::SUCCESS)];
             }else {
-
                 return ['code' => ReturnCode::ERROR,'msg' => Tools::errorCode(ReturnCode::ERROR)];
             }
         }
     }
-
-
 
     // 拿到子分类
     public function getChildren($id)
@@ -217,7 +199,7 @@ class Privilege extends Model
 		if(checksuperman($adminId)){
 
 			// 如果是，则吧所有的权限给超级管理员
-			$priData = $this->select();
+			$priData = $this->select()->toArray();
 		}else{
 
             // 否则，根据所给的角色给相应的权限
@@ -234,33 +216,18 @@ class Privilege extends Model
     			->field('DISTINCT c.id,c.pri_name,c.module_name,c.controller_name,c.action_name,c.parent_id,c.ico')
                 ->leftJoin('role_pri b', 'b.role_id = a.role_id')
                 ->leftJoin('privilege c', 'c.id = b.pri_id')
-    			->where('a.admin_id', $adminId)->select();
+    			->where('a.admin_id', $adminId)->select()->toArray();
             }
 		}
 		/*************** 从所有的权限中挑出前两级的 **********************/
 		$btns = [];
-        $ar = [];
-        $pd = [];
-        foreach ($priData as $key => $value) {
-            $ar['id']                = $value['id'];
-            $ar['pri_name']          = $value['pri_name'];
-            $ar['module_name']       = $value['module_name'];
-            $ar['controller_name']   = $value['controller_name'];
-            $ar['action_name']       = $value['action_name'];
-            $ar['parent_id']         = $value['parent_id'];
-            $ar['ico']               = $value['ico'];
-            $pd[] = $ar;
-        }
-		foreach ($pd as $k => $v){
+		foreach ($priData as $k => $v){
             /*判断循环的值得父级ID，存在，就继续向下挖递归，不存在该值，跳过这条数据*/
-			if($v['parent_id'] == 0)
-			{
+			if($v['parent_id'] == 0){
 				// 再找这个顶的子级，再次开始循环整个数据
-				foreach ($priData as $k1 => $v1)
-				{
+				foreach ($priData as $k1 => $v1){
 					// 判定第二次循环的数组的父级ID是否为上一层的值ID
-					if($v1['parent_id'] == $v['id'])
-					{
+					if($v1['parent_id'] == $v['id']){
 						// 存在，存二维数组
 						$v['children'][] = $v1;
 					}

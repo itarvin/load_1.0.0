@@ -35,31 +35,21 @@ class Setting extends Model
     public function store($data)
     {
         $validate  = Validate::make($this->rule,$this->message);
-
         $result = $validate->check($data);
-
         if(!$result) {
-
             return ['code' => ReturnCode::ERROR,'msg' => $validate->getError()];
         }
         $data = Request::only(['id','title','name','content','sort_num','tips','field_type','field_value','is_system']);
-
         if(isset($data['id'])){
-
             if($this->update($data)){
-
                 return ['code' => ReturnCode::SUCCESS,'msg' => Tools::errorCode(ReturnCode::SUCCESS)];
             }else {
-
                 return ['code' => ReturnCode::ERROR,'msg' => Tools::errorCode(ReturnCode::ERROR)];
             }
         }else{
-
             if($lastid = $this->insertGetId($data)){
-
                 return ['code' => ReturnCode::SUCCESS,'msg' => Tools::errorCode(ReturnCode::SUCCESS)];
             }else {
-
                 return ['code' => ReturnCode::ERROR,'msg' => Tools::errorCode(ReturnCode::ERROR)];
             }
         }
@@ -72,11 +62,9 @@ class Setting extends Model
     public function search()
     {
         $data = $this->order('sort_num  desc')->select();
-
         $count = $data->count();
         // 遍历制作数据分析
         foreach ($data as $k => $v) {
-
             switch ($v['field_type']) {
                 case 'input':
                     $data[$k]['html'] = '<input type="text" class="layui-input" name="content[]" value="'.$v['content'].'">';
@@ -114,12 +102,9 @@ class Setting extends Model
     public function del($id)
     {
         $result = $this->where('id',$id)->delete();
-
         if($result){
-
             return ['code' => ReturnCode::SUCCESS,'msg' => Tools::errorCode(ReturnCode::SUCCESS)];
         }else {
-
             return ['code' => ReturnCode::ERROR,'msg' => Tools::errorCode(ReturnCode::ERROR)];
         }
     }

@@ -1,0 +1,195 @@
+{layout name="layout/layout" /}
+  <style>
+      .dimission {
+          background-color: #aaa9a9;
+      }
+  </style>
+    <div class="x-nav">
+      <span class="layui-breadcrumb">
+        <a href="{:url('Index/index')}">首页</a>
+        <a href="{:url('admin/index')}">销售管理</a>
+        <a><cite>销售列表</cite></a>
+      </span>
+      <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新">
+        <i class="layui-icon" style="line-height:30px">ဂ</i></a>
+    </div>
+    <div class="x-body">
+      <div class="layui-row">
+        <form class="layui-form layui-col-md12 x-so" action="{:url('admin/index')}" method="post">
+          <input class="layui-input" placeholder="开始日期" name="start" id="start" value="{:input('post.start')}">
+          <input class="layui-input" placeholder="截止日期" name="end" id="end" value="{:input('post.end')}">
+          <input type="text" name="users"  placeholder="请输入用户名" autocomplete="off" class="layui-input" value="{:input('post.users')}">
+
+          <button class="layui-btn"  lay-submit="" lay-filter="sreach" onclick="changelogo()" id="button"><i class="layui-icon" id="logo">&#xe615;</i></button>
+
+        </form>
+      </div>
+      <xblock>
+          {if $uid == '1'}
+          <button class="layui-btn" onclick="x_admin_show('添加用户','{:url('admin/add')}')"><i class="layui-icon"></i>添加</button>
+          {/if}
+          <span class="x-right" style="line-height:40px">共有数据：{$count} 条</span>
+      </xblock>
+      <table class="layui-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>登录名</th>
+            <th>手　机</th>
+            <th>微　信</th>
+            <th>Q　Q</th>
+            <th>角　色</th>
+            <th><div class="layui-input-inline">
+                <select name="hitcount" onchange="changehit()" id="change">
+                    <option value="" >点击数</option>
+                    <option value="today" >今天</option>
+                    <option value="week" >一周内</option>
+                    <option value="halfmonth" >半个月</option>
+                    <option value="month" >一个月</option>
+                    <option value="threemonth" >三个月</option>
+                </select>
+            </div>
+            </th>
+            <th>状　态</th>
+            <th>操　作</th>
+        </thead>
+        <tbody>
+            {volist name="list" id="vo"}
+              <tr {if $vo['isow'] == '1'} class="dimission" {/if}>
+                <td>{$vo.id}</td>
+                <td>{$vo.users}</td>
+                <td><i class="iconfont">&#xe725;</i>{$vo.phone}</td>
+                <td>{$vo.weixin}</td>
+                <td><i class="iconfont">&#xe6f7;</i><a title="点击发起会话" style="color:green;" href="http://wpa.qq.com/msgrd?v=3&uin={$vo.qq1}&site=qq&menu=yes">{$vo.qq1}</a></td>
+                <td>{$vo.role_name}</td>
+                <th><span id="hit_{$vo.id}" style="font-size:20px;color:green;"></span></th>
+                <td class="td-status">
+                    <span class="layui-btn layui-btn-radius {if  $vo.chuqin == '0'}layui-btn-primary{else /}layui-btn-normal{/if}" onclick="changestatus({$vo.id})" id="stat_{$vo.id}">{if  $vo.chuqin == '0'}请假{else /}上班{/if}中</span>
+                </td>
+                <td class="td-manage">
+                  <a title="编辑"  onclick="x_admin_show('编辑','{:url('admin/edit',array('id' => $vo.id))}')" href="javascript:;">
+                      <button class="layui-btn layui-btn-sm layui-btn-primary">
+                          <i class="layui-icon">编辑</i>
+                      </button>
+                  </a>
+                  <a title="离职" onclick="member_del(this,'{$vo.id}')" href="javascript:;">
+                      <button class="layui-btn layui-btn-sm layui-btn-primary">
+                          <i class="layui-icon">离职</i>
+                      </button>
+                  </a>
+                </td>
+              </tr>
+              {/volist}
+            </tbody>
+      </table>
+    </div>
+    <script>
+    layui.use('laydate', function(){
+        var laydate = layui.laydate;
+        laydate.render({
+            elem: '#start' //指定元素
+        });
+        laydate.render({
+            elem: '#end' //指定元素
+        });
+    });
+    /*用户-删除*/
+    function member_del(obj,id){
+        layer.confirm('确认要离职吗？',function(index){
+            //发异步删除数据
+            $.ajax({
+                url:"{:url('admin/dimission')}",
+                type:'post',
+                dataType:'json',
+                data: {uid:id},
+                success:function(msg){
+                    if(msg.status == 1){
+                        $(obj).parents("tr").remove();
+                        layer.msg('操作成功!',{icon:1,time:1000});
+                    }else if(msg.status == -14) {
+                        layer.msg('当前用户无法操作！',{icon:1,time:1000});
+                    }else {
+                        layer.msg('操作失败了!稍后再试~！',{icon:1,time:1000});
+                    }
+                }
+            });
+        });
+    }
+    layui.use('form', function(){
+        var form = layui.form; //只有执行了这一步，部分表单元素才会自动修饰成功
+
+          //……
+
+          //但是，如果你的HTML是动态生成的，自动渲染就会失效
+          // 因此你需要在相应的地方，执行下述方法来手动渲染，跟这类似的还有 element.init();
+        form.render();
+    });
+    layui.use(['layer', 'form', 'element'], function(){
+        var layer = layui.layer
+        ,form = layui.form
+        ,element = layui.element
+    });
+    function loadhit(){
+        var str=$('.x-right').text();
+        var num=str.replace(/[^0-9]/ig,"");
+        console.log(num);
+    }
+    function changestatus(userid){
+        var data = {
+            uid : userid
+        };
+        $.ajax({
+            url:"{:url('admin/status')}",
+            type:'post',
+            dataType:'json',
+            data: data,
+            success:function(msg){
+                var cow = '#stat_' + userid;
+                if(msg.status == '1')
+                {
+                    switch (msg.chuqin) {
+                        case '0':
+                            $(cow).removeClass('layui-btn-normal');
+                            $(cow).addClass('layui-btn-primary');
+                            $(cow).text('请假中');
+                            break;
+                        case '1':
+                            $(cow).removeClass('layui-btn-primary');
+                            $(cow).addClass('layui-btn-normal');
+                            $(cow).text('上班中');
+                            break;
+                        }
+                        layer.msg('成功操作！', function(){
+                        });
+                    }else {
+                        layer.msg('失败了！稍后再试！', function(){
+                        });
+                    }
+                },
+            });
+        }
+        function changehit(){
+            var opt=$('#change').find("option:selected").val();
+            var data = {
+                date : opt
+            };
+            $.ajax({
+                url:"{:url('admin/getHit')}",
+                type:'post',
+                dataType:'json',
+                data: data,
+                success:function(msg){
+                    if(msg.status == 1){
+                        $.each(msg.data,function(key,value) {
+                            var anchor='#hit_'+key;
+                            $(anchor).text(value);
+                        });
+                    }
+                }
+            });
+        }
+        function changelogo(){
+            $('#button').addClass('layui-btn-danger');
+            $('#logo').html('&#xe63d;');
+        }
+    </script>

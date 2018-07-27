@@ -63,7 +63,6 @@ class Log extends Model
                         break;
                 }
             }else if(!empty($aid)){
-
                 $where[] = ['a.act', 'EQ', $aid];
             }
         }
@@ -77,14 +76,10 @@ class Log extends Model
 
         // 是否提交了关键字
         if(!empty($keyword) && $aid == Tools::logactKey('delete_import')){
-
             $lenght = mb_strlen($keyword, 'utf8');
-
             // 对符合数据进行高亮显示，标识位置
             foreach ($list as $key => $value) {
-
                 $have = strpos($value['note'], $keyword);
-
                 if($have){
                     $list[$key]['position'] = $have;
                     $list[$key]['lenght'] = $lenght;
@@ -92,17 +87,13 @@ class Log extends Model
                 }
             }
         }else {
-
             foreach($list as $k => $v){
-
                 // 解析json数据
                 $json = json_decode($v['note']);
                 if(json_last_error() == JSON_ERROR_NONE){
-
                     $note = '';
                     // 替换关键字
                     foreach ($json as $key => $value) {
-
                         $note .= Tools::keywordReplace($key).'：'.$value."，";
                     }
                     $list[$k]['note'] = $note;
@@ -111,7 +102,6 @@ class Log extends Model
             }
         }
         $count = $list->total();
-
         return $result = [
             'list' => $list,
             'count'=>$count

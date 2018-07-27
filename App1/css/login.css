@@ -1,0 +1,64 @@
+@charset "utf-8";
+/* CSS Document */
+*{padding: 0px; margin:0px;border:0px;list-style:none;}
+.fl{float:left}
+.fr{float:right;}
+input{height:28px;padding-left:4px;}
+html,body{overflow-x:hidden;overflow-y:hidden;overflow:hidden;}
+.checkBox,.loginBox{width:320px; height:275px;overflow:hidden;text-align:center;margin:auto;}
+.checkBox h2{margin-top:10px;}
+.qq{display:block;width:250px; height:40px; line-height:36px;font-size: 20px;border:#ccc solid 2px;margin: auto;padding-left:6px;color:#878484;}
+.checkBox h2,.loginBox h2{font-size:22px; line-height:30px;color:#333;margin-bottom: 5px;}
+.btn1{display:block;width:260px; height:40px;line-height:40px;font-size:20px;background-color:#f0f0f0;color:#000;text-decoration:none;margin:12px auto;cursor:pointer;}
+.btn1:last-child:hover{background-color:#dad9d9;}
+.btn_1{-webkit-box-shadow:0 0 5px #ccc;  
+  -moz-box-shadow:0 0 5px #ccc;  
+  box-shadow:0 0 5px #ccc;}
+
+.loginBox{display:none;}
+.loginBox h2{margin:10px auto;}
+.lg-item tr{width: 260px;height: 34px; line-height: 34px;font-size: 16px;margin:auto;}
+.lg-item tr input:last-child{border: none;}
+.lg-item tr td{text-align:left;padding:5px 0;}
+.btn2{width:80px;height:30px;background:#017301;color:#fff;padding:5px;line-height: 18px; font-size: 16px;border: 1px solid #ccc;}
+.lg-item1 input,.lg-item2 input{width:160px;line-height: 30px;height:30px;border: 1px solid #ccc;}
+.lg-item3 input{width:74px;height:30px;margin-right: 5px;line-height: 30px;border: 1px solid #ccc;}
+.lg-item3 img{vertical-align: bottom;}
+.lg-item4 td .fr input{margin-top:6px;border:1px solid #eaffea;}
+.lg-item4 .fl{text-align: center;line-height: 34px;}
+.lg-item4 .fl input{vertical-align: center;height:20px;}
+
+.dluBox ul li{height:70px;}
+.dlu{width:290px;font-size: 16px; line-height: 26px;margin: auto;}
+.dlu .utext{line-height: 26px;}
+.utext a{color:#232323;text-decoration:none;}
+.utext a:hover{color:#007fea;}
+.utext{text-align:left;margin-left:20px;margin-top:10px;}
+.photo img{margin-top:6px;border: 3px solid #fff;}
+
+.Info_box{display:block;height:70px;margin:5px 10px 3px 5px;}
+#app_qq{margin:0px 5px;}#cus_remes{margin:0px 10px;}
+.Info_box li{width:300px;height:70px;position:absolute;}
+.Info_box li.infoTxt{padding:5px;z-index:2;}
+.Info_box li.infoBg{background:#FFF; filter:alpha(opacity=50);opacity:0.5;z-index:1;}
+	li.infoTxt .photo{width:50px;height:50px;border:#FFF solid 3px;float:left;}
+	li.infoTxt .utext{width:230px;height:50px;float:left;padding-left:10px;font-size:14px;}
+	li.infoTxt .utext span{font-size:12px;}
+.searchIpt{position:relative;width:280px;margin:5px 0px;}
+.searchIpt #qq{width:270px;height:31px;line-height:31px;padding:0px 0px 0px 10px;font-size:18px; letter-spacing:1px; background:#fff;
+	border-radius:6px;
+	-moz-border-radius: 6px; /* Firefox */
+	-webkit-border-radius: 6px; /* Safari 和 Chrome */}
+#tis{width: 250px;height:24px; line-height: 24px;font-size: 16px;background:url(../images/bg_01.png); no-repeat;margin: auto;color:#000;}
+/*查询新增客户*/
+.hint{width:310px;margin:auto;font-size: 12px;line-height: 20px;background:#d5ffce;}
+.xin1{display:inline-block;margin:10px 0;line-height: 28px;text-align: left;}
+.xin1 td label input{vertical-align:bottom;}
+.xin1 textarea{margin-top: 10px;}
+
+.back input,.add input{width:54px;line-height: 28px;text-align: center;}
+.back input{margin-left: 30px;}
+.add input{margin-left: 80px;background-color: #028e02;color: #fff;}
+
+
+

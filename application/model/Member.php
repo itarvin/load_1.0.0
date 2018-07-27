@@ -11,7 +11,6 @@ class Member extends Model
     //主键
     protected $pk = 'id';
     protected $table='member';
-
     protected $rule = [
         'qq|QQ'        => 'number|length:6,11',
         'phone|手机号' => 'length:11|number|/^1[3-8]{1}[0-9]{9}$/',
@@ -40,13 +39,10 @@ class Member extends Model
         if($id != ''){
             $result = $this->checkValue($data, $id);
             if($result){
-
                 if($result['uid'] == $data['uid']){
-
                     $info = '已被你登记存在';
                     return ['code' => ReturnCode::ERROR, 'msg' => $info];
                 }else{
-
                     $info = '已被'.$result['user'].'登记存在';
                     return ['code' => ReturnCode::ERROR, 'msg' => $info];
                 }
@@ -55,50 +51,38 @@ class Member extends Model
 
         // 检测修改是否为所有者
         if(isset($id) && $id != ''){
-
             $exist = $this->where('id','EQ',$data['id'])->find();
-
             if($exist['uid'] != $data['uid']){
-
                 return ['code' => ReturnCode::OCCUPIED, 'msg' => Tools::errorCode(ReturnCode::OCCUPIED)];
             }
         }
         if(empty($data['qq']) && empty($data['phone']) && empty($data['weixin'])){
-
             return ['code' => ReturnCode::ERROR, 'msg' => 'QQ, 微信，电话不能同时为空！'];
         }
         // 基础数据验证
         $validate  = ValidateRule::make($this->rule,$this->msg);
         $result = $validate->check($data);
-
         if(!$result) {
-
             return ['code' => ReturnCode::ERROR,'msg' => $validate->getError()];
         }
         // 数据处理
         if(isset($id) && $id != ''){
-
             // ------日志处理 ---start
             writelog($data['id'], Tools::logactKey('cus_change'), $data['uid'],$data);
             // -------------------end
             if($this->update($data)){
-
                 return ['code' => ReturnCode::SUCCESS,'msg' => Tools::errorCode(ReturnCode::SUCCESS)];
             }else {
-
                 return ['code' => ReturnCode::ERROR,'msg' => Tools::errorCode(ReturnCode::ERROR)];
             }
         }else{
             unset($data['id']);
-
             if($lastid = $this->insertGetId($data)){
                 // ------日志处理 ---start
                 writelog($lastid, Tools::logactKey('cus_insert'), $data['uid']);
                 // -------------------end
-
                 return ['code' => ReturnCode::SUCCESS,'msg' => Tools::errorCode(ReturnCode::SUCCESS)];
             }else {
-
                 return ['code' => ReturnCode::ERROR,'msg' => Tools::errorCode(ReturnCode::ERROR)];
             }
         }
@@ -115,19 +99,14 @@ class Member extends Model
         $qq = [];
         $phone = [];
         $weixin = [];
-
         $qv = isset($value['qq']) ? $value['qq'] : '';
         $pv = isset($value['phone']) ? $value['phone'] : '';
         $wv = isset($value['weixin']) ? $value['weixin'] : '';
-
         if($result = $this->deepCheck($qv, $qq, $id, $value)){
-
             return $result;
         }else if($result = $this->deepCheck($pv, $phone, $id, $value)){
-
             return $result;
         }else if($result = $this->deepCheck($wv, $weixin, $id, $value)){
-
             return $result;
         }
     }
@@ -143,29 +122,22 @@ class Member extends Model
     private function deepCheck($value, $key, $id, $data)
     {
         if($value != ''){
-
             $key[] = ['qq|weixin|phone', 'EQ', $value];
             // 查询所有满足条件的数据
             $check = $this->where($key)->select();
-
             if(count($check) > 0){
-
                 $exist = [];
                 // 遍历数据
                 foreach ($check as $key => $value) {
-
                     $user = Admin::field('users')->where('id', 'EQ', $value['uid'])->find();
-
                     // 若为修改同时满足id不为空且跳过当前操作的列 。或同时满足查询的数列的操作人不为当前操作者
                     if(!empty($id) && $value['id'] != $id){
-
                         $exist[$key] = array(
                             'id' => $value['id'],
                             'user' => $user['users'],
                             'uid' => $value['uid']
                         );
                     }else if($value['uid'] != $data['uid']){
-
                         $exist[$key] = array(
                             'id' => $value['id'],
                             'user' => $user['users'],
@@ -192,29 +164,21 @@ class Member extends Model
     public function softDelete($kid = '', $uid)
     {
         if(!empty($kid)){
-
             $data = $this->find($kid);
-
             if($data['uid'] == $uid){
-
                 $result = $this->where('id', 'eq', $kid)->update(array('is_delete' => '1'));
                 if($result){
-
                     return ['code' => ReturnCode::SUCCESS, 'msg' => Tools::errorCode(ReturnCode::SUCCESS)];
                 }else{
-
                     return ['code' => ReturnCode::ERROR, 'msg' => Tools::errorCode(ReturnCode::ERROR)];
                 }
             }else {
-
                 return ['code' => ReturnCode::OCCUPIED, 'msg' => Tools::errorCode(ReturnCode::OCCUPIED)];
             }
         }else {
-
             return ['code' => ReturnCode::LACKOFPARAM, 'msg' => Tools::errorCode(ReturnCode::LACKOFPARAM)];
         }
     }
-
 
     /**
      * 应用场景：API自定义搜索信息
@@ -225,19 +189,15 @@ class Member extends Model
      {
          $page = isset($data['page']) ? $data['page'] : 1;
          $limit = isset($data['limit']) ? $data['limit'] : 10;
-
          $where = [];
          $where[] = ['uid', 'EQ', $uid];
          $where[] = ['is_delete', 'EQ', 0];
-
          $start = isset($data['start']) ? $data['start'] : '';
          $end = isset($data['end']) ? $data['end'] : '';
          $key = isset($data['key']) ? $data['key'] : '';
          $type = isset($data['type']) ? $data['type'] : '';
          $note = isset($data['note']) ? $data['note'] : '';
-
          if($start != '' || $end != '' || ($key != '' && $type != '') || $note != ''){
-
              //check time
              if ($start && $end) {
                  $where[] = ['newtime', 'between', [$start, $end]];
@@ -246,13 +206,10 @@ class Member extends Model
              }elseif ($end) {
                  $where[] = ['newtime', 'LT', $end];
              }
-
              // check type查询key
              if($type == 'all' || $type == ''){
-
                  $where[] = ['phone|weixin|qq', 'eq', $key];
              }else if($type == 'qq' || $type == 'phone' || $type == 'weixin'){
-
                  $where[] = [$type, 'eq', $key];
              }
              if($note != ''){
@@ -263,7 +220,6 @@ class Member extends Model
          // $list = $this->field('id,username,sex,calendar,birthday,qq,phone,weixin,note,newtime,address')->where($where)->order('id desc')->paginate('100');
          $list = $this->field('id,username,sex,calendar,birthday,qq,phone,weixin,note,newtime,address')->where($where)->order('id desc')->page($page, $limit)->select();
          $count = $this->where($where)->count();
-
          // $pages = $list->render();
          return $retult = [
              'data' => $list,
@@ -280,14 +236,11 @@ class Member extends Model
      {
          $where = [];
          if($value && is_numeric($value)){
-
              $where[] = ['a.phone|a.weixin|a.qq', 'eq', $value];
-
              $result = $this->alias('a')
              ->field('b.users,b.qq1')
              ->leftJoin(['admin'=>'b'],'a.uid = b.id')
              ->where($where)->find();
-
              if($result != null){
                  return ['code' => ReturnCode::SUCCESS, 'msg' => Tools::errorCode(ReturnCode::SUCCESS), 'data' => $result];
              }else {
@@ -317,19 +270,14 @@ class Member extends Model
              ->field('b.users,b.qq1,a.id,a.username,a.weixin,a.note,a.phone,a.qq,a.sex,a.uid,a.newtime,a.address,a.age')
              ->leftJoin(['admin'=>'b'],'a.uid = b.id')
              ->where($where)->find();
-
              if($result != null){
-
                  if($result['uid'] != $uid){
-
                      $data['users'] = $result['users'];
                      $data['qq1'] = $result['qq1'];
                      $data['newtime'] = $result['newtime'];
                  }else {
-
                      $data = $result;
                  }
-
                  return ['code' => ReturnCode::SUCCESS, 'msg' => Tools::errorCode(ReturnCode::SUCCESS), 'data' => $data];
              }else {
                  return ['code' => ReturnCode::NODATA, 'msg' => Tools::errorCode(ReturnCode::NODATA), 'data' => []];
@@ -355,14 +303,12 @@ class Member extends Model
          // 默认取出当天范围内的客户
          // $where[] = ['newtime', 'between', [date('Y-m-d', time()), date('Y-m-d H:i:s', time())]];
          if($isPost  = 'true'){
-
              $where = [];
              // 接收参数
              $start = isset($data['start']) ? $data['start'] : '';
              $end = isset($data['end']) ? $data['end'] : '';
              $type = isset($data['type']) ? $data['type'] : '';
              $keyword = isset($data['keyword']) ? $data['keyword'] : '';
-
              //check time
              if ($start && $end) {
                  $where[] = ['a.newtime', 'between', [$start, $end]];
@@ -371,7 +317,6 @@ class Member extends Model
              }elseif ($end) {
                  $where[] = ['a.newtime', 'LT', $end];
              }
-
              // check type
              if (!empty($keyword)) {
                  if($type && in_array($type, $checktype)){
@@ -383,10 +328,8 @@ class Member extends Model
          }
 
          if($isdelete == 'true'){
-
              $where[] = ['a.is_delete', 'EQ', '1'];
          }else{
-
              $where[] = ['a.is_delete', 'EQ', '0'];
          }
 
@@ -398,7 +341,6 @@ class Member extends Model
          ->leftJoin(['admin'=>'b'], 'a.uid = b.id')
          ->where($where)->order('id desc')->paginate();
          $count = $list->total();
-
          return $result = [
              'list' => $list,
              'count'=>$count,
@@ -416,14 +358,10 @@ class Member extends Model
              $qq = [];
              $ph = [];
              $wx = [];
-
              // 根据字段拼接其键
              foreach($file as $k => $v){
-
                  foreach($fields as $k1 => $v1) {
-
                      $data[$k][$v1] = $v[$k1] ? trim(Tools::convertStrType($v[$k1], 'TOSBC')) : '';
-
                      if($v1 == 'qq'){
                          $qq[$k] = $v[$k1];
                      }else if($v1 == 'phone') {
@@ -431,9 +369,7 @@ class Member extends Model
                      }else if($v1 == 'weixin'){
                          $wx[$k] = $v[$k1];
                      }
-
                  }
-
                  $data[$k]['uid'] = $uid;
                  $data[$k]['newtime'] = date('Y-m-d H:i:s', time());
              }
@@ -441,13 +377,10 @@ class Member extends Model
              $have = [];
              // 验证数据合法性
              foreach($data as $k => $v){
-
                  if(strlen($v['qq']) < 5 || !is_numeric($v['qq']) || strlen($v['qq']) > 11){
-
                      $have[] = $k;
                  }
                  if(!is_numeric($v['qq']) || strlen($v['phone']) != 11){
-
                      $have[] = $k;
                  }
                  // 正则验证手机号
@@ -461,25 +394,20 @@ class Member extends Model
              $have = isset($wx) ? $this->checkUnique($wx, $have) : $have;
              // 读取一次数据库所有数据
              $model = new Member;
-
              if(count($qq) > 0){
                  $haveqq = $model->field('qq, phone, weixin')->where('qq', 'in', $qq)->select();
 
                  $have = $this->arraySearch($haveqq, $qq, $have, 'qq');
              }
-
              if(count($ph) > 0){
                  $haveph = $model->field('qq, phone, weixin')->where('phone', 'in', $ph)->select();
-
                  $have = $this->arraySearch($haveph, $ph, $have, 'phone');
              }
 
              if(count($wx) > 0){
                  $havewx = $model->field('qq, phone, weixin')->where('weixin', 'in', $wx)->select();
-
                  $have = $this->arraySearch($havewx, $wx, $have, 'weixin');
              }
-
              // 如果已经存在，返回键
              $have = array_unique($have);
 
@@ -499,18 +427,14 @@ class Member extends Model
 
                  Cache::set('scv_'.$uid.'_'.$filename, $error);
              }
-
              // 不存在数据的不存入日志
              if(!empty($data)){
-
                  // ------日志处理 ---start
                  writelog($data, Tools::logactKey('delete_import'), $uid);
                  // -------------------end
              }
              // -------------------批量新增数据
-
              $success = $model->limit(100)->insertAll($data);
-
              return array(
                  'success' => $success ? $success : 0,
                  'error'   => $errors ? $errors : 0,
@@ -523,19 +447,12 @@ class Member extends Model
       * @return have 重复的键名
       */
      private function checkUnique($data,$have){
-
          $key = isset($data) ? $data : [];
-
          if(!empty($key)){
-
              $newkey = array_unique($key);
-
              foreach (array_flip($data) as $key => $value) {
-
                  if(!in_array($value, array_flip($newkey))){
-
                      if(!in_array($value, $have)){
-
                          $have[] = $value;
                      }
                  }
@@ -552,14 +469,10 @@ class Member extends Model
      private function arraySearch($exist, $array, $have, $ke)
      {
          foreach ($exist as $key => $value) {
-
              $k = array_search($value[$ke], $array);
-
              // 避免键为0被误伤到
              if($k == '0' || $k != false){
-
                  if(!in_array($k, $have)){
-
                      $have[] = $k;
                  }
              }

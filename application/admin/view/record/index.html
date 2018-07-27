@@ -1,0 +1,114 @@
+{layout name="layout/layout" /}
+    <div class="x-nav">
+      <span class="layui-breadcrumb">
+        <a href="{:url('Index/index')}">首页</a>
+        <a href="{:url('record/index')}">订单管理</a>
+        <a><cite>订单列表</cite></a>
+      </span>
+      <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新">
+        <i class="layui-icon" style="line-height:30px">ဂ</i></a>
+    </div>
+    <div class="x-body">
+      <div class="layui-row">
+        <form class="layui-form layui-col-md12 x-so"  action="{:url('record/index')}" method="post">
+          <input class="layui-input" placeholder="开始日期" name="start" id="start" value="{:input('post.start')}">
+          <input class="layui-input" placeholder="截止日期" name="end" id="end" value="{:input('post.end')}">
+          <input type="text" name="keyword"  placeholder="产品名称|价格" autocomplete="off" class="layui-input" value="{:input('post.keyword')}">
+          <button class="layui-btn"  lay-submit="" lay-filter="sreach"><i class="layui-icon">&#xe615;</i></button>
+        </form>
+      </div>
+      <xblock>
+        <span class="x-right" style="line-height:40px">共有数据：{$count} 条</span>
+      </xblock>
+      <table class="layui-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>客户名称</th>
+            {if $uid == '1'}
+            <th>谁的客户</th>
+            {/if}
+            <th>产品名称</th>
+            <th>价　　格(RMB)</th>
+            <th>加入时间</th>
+            {if $uid != '1'}
+            <th>操作</th></tr>
+            {/if}
+        </thead>
+        <tbody>
+        {volist name="list" id="vo"}
+          <tr>
+            <td>{$vo.id}</td>
+            <td>{$vo.username}</td>
+            {if $uid == '1'}
+            <th>{$vo.users}</th>
+            {/if}
+            <td>{$vo.product}</td>
+            <td><i class="layui-icon">&#xe65e;</i>：{$vo.price}</td>
+            <td>{$vo.newtime}</td>
+            {if $uid != '1'}
+            <td class="td-manage">
+              <a title="删除" onclick="member_del(this,'{$vo.id}')" href="javascript:;">
+                  <button class="layui-btn layui-btn-sm layui-btn-primary">
+                      <i class="layui-icon">&#xe640;</i>
+                  </button>
+              </a>
+            </td>
+            {/if}
+          </tr>
+        {/volist}
+        </tbody>
+      </table>
+      <div class="page">
+        <div>
+            {$list|raw}
+        </div>
+      </div>
+    </div>
+    <script>
+    layui.use('laydate', function(){
+        var laydate = layui.laydate;
+        laydate.render({
+            elem: '#start' //指定元素
+        });
+        laydate.render({
+            elem: '#end' //指定元素
+        });
+    });
+    /*订单-删除*/
+    function member_del(obj,id){
+        layer.confirm('确认要删除吗？',function(index){
+            //发异步删除数据
+            $.ajax({
+                url:"{:url('record/delete')}",
+                type:'post',
+                dataType:'json',
+                data: {deleid: id},
+                success:function(msg){
+                    if(msg.status == 1){
+                        $(obj).parents("tr").remove();
+                        layer.msg('已删除!',{icon:1,time:1000});
+                    }else {
+                        layer.msg(msg.error+'禁止操作！', {icon: 1});
+                    }
+                },
+            });
+        });
+    }
+    // 默认填充当天的时间
+    window.onload=function(){
+        gettime();
+    }
+    function gettime()
+    {
+        var myDate = new Date();//获取系统当前时间
+        var year = myDate.getFullYear(); //获取完整的年份(4位,1970-????)
+        var month = myDate.getMonth() + 1; //获取当前月份(0-11,0代表1月)
+        var day = myDate.getDate(); //获取当前日(1-31)
+        var now = year+'-'+month+'-'+day;
+        var hasvalue = $('#start').val();
+        if(!hasvalue){
+            $('#start').val(now);
+        }
+    }
+  </script>

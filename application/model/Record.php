@@ -17,9 +17,7 @@ class Record extends Model
         $where = [];
         // 默认取出当天范围内的客户
         $where[] = ['a.newtime', 'between', [date('Y-m-d', time()), date('Y-m-d H:i:s', time())]];
-
         if($isPost == 'true'){
-
             $where = [];
             $start = isset($data['start']) ? $data['start'] : '';
             $end = isset($data['end']) ? $data['end'] : '';
@@ -50,9 +48,7 @@ class Record extends Model
         ->leftJoin(['admin'=>'c'], 'c.id = a.uid')
         ->where($where)
         ->order('id desc')->paginate();
-
         $count = $list->total();
-
         return $result = [
             'list'  => $list,
             'count' => $count,

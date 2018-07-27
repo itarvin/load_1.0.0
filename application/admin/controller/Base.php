@@ -8,45 +8,36 @@ namespace app\admin\controller;
 use think\Controller;
 use app\model\Admin;
 use app\model\Privilege;
+use think\facade\Request;
 class Base extends Controller
 {
     // 初始化方法
-    protected function initialize(){
-
-        if(!session('uid'))
-        {
+    protected function initialize()
+    {
+        if(!session('uid')){
             $this->redirect(url('Login/login'));
         }
         // 解密session, 对比权限
         $this->uid = json_decode(base64_decode(session('uid'),  true), true);
-
         if( array_key_exists('auth_'.md5(session('uid')), $_COOKIE)){
-
             $auth = $_COOKIE['auth_'.md5(session('uid'))] ? $_COOKIE['auth_'.md5(session('uid'))] : '';
-
             if( $auth){
-
                 $user = Admin::field('users,pwd')->find($this->uid);
-
                 if( md5($user['users'].$user['pwd']) != $auth){
-
                     $this->redirect(url('Login/login'));
                 }
             }else {
-
                 $this->redirect(url('Login/login'));
             }
         }else {
-
             $this->redirect(url('Login/login'));
         }
         $this->name = session('u_name');
         // 所有管理员都可以进入后台的首页
-        if(request()->controller() == 'Index'){
+        if($this->request->controller() == 'Index'){
             return TRUE;
         }
         $priModel = new Privilege;
-
         if(!$priModel->checkPri()){
             $this->error('你想要的操作对象！程序员小哥哥办不到！(╯﹏╰)');
             exit;

@@ -49,7 +49,7 @@ class Members extends Base
     {
 
         if($this->AuthPermission == '200'){
-            if( request()->isGet()){
+            if( request()->isPost()){
 
                 $member = new Member;
 

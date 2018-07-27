@@ -4,14 +4,13 @@ namespace app\api\controller;
  * 接口客户处理类
  * @author  itarvin itarvin@163.com
  */
-use app\model\Admin;
+use app\model\Admin as adminModel;
 use app\Util\Tools;
 use app\Util\ReturnCode;
 use think\facade\Request;
 use think\File;
-class Admins extends Base
+class Admin extends Base
 {
-
     /**
      * 修改页面处理
      * @return json
@@ -20,18 +19,13 @@ class Admins extends Base
     {
         if($this->AuthPermission == '200'){
             if( request()->isPost()){
-
-                $admin = new Admin;
-                
+                $admin = new adminModel;
                 $result = $admin->apiStore(Request::param());
-
                 return buildReturn(['status' => $result['code'],'info'=> $result['msg']]);
             }else {
-
                 return buildReturn(['status' => ReturnCode::LACKOFPARAM,'info'=>  Tools::errorCode(ReturnCode::LACKOFPARAM)]);
             }
         }else {
-
             return $this->returnRes($this->AuthPermission, 'true');
         }
     }
@@ -45,26 +39,19 @@ class Admins extends Base
     public function info()
     {
         if($this->AuthPermission == '200'){
-
             if( request()->isPost()){
-                $admin = new Admin;
-
+                $admin = new adminModel;
                 $list = $admin->field('id,users,phone,qq1,qq2,qq3,qq4,description,qq1name,qq2name,qq3name,qq4name,weixin,wxname')->find($this->uid);
                 if($list){
-
                     return buildReturn(['status' => ReturnCode::SUCCESS,'info'=> Tools::errorCode(ReturnCode::SUCCESS), 'data' => $list]);
                 }else {
-
                     return buildReturn(['status' => ReturnCode::NODATA,'info'=> Tools::errorCode(ReturnCode::NODATA)]);
                 }
             }else {
-
                 return buildReturn(['status' => ReturnCode::LACKOFPARAM,'info'=>  Tools::errorCode(ReturnCode::LACKOFPARAM)]);
             }
         }else {
-
             return $this->returnRes($this->AuthPermission, 'true');
         }
     }
-
 }

@@ -9,7 +9,6 @@ use app\model\Admin;
 use think\facade\Cookie;
 use think\Validate;
 use think\captcha\Captcha;
-use think\facade\Request;
 class  Login extends controller
 {
     /**
@@ -17,9 +16,9 @@ class  Login extends controller
      */
     public function login()
     {
-        if(request()->isPost()){
+        if($this->request->isPost()){
             $user = new Admin;
-            $data = Request::param();
+            $data = $this->request->param();
 
             // 先验证验证码是否正确
             if( !captcha_check($data['verify'])){
@@ -43,41 +42,30 @@ class  Login extends controller
             $preview = $user->where(array(
                 'users' => $data['users']
             ))->find();
-
             if( !$preview){
                 $this->error('当前用户不存在', 'Login/login');
             }
-
             $where_query = [
                 'users' => $data['users'],
                 'pwd' => $data['pwd']
             ];
-
             if( $user = $user->where($where_query)->find()) {
-
                 //注册session
                 $sid = base64_encode(json_encode($user->id));
-
                 session('uid', $sid);
-
                 session('u_name', $user->users);
-
                 $salt = md5($user->users.$user->pwd);
-
                 // 设置cookie 前缀为think_
                 Cookie::set('auth_'.md5($sid), $salt, ['expire'=> 3600 * 12 ]);
-
                 //更新最后请求IP及时间
                 $time = date('Y-m-d H:i:s', time());
-
                 $user->where($where_query)->update(['lasttime' => $time]);
-
                 return $this->success('登录成功', 'Index/index');
             } else {
                 $this->error('登录失败:账号或密码错误', 'Login/login');
             }
         }
-        return $this->fetch('Login/login');
+        return $this->fetch('');
     }
 
     /**
@@ -107,7 +95,6 @@ class  Login extends controller
         session(null);
         return $this->success('已成功登出', 'Login/login');
     }
-
 
     /**
      * 应用场景：空操作返回状态
